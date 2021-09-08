@@ -15,6 +15,6 @@
     "server-dev": "yarn workspace @team-2/server dev",
     "server-start": "yarn workspace @team-2/server start",
     "server-clean": "yarn workspace @team-2/server clean",
-    "full-start": "yarn client-build && yarn common-compile && yarn server-start"
+    "full-start": "yarn common-compile && yarn client-build && yarn server-start"
   }
 }
