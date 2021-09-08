@@ -64,7 +64,7 @@ At a high level, this project is made up of three packages: `client`, `server`, 
     ```sh
     git commit -m <message>
     ```
-    where `<message>` is a short imperative statement describing your changes. The message should start with a capital letter and end without a period. There is no need for a longer description here as that information can be added to the task on ClickUp.
+    where `<message>` is a short imperative statement describing your changes. The message should end without a period. There is no need for a longer description here as that information can be added to the task on ClickUp.
     
     Ex: I wrote code to enable the user to draw on the canvas so my commit message would be `"Enable user to draw on canvas"`.
 
@@ -74,7 +74,9 @@ At a high level, this project is made up of three packages: `client`, `server`, 
     git push
     ```
 
-9. Once you have completed your task and pushed all commits to your remote brach, create a **Pull Request** on GitHub to merge your feature branch into the `dev` branch.
+9. Once you have completed your task and pushed all commits to your remote brach, create a **Pull Request** on GitHub to merge your feature branch into the `dev` branch. Give the pull request a short imperative title reflective of your task.
+
+Ex: My task is to add canvas drawing functionality so my pull request is titled `Add canvas drawing functionality`.
 
 10. Add at least one programmer as a reviewer for your pull request. If any changes are requested by the reviewer(s), just commit those changes and the pull request will automatically include those changes.
 
