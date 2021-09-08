@@ -1,0 +1,20 @@
+{
+  "name": "team-2",
+  "version": "0.1.0",
+  "repository": "https://github.com/Cloudhax23/team-2.git",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "client-dev": "yarn yarn workspace @team-2/client dev",
+    "client-build": "yarn workspace @team-2/client build",
+    "client-clean": "yarn workspace @team-2/client clean",
+    "common-compile": "yarn workspace @team-2/common compile",
+    "common-clean": "yarn workspace @team-2/common clean",
+    "server-dev": "yarn workspace @team-2/server dev",
+    "server-start": "yarn workspace @team-2/server start",
+    "server-clean": "yarn workspace @team-2/server clean",
+    "full-start": "yarn common-compile && yarn client-build && yarn server-start"
+  }
+}
