@@ -1,26 +1,26 @@
 import express from 'express';
 import * as path from 'path';
 import { createServer } from 'http';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 
 const app = express();
-const httpServer = createServer(app);
-const io = new Server(httpServer);
-
+const server = createServer(app);
+const io = new Server(server);
 const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
-const userHashMap = new Map<string, any>();
 
 app.use(express.static(root));
 
-io.on('connection', (_socket: Socket) => {
-  console.log('new client connected!');
-  _socket.on('gameData', (_data) => {
-    userHashMap.set(_socket.id, _data); //  future game data stuff
+io.on('connection', (socket) => {
+  socket.broadcast.emit('receive_chat_message', `Client ${socket.id} joined the chat.`);
+
+  socket.on('send_chat_message', (message: string) => {
+    socket.broadcast.emit('receive_chat_message', `${socket.id}: ${message}`);
   });
-  _socket.on('chatMessage', (_msgPayload: string) => {
-    _socket.broadcast.emit('recieveChatMessage', _socket.id.concat(' ') + _msgPayload); //   send the message (with sender id) to all clients except the sender
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('receive_chat_message', `Client ${socket.id} left the chat.`);
   });
 });
 
-httpServer.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+server.listen(port, () => console.log(`App listening at http://localhost:${port}`));

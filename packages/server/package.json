@@ -20,12 +20,12 @@
   "dependencies": {
     "@team-2/common": "^0.1.0",
     "express": "^4.17.1",
-    "http": "^0.0.1-security",
     "socket.io": "^4.2.0"
   },
   "scripts": {
     "dev": "ts-node-dev src/index",
     "start": "ts-node src/index",
+    "build": "tsc",
     "clean": "rimraf dist"
   }
 }
