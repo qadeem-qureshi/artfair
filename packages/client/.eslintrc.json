@@ -22,7 +22,7 @@
     "@typescript-eslint"
   ],
   "rules": {
-    "linebreak-style": 0,
+    "linebreak-style": "off",
     "no-use-before-define": "off",
     "@typescript-eslint/no-use-before-define": [
       "error"

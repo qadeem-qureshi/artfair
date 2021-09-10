@@ -10,11 +10,12 @@
     "client-dev": "yarn yarn workspace @team-2/client dev",
     "client-build": "yarn workspace @team-2/client build",
     "client-clean": "yarn workspace @team-2/client clean",
-    "common-compile": "yarn workspace @team-2/common compile",
+    "common-build": "yarn workspace @team-2/common build",
     "common-clean": "yarn workspace @team-2/common clean",
     "server-dev": "yarn workspace @team-2/server dev",
     "server-start": "yarn workspace @team-2/server start",
     "server-clean": "yarn workspace @team-2/server clean",
-    "full-start": "yarn common-compile && yarn client-build && yarn server-start"
+    "full-start": "yarn common-build && yarn client-build && yarn server-start",
+    "full-clean": "yarn common-clean && yarn client-clean && yarn server-clean"
   }
 }
