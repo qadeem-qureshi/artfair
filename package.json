@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "client-dev": "yarn yarn workspace @team-2/client dev",
+    "client-dev": "yarn workspace @team-2/client dev",
     "client-build": "yarn workspace @team-2/client build",
     "client-clean": "yarn workspace @team-2/client clean",
     "common-build": "yarn workspace @team-2/common build",
@@ -16,6 +16,10 @@
     "server-start": "yarn workspace @team-2/server start",
     "server-clean": "yarn workspace @team-2/server clean",
     "full-start": "yarn common-build && yarn client-build && yarn server-start",
-    "full-clean": "yarn common-clean && yarn client-clean && yarn server-clean"
+    "full-clean": "yarn common-clean && yarn client-clean && yarn server-clean",
+    "full-dev": "concurrently \"yarn server-dev\" \"yarn client-dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^6.2.1"
   }
 }
