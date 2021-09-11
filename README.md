@@ -35,8 +35,13 @@ At a high level, this project is made up of three packages: `client`, `server`, 
     git checkout dev
     git fetch && git pull
     ```
+3. Make sure your dependencies are up to date:
+    
+    ```sh
+    yarn
+    ```
 
-3. Create a local feature branch off of `dev` to work on your task:
+4. Create a local feature branch off of `dev` to work on your task:
     
     ```sh
     git checkout -b feature/<new-branch-name>
@@ -45,21 +50,21 @@ At a high level, this project is made up of three packages: `client`, `server`, 
 
     Ex: My task is to add canvas drawing functionality so my branch is called `feature/canvas-drawing`
     
-4. Push your local feature branch to the remote repository:
+5. Push your local feature branch to the remote repository:
     
     ```sh
     git push -u origin feature/<new-branch-name>
     ```
 
-5. Create/Edit/Delete files as necessary to complete your task.
+6. Create/Edit/Delete files as necessary to complete your task.
 
-6. Stage your new, modified, or deleted files:
+7. Stage your new, modified, or deleted files:
     
     ```sh
     git add -A
     ```
 
-7. Commit your staged changes:
+8. Commit your staged changes:
     
     ```sh
     git commit -m <message>
@@ -68,16 +73,16 @@ At a high level, this project is made up of three packages: `client`, `server`, 
     
     Ex: I wrote code to enable the user to draw on the canvas so my commit message would be `"Enable user to draw on canvas"`.
 
-8. Push your commit(s) to your remote branch:
+9. Push your commit(s) to your remote branch:
     
     ```sh
     git push
     ```
 
-9. Once you have completed your task and pushed all commits to your remote brach, create a **Pull Request** on GitHub to merge your feature branch into the `dev` branch. Give the pull request a short imperative title reflective of your task.
+10. Once you have completed your task and pushed all commits to your remote brach, create a **Pull Request** on GitHub to merge your feature branch into the `dev` branch. Give the pull request a short imperative title reflective of your task.
 
     Ex: My task is to add canvas drawing functionality so my pull request is titled `Add canvas drawing functionality`.
 
-10. Add at least one programmer as a reviewer for your pull request. If any changes are requested by the reviewer(s), just commit those changes and the pull request will automatically include those changes.
+11. Add at least one programmer as a reviewer for your pull request. If any changes are requested by the reviewer(s), just commit those changes and the pull request will automatically include those changes.
 
-11. Once your pull request is approved by the reviewer(s), you may merge the pull request into `dev`.
+12. Once your pull request is approved by the reviewer(s), you may merge the pull request into `dev`.
