@@ -5,7 +5,11 @@ import { Server } from 'socket.io';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:1234',
+  },
+});
 const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
