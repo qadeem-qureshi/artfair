@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import socket from '../services/socket';
+import './Chat.css';
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<string[]>([]);
@@ -28,11 +29,11 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="chatbox">
       {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-      <input type="text" value={input} onChange={handleInputChange} onKeyDown={handleKeyDown} autoFocus />
-      <button type="button" onClick={handleSend} disabled={input === ''}>Send</button>
-      {messages.map((message) => <p>{message}</p>)}
+      <input className="input" type="text" placeholder="type a message..." value={input} onChange={handleInputChange} onKeyDown={handleKeyDown} autoFocus />
+      <button className="button" type="button" onClick={handleSend} disabled={input === ''}>send</button>
+      {messages.map((message) => <p className="message">{message}</p>)}
     </div>
   );
 };
