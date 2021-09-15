@@ -60,8 +60,13 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <Box className={classes.messageContainer}>
-        {/* eslint-disable-next-line react/no-array-index-key */}
-        {messages.map((message, index) => <ChatLine key={index} message={message} />)}
+        {messages.map((message, index) => (
+          <ChatLine
+            // eslint-disable-next-line react/no-array-index-key
+            key={messages.length - index}
+            message={message}
+          />
+        ))}
       </Box>
       <ChatInput className={classes.input} onSend={handleSend} />
     </Box>
