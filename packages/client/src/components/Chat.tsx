@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     padding: '1rem',
   },
   messageContainer: {
-    overflowY: 'scroll',
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column-reverse',
   },
