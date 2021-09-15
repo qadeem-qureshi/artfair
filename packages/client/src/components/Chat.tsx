@@ -1,40 +1,70 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Box, BoxProps, makeStyles } from '@material-ui/core';
+import clsx from 'clsx';
+import { ChatMessage } from '@team-2/common';
 import socket from '../services/socket';
-import './Chat.css';
+import ChatInput from './ChatInput';
+import ChatLine from './ChatLine';
 
-const Chat: React.FC = () => {
-  const [messages, setMessages] = useState<string[]>([]);
-  const [input, setInput] = useState('');
+const useStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    padding: '1rem',
+  },
+  messageContainer: {
+    overflowY: 'scroll',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+  },
+  input: {
+    marginTop: '1rem',
+  },
+});
 
-  const addMessage = useCallback((message) => {
-    setMessages([...messages, message]);
+export type ChatProps = BoxProps;
+
+const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
+  const classes = useStyles();
+
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  const addMessage = useCallback((message: ChatMessage) => {
+    // Messages are added to front because elements are rendered in reverse
+    setMessages([message, ...messages]);
   }, [messages]);
 
-  useEffect(() => {
-    socket.on('receive_chat_message', addMessage);
+  const handleUserJoin = useCallback((user: string) => {
+    const message: ChatMessage = { sender: '', content: `${user} joined the chat` };
+    addMessage(message);
   }, [addMessage]);
 
-  const handleSend = () => {
-    socket.emit('send_chat_message', input);
-    addMessage(`You: ${input}`);
-    setInput('');
-  };
+  const handleUserLeave = useCallback((user: string) => {
+    const message: ChatMessage = { sender: '', content: `${user} left the chat` };
+    addMessage(message);
+  }, [addMessage]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(event.target.value);
-  };
+  useEffect(() => {
+    socket.on('chat_message', addMessage);
+    socket.on('join_chat', handleUserJoin);
+    socket.on('leave_chat', handleUserLeave);
+  }, [addMessage, handleUserJoin, handleUserLeave]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (input && event.key === 'Enter') { handleSend(); }
+  const handleSend = (content: string) => {
+    const message: ChatMessage = { sender: socket.id, content };
+    socket.emit('chat_message', message);
+    addMessage(message);
   };
 
   return (
-    <div className="chatbox">
-      {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-      <input className="input" type="text" placeholder="type a message..." value={input} onChange={handleInputChange} onKeyDown={handleKeyDown} autoFocus />
-      <button className="button" type="button" onClick={handleSend} disabled={input === ''}>send</button>
-      {messages.map((message) => <p className="message">{message}</p>)}
-    </div>
+    <Box className={clsx(classes.root, className)} {...rest}>
+      <Box className={classes.messageContainer}>
+        {/* eslint-disable-next-line react/no-array-index-key */}
+        {messages.map((message, index) => <ChatLine key={index} message={message} />)}
+      </Box>
+      <ChatInput className={classes.input} onSend={handleSend} />
+    </Box>
   );
 };
 
