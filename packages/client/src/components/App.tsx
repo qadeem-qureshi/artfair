@@ -1,45 +1,46 @@
 import React from 'react';
-import { Box, makeStyles } from '@material-ui/core';
+import {
+  Box, CssBaseline, makeStyles, ThemeProvider,
+} from '@material-ui/core';
 import Chat from './Chat';
 import Canvas from './Canvas';
+import professional from '../themes/professional';
 
-const useStyles = makeStyles({
-  root: {
+const useStyles = makeStyles((theme) => ({
+  grid: {
     height: '100vh',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  main: {
-    padding: '1rem',
-    maxWidth: '80vw',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-  chat: {
-    margin: '1rem',
-    border: '1px solid black',
-    flexGrow: 1,
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr 1fr',
+    gridTemplateRows: '1fr 1fr 1fr 1fr',
+    gap: '2rem',
   },
   canvas: {
-    margin: '1rem',
-    width: 'min(70vw, 80vh)',
+    gridArea: '2 / 2 / 3 / 3',
+    placeSelf: 'stretch',
     aspectRatio: '1',
-    border: '1px solid black',
+    boxShadow: theme.shadows[3],
+    borderRadius: theme.shape.borderRadius,
   },
-});
+  chat: {
+    gridArea: '3 / 2 / 4 / 3',
+    placeSelf: 'stretch',
+    minHeight: '15rem',
+    minWidth: '15rem',
+    boxShadow: theme.shadows[3],
+    borderRadius: theme.shape.borderRadius,
+  },
+}));
 
 const App: React.FC = () => {
   const classes = useStyles();
   return (
-    <Box className={classes.root}>
-      <Box className={classes.main}>
+    <ThemeProvider theme={professional}>
+      <CssBaseline />
+      <Box className={classes.grid}>
         <Canvas className={classes.canvas} />
         <Chat className={classes.chat} />
       </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 
