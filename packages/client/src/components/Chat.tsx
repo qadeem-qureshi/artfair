@@ -32,8 +32,8 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
-    setMessages([message, ...messages]);
-  }, [messages]);
+    setMessages((previous) => [message, ...previous]);
+  }, []);
 
   const handleUserJoin = useCallback((user: string) => {
     const message: ChatMessage = { sender: '', content: `${user} joined the chat` };
