@@ -24,9 +24,16 @@
   "rules": {
     "linebreak-style": "off",
     "no-use-before-define": "off",
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "@typescript-eslint/no-use-before-define": [
       "error"
     ],
+    "react/jsx-props-no-spreading": "off",
     "react/jsx-filename-extension": [
       "warn",
       {

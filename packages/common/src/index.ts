@@ -1,1 +1,4 @@
-export const message = 'Hello, World!';
+export interface ChatMessage {
+  sender: string;
+  content: string;
+}

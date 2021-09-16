@@ -2,6 +2,7 @@ import express from 'express';
 import * as path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { ChatMessage } from '@team-2/common';
 
 const app = express();
 const server = createServer(app);
@@ -16,14 +17,14 @@ const root = path.join(__dirname, '../../client/dist');
 app.use(express.static(root));
 
 io.on('connection', (socket) => {
-  socket.broadcast.emit('receive_chat_message', `Client ${socket.id} joined the chat.`);
+  socket.broadcast.emit('join_chat', socket.id);
 
-  socket.on('send_chat_message', (message: string) => {
-    socket.broadcast.emit('receive_chat_message', `${socket.id}: ${message}`);
+  socket.on('chat_message', (message: ChatMessage) => {
+    socket.broadcast.emit('chat_message', message);
   });
 
   socket.on('disconnect', () => {
-    socket.broadcast.emit('receive_chat_message', `Client ${socket.id} left the chat.`);
+    socket.broadcast.emit('leave_chat', socket.id);
   });
 });
 
