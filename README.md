@@ -17,10 +17,10 @@ At a high level, this project is made up of three packages: `client`, `server`, 
     yarn
     ```
 
-2. Serve the app locally:
+2. Serve the app locally in development mode:
     
     ```sh
-    yarn full-start
+    yarn full-dev
     ```
 
 3. View the site at <http://localhost:3000>
