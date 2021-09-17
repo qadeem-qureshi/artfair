@@ -1,9 +1,9 @@
 ## Scripts
 
-`server-dev` : start the server with hot reload
+`yarn server-dev` : start the server with hot reload
 
-`server-build` : compile package for distribution
+`yarn server-build` : compile package for distribution
 
-`server-start` : start the server without hot reload
+`yarn server-start` : start the server without hot reload
 
-`server-clean` : delete distribution package
+`yarn server-clean` : delete distribution package
