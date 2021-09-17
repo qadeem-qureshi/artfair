@@ -1,7 +1,7 @@
 ## Scripts
 
-`yarn common-dev` : compile package in watch mode
+`yarn dev` : compile package in watch mode
 
-`yarn common-build` : compile package for distribution
+`yarn build` : compile package for distribution
 
-`yarn common-clean` : delete distribution package
+`yarn clean` : delete distribution package
