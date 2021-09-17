@@ -49,7 +49,7 @@ At a high level, this project is made up of three packages: `client`, `server`, 
 
 `full-dev` : run dev scripts for client, common, and server
 
-`full-start` : build the client bundle and starts the server
+`full-start` : build the client bundle and start the server
 
 `full-clean` : delete build artifacts for client, common, and server
 
