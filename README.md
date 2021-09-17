@@ -28,17 +28,29 @@ At a high level, this project is made up of three packages: `client`, `server`, 
 ## Scripts
 
 `client-dev` : build the unoptimized client bundle and serve it with hot reload at <http://localhost:1234>
+
 `client-build` : build the optimized client bundle for distribution
+
 `client-clean` : delete all client build artifacts
+
 `common-dev` : compile the common package in watch mode
+
 `common-build` : compile the common package for distribution
+
 `common-clean` : delete common distribution package
+
 `server-dev` : start the server with hot reload
+
 `server-build` : compile the server package for distribution
+
 `server-start` : start the server without hot reload
+
 `server-clean` : delete server distribution package
+
 `full-dev` : runs dev scripts for client, common, and server
+
 `full-start` : builds the client bundle and starts the server
+
 `full-clean` : delete build artifacts for client, common, and server
 
 ## Development
