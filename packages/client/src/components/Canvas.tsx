@@ -3,10 +3,11 @@ import { makeStyles } from '@material-ui/core';
 import { Point } from '@team-2/common';
 import clsx from 'clsx';
 import {
-  getCanvasPoint, getClientPoint, getDistance, SEGMENT_SIZE,
+  getCanvasPoint, getClientPoint, getDistance,
 } from '../util/canvas';
 
-const DEFAULT_STROKE_RADIUS = 10;
+const STROKE_RADIUS = 10;
+const SEGMENT_SIZE = 5;
 
 const useStyles = makeStyles({
   root: {
@@ -30,7 +31,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     if (!context) return;
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
-    context.lineWidth = DEFAULT_STROKE_RADIUS * 2;
+    context.lineWidth = STROKE_RADIUS * 2;
     context.strokeStyle = 'black';
     context.fillStyle = 'black';
   }, [context]);
@@ -39,7 +40,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     if (!context) return;
 
     requestAnimationFrame(() => {
-      context.ellipse(point.x, point.y, DEFAULT_STROKE_RADIUS, DEFAULT_STROKE_RADIUS, 0, 0, Math.PI * 2);
+      context.ellipse(point.x, point.y, STROKE_RADIUS, STROKE_RADIUS, 0, 0, Math.PI * 2);
       context.fill();
       context.beginPath();
       context.moveTo(point.x, point.y);

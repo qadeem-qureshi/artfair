@@ -1,8 +1,6 @@
 import React from 'react';
 import { Point } from '@team-2/common';
 
-export const SEGMENT_SIZE = 5;
-
 export const getCanvasPoint = (clientPoint: Point, canvasElement: HTMLCanvasElement): Point => {
   const rect = canvasElement.getBoundingClientRect();
 
