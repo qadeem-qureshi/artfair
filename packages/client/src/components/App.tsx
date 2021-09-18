@@ -51,7 +51,7 @@ const App: React.FC = () => {
     <ThemeProvider theme={professional}>
       <CssBaseline />
       <Box className={clsx(classes.content, shouldWrap && classes.wrappedContent)}>
-        <Canvas className={classes.canvas} />
+        <Canvas width={1000} height={1000} className={classes.canvas} />
         <Chat className={clsx(classes.chat, shouldWrap && classes.wrappedChat)} />
       </Box>
     </ThemeProvider>
