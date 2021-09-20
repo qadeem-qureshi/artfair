@@ -25,8 +25,6 @@ const useStyles = makeStyles((theme) => ({
   canvas: {
     height: 'min(70vw, 60vh)',
     width: 'min(70vw, 60vh)',
-    minHeight: '10rem',
-    minWidth: '10rem',
     boxShadow: theme.shadows[3],
     borderRadius: theme.shape.borderRadius,
   },
