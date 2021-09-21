@@ -1,0 +1,41 @@
+{
+  "name": "@team-2/client",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@types/material-ui": "^0.21.9",
+    "@types/react": "^17.0.20",
+    "@types/react-dom": "^17.0.9",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.25.1",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "parcel-bundler": "^1.12.5",
+    "parcel-plugin-static-files-copy": "^2.6.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.12.3",
+    "@team-2/common": "^0.1.0",
+    "clsx": "^1.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "socket.io-client": "^4.2.0"
+  },
+  "scripts": {
+    "dev": "parcel src/index.html --open --out-dir build --cache-dir build/cache",
+    "build": "parcel build src/index.html --no-source-maps --out-dir dist --cache-dir build/cache",
+    "clean": "rimraf build dist"
+  },
+  "staticFiles": {
+    "staticPath": [
+      "src/assets/robots.txt"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@team-2/server",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.7.13",
+    "@types/socket.io": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-import-resolver-typescript": "^2.4.0",
+    "eslint-plugin-import": "^2.24.2",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.2.1",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.4.2"
+  },
+  "dependencies": {
+    "@team-2/common": "^0.1.0",
+    "express": "^4.17.1",
+    "socket.io": "^4.2.0"
+  },
+  "scripts": {
+    "dev": "ts-node-dev src/index",
+    "start": "ts-node src/index",
+    "build": "tsc",
+    "clean": "rimraf dist"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "editor.tabSize": 2,
+  "typescript.preferences.quoteStyle": "single",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+}
