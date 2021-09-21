@@ -25,8 +25,6 @@ const useStyles = makeStyles((theme) => ({
   canvas: {
     height: 'min(70vw, 60vh)',
     width: 'min(70vw, 60vh)',
-    minHeight: '10rem',
-    minWidth: '10rem',
     boxShadow: theme.shadows[3],
     borderRadius: theme.shape.borderRadius,
   },
@@ -51,7 +49,7 @@ const App: React.FC = () => {
     <ThemeProvider theme={professional}>
       <CssBaseline />
       <Box className={clsx(classes.content, shouldWrap && classes.wrappedContent)}>
-        <Canvas className={classes.canvas} />
+        <Canvas width={1000} height={1000} className={classes.canvas} />
         <Chat className={clsx(classes.chat, shouldWrap && classes.wrappedChat)} />
       </Box>
     </ThemeProvider>
