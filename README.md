@@ -1,4 +1,4 @@
-# Company Corportation LLC Project
+# Company Corporation LLC Project
 
 ## Note
 
