@@ -31,7 +31,7 @@ export interface ChatLineProps extends BoxProps {
 const ChatLine: React.FC<ChatLineProps> = ({ message, className, ...rest }) => {
   const classes = useStyles();
 
-  const isAnnouncement = message.sender.length === 0;
+  const isAnnouncement = message.senderID.length === 0;
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
@@ -42,7 +42,7 @@ const ChatLine: React.FC<ChatLineProps> = ({ message, className, ...rest }) => {
       ) : (
         <>
           <Typography className={classes.sender}>
-            {message.sender}
+            {message.senderName}
             :
           </Typography>
           <Typography className={classes.content}>

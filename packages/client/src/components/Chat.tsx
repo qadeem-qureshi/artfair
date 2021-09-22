@@ -6,6 +6,11 @@ import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
 
+const clientName = prompt('What is your name?', 'default user');
+
+const joinMessage: ChatMessage = { senderName: clientName, senderID: '', content: `${clientName} joined the chat` };
+socket.emit('join_message', joinMessage);
+
 const useStyles = makeStyles({
   root: {
     display: 'flex',
@@ -35,13 +40,12 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     setMessages((previous) => [message, ...previous]);
   }, []);
 
-  const handleUserJoin = useCallback((user: string) => {
-    const message: ChatMessage = { sender: '', content: `${user} joined the chat` };
+  const handleUserJoin = useCallback((message: ChatMessage) => {
     addMessage(message);
   }, [addMessage]);
 
   const handleUserLeave = useCallback((user: string) => {
-    const message: ChatMessage = { sender: '', content: `${user} left the chat` };
+    const message: ChatMessage = { senderName: clientName, senderID: '', content: `${user} left the chat` };
     addMessage(message);
   }, [addMessage]);
 
@@ -52,7 +56,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   }, [addMessage, handleUserJoin, handleUserLeave]);
 
   const handleSend = (content: string) => {
-    const message: ChatMessage = { sender: socket.id, content };
+    const message: ChatMessage = { senderName: clientName, senderID: socket.id, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };
