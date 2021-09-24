@@ -2,7 +2,7 @@ import express from 'express';
 import * as path from 'path';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { ChatMessage, GameUser } from '@team-2/common';
+import { ChatMessage, CanvasData, GameUser } from '@team-2/common';
 
 const app = express();
 const server = createServer(app);
@@ -18,10 +18,15 @@ const users = new Map<string, GameUser>();
 app.use(express.static(root));
 
 io.on('connection', (socket) => {
+  socket.on('canvas_data', (canvasData: CanvasData) => {
+    socket.broadcast.emit('canvas_client_data', canvasData);
+  });
+
   socket.on('join_message', (message: ChatMessage) => {
     users.set(socket.id, { userName: message.senderName });
     socket.broadcast.emit('join_chat', message);
   });
+
   socket.on('chat_message', (message: ChatMessage) => {
     socket.broadcast.emit('chat_message', message);
   });

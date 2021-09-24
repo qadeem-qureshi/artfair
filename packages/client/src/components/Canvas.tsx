@@ -1,7 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Point } from '@team-2/common';
+import { Point, CanvasData } from '@team-2/common';
 import clsx from 'clsx';
+import socket from '../services/socket';
 import {
   getCanvasPoint, getClientPoint, getDistance,
 } from '../util/canvas';
@@ -36,7 +39,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     context.fillStyle = 'black';
   }, [context]);
 
-  const beginStroke = (point: Point) => {
+  const beginStroke = useCallback((point: Point) => {
     if (!context) return;
 
     requestAnimationFrame(() => {
@@ -45,9 +48,9 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       context.beginPath();
       context.moveTo(point.x, point.y);
     });
-  };
+  }, [context]);
 
-  const extendStroke = (point: Point) => {
+  const extendStroke = useCallback((point: Point) => {
     if (!context) return;
 
     requestAnimationFrame(() => {
@@ -55,13 +58,14 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       context.moveTo(point.x, point.y);
       context.stroke();
     });
-  };
+  }, [context]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasElementRef.current) return;
 
     const currentPoint = getCanvasPoint(getClientPoint(event), canvasElementRef.current);
     setLastPoint(currentPoint);
+    socket.emit('canvas_data', { startSegment: currentPoint, endSegment: currentPoint });
     beginStroke(currentPoint);
   };
 
@@ -78,10 +82,23 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     const pointDelta = getDistance(lastPoint, currentPoint);
 
     if (pointDelta < SEGMENT_SIZE) return;
-
+    socket.emit('canvas_data', { startSegment: lastPoint, endSegment: currentPoint });
     extendStroke(currentPoint);
     setLastPoint(currentPoint);
   };
+
+  const handleRemoteData = useCallback((canvasData: CanvasData) => {
+    if (!context) return;
+
+    requestAnimationFrame(() => {
+      beginStroke(canvasData.startSegment);
+      if (canvasData.startSegment !== canvasData.endSegment) { extendStroke(canvasData.endSegment); }
+    });
+  }, [context, beginStroke, extendStroke]);
+
+  useEffect(() => {
+    socket.on('canvas_client_data', handleRemoteData);
+  }, [handleRemoteData]);
 
   return (
     <canvas
