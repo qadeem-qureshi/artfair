@@ -1,6 +1,5 @@
 export interface ChatMessage {
-  senderID: string;
-  senderName: string;
+  sender: string;
   content: string;
 }
 
@@ -9,15 +8,15 @@ export interface Point {
   y: number;
 }
 
-export interface GameUser {
-  userName: string;
+export interface UserData {
+  name: string;
 }
 
-export interface CanvasData {
-  startSegment: Point;
-  endSegment: Point;
+export interface StrokeSegment {
+  start: Point;
+  end: Point;
 }
 
-export interface GameData {
-  content: any;
+export interface Dot {
+  center: Point;
 }

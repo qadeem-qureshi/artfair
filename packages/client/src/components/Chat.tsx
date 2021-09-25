@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { ChatMessage } from '@team-2/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
-
-const clientName = prompt('What is your name?', 'default user');
-
-const joinMessage: ChatMessage = { senderName: clientName, senderID: '', content: `${clientName} joined the chat` };
-socket.emit('join_message', joinMessage);
 
 const useStyles = makeStyles({
   root: {
@@ -34,29 +34,44 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [chosenName, setChosenName] = useState('default user');
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
     setMessages((previous) => [message, ...previous]);
   }, []);
 
-  const handleUserJoin = useCallback((message: ChatMessage) => {
-    addMessage(message);
-  }, [addMessage]);
+  const handleUserJoin = useCallback(
+    (name: string) => {
+      addMessage({ sender: '', content: `${name} joined the chat` });
+    },
+    [addMessage],
+  );
 
-  const handleUserLeave = useCallback((user: string) => {
-    const message: ChatMessage = { senderName: clientName, senderID: '', content: `${user} left the chat` };
-    addMessage(message);
-  }, [addMessage]);
+  const handleUserLeave = useCallback(
+    (name: string) => {
+      addMessage({ sender: '', content: `${name} left the chat` });
+    },
+    [addMessage],
+  );
 
   useEffect(() => {
     socket.on('chat_message', addMessage);
-    socket.on('join_chat', handleUserJoin);
-    socket.on('leave_chat', handleUserLeave);
+    socket.on('user_join', handleUserJoin);
+    socket.on('user_leave', handleUserLeave);
   }, [addMessage, handleUserJoin, handleUserLeave]);
 
+  useLayoutEffect(() => {
+    // eslint-disable-next-line no-alert
+    const requestedName = prompt('What is your name?');
+    if (requestedName) {
+      setChosenName(requestedName);
+      socket.emit('user_join', { name: requestedName });
+    }
+  }, [setChosenName]);
+
   const handleSend = (content: string) => {
-    const message: ChatMessage = { senderName: clientName, senderID: socket.id, content };
+    const message: ChatMessage = { sender: chosenName, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };
