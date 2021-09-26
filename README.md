@@ -23,8 +23,6 @@ At a high level, this project is made up of three packages: `client`, `server`, 
    yarn full-dev
    ```
 
-3. View the site at <http://localhost:3000>
-
 ## Scripts
 
 `yarn client-dev` : build the unoptimized client bundle and serve it with hot reload at <http://localhost:1234>
