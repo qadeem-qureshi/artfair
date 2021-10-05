@@ -1,7 +1,7 @@
 import express from 'express';
 import * as path from 'path';
 import { createServer } from 'http';
-import { Server, Socket } from 'socket.io'; //= > "brYXPT"
+import { Server, Socket } from 'socket.io';
 import {
   ChatMessage, StrokeSegment, UserData, Dot,
 } from '@team-2/common';
