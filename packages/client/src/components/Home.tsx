@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { nanoid } from 'nanoid';
 import {
   TextField, Button, Box, makeStyles, BoxProps,
 } from '@material-ui/core';
@@ -39,7 +38,7 @@ const Home: React.FC<BoxProps> = (className, ...rest) => {
 
   const handleCreateRoom = () => {
     ChosenNameContext.displayName = nameInput;
-    socket.emit('user_join', { name: nameInput, gameID: nanoid(6) });
+    socket.emit('user_join', { name: nameInput, gameID: '' });
   };
 
   const handleJoinRoom = () => {
