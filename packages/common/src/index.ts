@@ -10,6 +10,7 @@ export interface Point {
 
 export interface UserData {
   name: string;
+  gameID: string;
 }
 
 export interface StrokeSegment {

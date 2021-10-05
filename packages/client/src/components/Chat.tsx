@@ -1,7 +1,6 @@
 import React, {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useState,
 } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
@@ -10,6 +9,7 @@ import { ChatMessage } from '@team-2/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
+import { ChosenNameContext } from './Home';
 
 const useStyles = makeStyles({
   root: {
@@ -34,7 +34,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [chosenName, setChosenName] = useState('default user');
+  const chosenName = ChosenNameContext.displayName;
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
@@ -60,15 +60,6 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
   }, [addMessage, handleUserJoin, handleUserLeave]);
-
-  useLayoutEffect(() => {
-    // eslint-disable-next-line no-alert
-    const requestedName = prompt('What is your name?');
-    if (requestedName) {
-      setChosenName(requestedName);
-      socket.emit('user_join', { name: requestedName });
-    }
-  }, [setChosenName]);
 
   const handleSend = (content: string) => {
     const message: ChatMessage = { sender: chosenName, content };

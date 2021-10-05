@@ -10,7 +10,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:1234',
+    origin: '*',
   },
 });
 const port = process.env.port || 3000;
@@ -23,8 +23,10 @@ app.use(express.static(root));
 
 const addUserJoinListener = (socket: Socket) => {
   socket.on('user_join', (data: UserData) => {
-    socket.broadcast.emit('user_join', data.name);
     users.set(socket.id, data);
+    socket.join(data.gameID);
+    socket.broadcast.to(data.gameID).emit('user_join', data.name);
+    socket.emit('game_room', data.gameID);
   });
 };
 
@@ -32,21 +34,33 @@ const addUserLeaveListener = (socket: Socket) => {
   socket.on('disconnect', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.emit('user_leave', userData.name);
+    socket.broadcast.to(userData.gameID).emit('user_leave', userData.name);
     users.delete(socket.id);
   });
 };
 
 const addChatMessageListener = (socket: Socket) => {
-  socket.on('chat_message', (message: ChatMessage) => socket.broadcast.emit('chat_message', message));
+  socket.on('chat_message', (message: ChatMessage) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.gameID).emit('chat_message', message);
+  });
 };
 
 const addDrawSegmentListener = (socket: Socket) => {
-  socket.on('draw_segment', (segment: StrokeSegment) => socket.broadcast.emit('draw_segment', segment));
+  socket.on('draw_segment', (segment: StrokeSegment) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.gameID).emit('draw_segment', segment);
+  });
 };
 
 const addDrawDotListener = (socket: Socket) => {
-  socket.on('draw_dot', (dot: Dot) => socket.broadcast.emit('draw_dot', dot));
+  socket.on('draw_dot', (dot: Dot) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.gameID).emit('draw_dot', dot);
+  });
 };
 
 io.on('connection', (socket) => {

@@ -2,9 +2,13 @@ import React from 'react';
 import {
   Box, CssBaseline, makeStyles, ThemeProvider, useMediaQuery,
 } from '@material-ui/core';
+import {
+  BrowserRouter, Switch, Route,
+} from 'react-router-dom';
 import clsx from 'clsx';
 import Chat from './Chat';
 import Canvas from './Canvas';
+import Home from './Home';
 import professional from '../themes/professional';
 
 const useStyles = makeStyles((theme) => ({
@@ -48,10 +52,19 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={professional}>
       <CssBaseline />
-      <Box className={clsx(classes.content, shouldWrap && classes.wrappedContent)}>
-        <Canvas width={1000} height={1000} className={classes.canvas} />
-        <Chat className={clsx(classes.chat, shouldWrap && classes.wrappedChat)} />
-      </Box>
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/">
+            <Home className={classes.content} />
+          </Route>
+          <Route path="/room/:id">
+            <Box className={clsx(classes.content, shouldWrap && classes.wrappedContent)}>
+              <Canvas width={1000} height={1000} className={classes.canvas} />
+              <Chat className={clsx(classes.chat, shouldWrap && classes.wrappedChat)} />
+            </Box>
+          </Route>
+        </Switch>
+      </BrowserRouter>
     </ThemeProvider>
   );
 };
