@@ -1,15 +1,11 @@
-import React, {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { ChatMessage } from '@team-2/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
-import { ChosenNameContext } from './Home';
+import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -34,7 +30,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const chosenName = ChosenNameContext.displayName;
+  const { state } = useAppContext();
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
@@ -62,7 +58,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   }, [addMessage, handleUserJoin, handleUserLeave]);
 
   const handleSend = (content: string) => {
-    const message: ChatMessage = { sender: chosenName, content };
+    const message: ChatMessage = { sender: state.username, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };

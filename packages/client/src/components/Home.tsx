@@ -1,110 +1,133 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
   TextField, Button, Box, makeStyles, BoxProps,
 } from '@material-ui/core';
 import clsx from 'clsx';
+import { RoomRequestData } from '@team-2/common';
 import socket from '../services/socket';
+import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
-  container: {
-    padding: '2rem',
-    height: '100vh',
-    minHeight: '20rem',
-    minWidth: '10rem',
+  root: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
-    gap: '2rem',
+    alignItems: 'stretch',
   },
-  button: {
-    flexDirection: 'row',
-    margin: '.3vw',
-  },
-  input: {
+  inputContainer: {
+    display: 'flex',
     flexDirection: 'column',
-    margin: 'none',
+    gap: '1rem',
+  },
+  textField: {},
+  button: {
+    flex: 1,
   },
 });
 
-export const ChosenNameContext = React.createContext('');
+export type HomeProps = BoxProps;
 
-const Home: React.FC<BoxProps> = (className, ...rest) => {
+const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const [roomInput, setRoomInput] = useState('');
-  const [nameInput, setNameInput] = useState('');
+  const [requestedUsername, setRequestedUsername] = useState('');
+  const [requestedRoom, setRequestedRoom] = useState('');
+  const [requestedUsernameError, setRequestedUsernameError] = useState('');
+  const [requestedRoomError, setRequestedRoomError] = useState('');
   const history = useHistory();
+  const { dispatch } = useAppContext();
 
-  const handleCreateRoom = () => {
-    ChosenNameContext.displayName = nameInput;
-    socket.emit('user_join', { name: nameInput, gameID: '' });
-  };
-
-  const handleJoinRoom = () => {
-    ChosenNameContext.displayName = nameInput;
-    socket.emit('user_join', { name: nameInput, gameID: roomInput });
+  const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRequestedUsernameError('');
+    setRequestedUsername(event.target.value.trimLeft());
   };
 
   const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRoomInput(event.target.value);
+    setRequestedRoomError('');
+    setRequestedRoom(event.target.value.trimLeft());
   };
 
-  const handleNameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNameInput(event.target.value);
+  const handleCreateRoom = () => {
+    socket.emit('create_room_attempt', { username: requestedUsername, room: requestedRoom });
   };
 
-  const handleGameRoom = useCallback(
-    (gameID: string) => {
-      history.push(`/room/${gameID}`);
+  const handleJoinRoom = () => {
+    socket.emit('join_room_attempt', { username: requestedUsername, room: requestedRoom });
+  };
+
+  const handleTakenRoom = useCallback(() => {
+    setRequestedRoomError('A room with this name already exists.');
+  }, []);
+
+  const handleNonexistentRoom = useCallback(() => {
+    setRequestedRoomError('This room does not exist.');
+  }, []);
+
+  const handleTakenUsername = useCallback(() => {
+    setRequestedUsernameError('This username is taken.');
+  }, []);
+
+  const handleRoomRequestAccepted = useCallback(
+    (data: RoomRequestData) => {
+      dispatch({ type: 'initialize-user', username: data.username, room: data.room });
+      history.push('/game');
     },
-    [history],
+    [dispatch, history],
   );
 
   useEffect(() => {
-    socket.on('game_room', handleGameRoom);
-  }, [handleGameRoom]);
+    socket.on('room_taken', handleTakenRoom);
+    socket.on('room_does_not_exist', handleNonexistentRoom);
+    socket.on('username_taken', handleTakenUsername);
+    socket.on('room_created', handleRoomRequestAccepted);
+    socket.on('room_joined', handleRoomRequestAccepted);
+  }, [handleTakenRoom, handleNonexistentRoom, handleTakenUsername, handleRoomRequestAccepted]);
+
+  const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoom.length === 0;
 
   return (
-    <Box className={clsx(classes.container, className)} {...rest}>
-      <TextField
-        className={classes.input}
-        placeholder="Enter a Username..."
-        variant="outlined"
-        color="primary"
-        size="medium"
-        spellCheck={false}
-        onChange={handleNameInputChange}
-        value={nameInput}
-      />
-      <TextField
-        className={classes.input}
-        placeholder="Room ID"
-        variant="outlined"
-        color="primary"
-        onChange={handleRoomInputChange}
-        size="medium"
-        spellCheck={false}
-        value={roomInput}
-      />
-      <Box className={clsx(classes.button, className)} {...rest}>
-        <Button
-          className={clsx(classes.button)}
+    <Box className={clsx(classes.root, className)} {...rest}>
+      <Box className={classes.inputContainer}>
+        <TextField
+          label="Username"
           variant="outlined"
-          onClick={handleJoinRoom}
-          disabled={roomInput.trim().length === 0 || nameInput.trim().length === 0}
-        >
-          Join Room
-        </Button>
-        <Button
-          className={clsx(classes.button)}
+          color="primary"
+          className={classes.textField}
+          value={requestedUsername}
+          onChange={handleUsernameInputChange}
+          spellCheck={false}
+          error={requestedUsernameError.length !== 0}
+          helperText={requestedUsernameError}
+        />
+        <TextField
+          label="Room"
+          color="primary"
           variant="outlined"
+          className={classes.textField}
+          value={requestedRoom}
+          onChange={handleRoomInputChange}
+          spellCheck={false}
+          error={requestedRoomError.length !== 0}
+          helperText={requestedRoomError}
+        />
+        <Button
+          className={classes.button}
           onClick={handleCreateRoom}
-          disabled={nameInput.trim().length === 0}
+          disabled={textFieldsAreEmpty}
+          variant="contained"
+          color="primary"
         >
           Create Room
         </Button>
-        <ChosenNameContext.Provider value={nameInput} />
+        <Button
+          className={classes.button}
+          onClick={handleJoinRoom}
+          disabled={textFieldsAreEmpty}
+          variant="contained"
+          color="primary"
+        >
+          Join Room
+        </Button>
       </Box>
     </Box>
   );
