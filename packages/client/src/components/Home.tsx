@@ -14,13 +14,9 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'stretch',
-  },
-  inputContainer: {
-    display: 'flex',
-    flexDirection: 'column',
+    width: '15rem',
     gap: '1rem',
   },
-  textField: {},
   button: {
     flex: 1,
   },
@@ -56,7 +52,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   };
 
   const handleTakenRoom = useCallback(() => {
-    setRequestedRoomError('A room with this name already exists.');
+    setRequestedRoomError('This room already exists.');
   }, []);
 
   const handleNonexistentRoom = useCallback(() => {
@@ -87,48 +83,46 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Box className={classes.inputContainer}>
-        <TextField
-          label="Username"
-          variant="outlined"
-          color="primary"
-          className={classes.textField}
-          value={requestedUsername}
-          onChange={handleUsernameInputChange}
-          spellCheck={false}
-          error={requestedUsernameError.length !== 0}
-          helperText={requestedUsernameError}
-        />
-        <TextField
-          label="Room"
-          color="primary"
-          variant="outlined"
-          className={classes.textField}
-          value={requestedRoom}
-          onChange={handleRoomInputChange}
-          spellCheck={false}
-          error={requestedRoomError.length !== 0}
-          helperText={requestedRoomError}
-        />
-        <Button
-          className={classes.button}
-          onClick={handleCreateRoom}
-          disabled={textFieldsAreEmpty}
-          variant="contained"
-          color="primary"
-        >
-          Create Room
-        </Button>
-        <Button
-          className={classes.button}
-          onClick={handleJoinRoom}
-          disabled={textFieldsAreEmpty}
-          variant="contained"
-          color="primary"
-        >
-          Join Room
-        </Button>
-      </Box>
+      <TextField
+        label="Username"
+        variant="outlined"
+        color="primary"
+        value={requestedUsername}
+        onChange={handleUsernameInputChange}
+        spellCheck={false}
+        error={requestedUsernameError.length !== 0}
+        helperText={requestedUsernameError}
+      />
+      <TextField
+        label="Room"
+        color="primary"
+        variant="outlined"
+        value={requestedRoom}
+        onChange={handleRoomInputChange}
+        spellCheck={false}
+        error={requestedRoomError.length !== 0}
+        helperText={requestedRoomError}
+      />
+      <Button
+        className={classes.button}
+        onClick={handleCreateRoom}
+        disabled={textFieldsAreEmpty}
+        variant="contained"
+        color="primary"
+        size="large"
+      >
+        Create Room
+      </Button>
+      <Button
+        className={classes.button}
+        onClick={handleJoinRoom}
+        disabled={textFieldsAreEmpty}
+        variant="contained"
+        color="primary"
+        size="large"
+      >
+        Join Room
+      </Button>
     </Box>
   );
 };

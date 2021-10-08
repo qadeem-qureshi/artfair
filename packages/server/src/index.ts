@@ -55,7 +55,7 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
       rooms.get(data.room)?.members.add(data.username);
       socket.join(data.room);
       socket.emit('room_joined', data);
-      socket.broadcast.emit('user_join', data.username);
+      socket.broadcast.to(data.room).emit('user_join', data.username);
     }
   });
 };
