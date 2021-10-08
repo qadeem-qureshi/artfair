@@ -6,7 +6,7 @@ import { HashRouter, Switch, Route } from 'react-router-dom';
 import Home from './Home';
 import professional from '../themes/professional';
 import Game from './Game';
-import UserContextProvider from './AppContextProvider';
+import AppContextProvider from './AppContextProvider';
 
 const useStyles = makeStyles({
   content: {
@@ -22,7 +22,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={professional}>
       <CssBaseline />
-      <UserContextProvider>
+      <AppContextProvider>
         <HashRouter>
           <Box className={classes.content}>
             <Switch>
@@ -35,7 +35,7 @@ const App: React.FC = () => {
             </Switch>
           </Box>
         </HashRouter>
-      </UserContextProvider>
+      </AppContextProvider>
     </ThemeProvider>
   );
 };

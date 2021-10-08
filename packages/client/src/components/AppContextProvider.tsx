@@ -38,7 +38,7 @@ export const useAppContext = (): AppContextData => {
   return context;
 };
 
-const UserContextProvider: React.FC = ({ children }) => {
+const AppContextProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, DEFAULT_APP_DATA);
   return (
     <AppContext.Provider value={{ state, dispatch }}>
@@ -47,4 +47,4 @@ const UserContextProvider: React.FC = ({ children }) => {
   );
 };
 
-export default UserContextProvider;
+export default AppContextProvider;
