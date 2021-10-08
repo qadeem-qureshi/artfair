@@ -17,9 +17,6 @@ const useStyles = makeStyles({
     width: '15rem',
     gap: '1rem',
   },
-  button: {
-    flex: 1,
-  },
 });
 
 export type HomeProps = BoxProps;
@@ -104,7 +101,6 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         helperText={requestedRoomError}
       />
       <Button
-        className={classes.button}
         onClick={handleCreateRoom}
         disabled={textFieldsAreEmpty}
         variant="contained"
@@ -114,7 +110,6 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         Create Room
       </Button>
       <Button
-        className={classes.button}
         onClick={handleJoinRoom}
         disabled={textFieldsAreEmpty}
         variant="contained"
