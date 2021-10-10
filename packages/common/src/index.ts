@@ -10,6 +10,17 @@ export interface Point {
 
 export interface UserData {
   name: string;
+  room: string;
+}
+
+export interface RoomData {
+  name: string;
+  members: Set<string>;
+}
+
+export interface RoomRequestData {
+  username: string;
+  room: string;
 }
 
 export interface StrokeSegment {
