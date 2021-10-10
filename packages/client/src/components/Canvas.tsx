@@ -6,6 +6,7 @@ import { Dot, Point, StrokeSegment } from '@team-2/common';
 import clsx from 'clsx';
 import socket from '../services/socket';
 import { getCanvasPoint, getClientPoint, getDistance } from '../util/canvas';
+import { useAppContext } from './AppContextProvider';
 
 const STROKE_RADIUS = 10;
 const SEGMENT_SIZE = 5;
@@ -13,6 +14,7 @@ const SEGMENT_SIZE = 5;
 const useStyles = makeStyles({
   root: {
     userSelect: 'none',
+    backgroundColor: 'white',
   },
 });
 
@@ -26,6 +28,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   const canvasElementRef = useRef<HTMLCanvasElement>(null);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>();
   const [lastPoint, setLastPoint] = useState<Point>({ x: 0, y: 0 });
+  const { state } = useAppContext();
 
   const drawSegment = useCallback(
     (segment: StrokeSegment) => {
@@ -35,6 +38,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
         context.beginPath();
         context.moveTo(segment.start.x, segment.start.y);
         context.lineTo(segment.end.x, segment.end.y);
+        context.strokeStyle = segment.color;
         context.stroke();
       });
     },
@@ -56,6 +60,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
           0,
           Math.PI * 2,
         );
+        context.fillStyle = dot.color;
         context.fill();
       });
     },
@@ -67,8 +72,6 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
     context.lineWidth = STROKE_RADIUS * 2;
-    context.strokeStyle = 'black';
-    context.fillStyle = 'black';
   }, [context]);
 
   useEffect(() => {
@@ -88,7 +91,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       getClientPoint(event),
       canvasElementRef.current,
     );
-    const dot: Dot = { center: currentPoint };
+    const dot: Dot = { center: currentPoint, color: state.color };
     drawDot(dot);
     socket.emit('draw_dot', dot);
     setLastPoint(currentPoint);
@@ -111,7 +114,11 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
 
     if (pointDelta < SEGMENT_SIZE) return;
 
-    const segment: StrokeSegment = { start: lastPoint, end: currentPoint };
+    const segment: StrokeSegment = {
+      start: lastPoint,
+      end: currentPoint,
+      color: state.color,
+    };
     drawSegment(segment);
     socket.emit('draw_segment', segment);
     setLastPoint(currentPoint);

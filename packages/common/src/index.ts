@@ -26,8 +26,10 @@ export interface RoomRequestData {
 export interface StrokeSegment {
   start: Point;
   end: Point;
+  color: string;
 }
 
 export interface Dot {
   center: Point;
+  color: string;
 }

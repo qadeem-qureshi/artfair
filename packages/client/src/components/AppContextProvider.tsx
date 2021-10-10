@@ -3,14 +3,18 @@ import React, { createContext, useContext, useReducer } from 'react';
 interface AppData {
   username: string;
   room: string;
+  color: string;
 }
 
 const DEFAULT_APP_DATA: AppData = {
   username: '',
   room: '',
+  color: '',
 };
 
-type AppAction = { type: 'initialize-user', username: string, room: string }
+type AppAction =
+  | { type: 'initialize-user'; username: string; room: string }
+  | { type: 'select-color'; color: string };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -19,6 +23,11 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
         ...state,
         username: action.username,
         room: action.room,
+      };
+    case 'select-color':
+      return {
+        ...state,
+        color: action.color,
       };
     default:
       throw new Error('Invalid action.');
