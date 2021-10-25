@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import Canvas from './Canvas';
 import Chat from './Chat';
 import ColorPalette from './ColorPalette';
+import StrokeSize from './StrokeSize';
 
 const CANVAS_SIZE = 'min(70vw, 55vh)';
 const PALETTE_SIZE = `calc(0.05 * ${CANVAS_SIZE})`;
@@ -25,6 +26,12 @@ const useStyles = makeStyles((theme) => ({
   },
   colorPalette: {
     height: PALETTE_SIZE,
+    boxShadow: theme.shadows[2],
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
+  },
+  strokeSize: {
+    height: '3rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
     overflow: 'hidden',
@@ -68,6 +75,7 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
     >
       <Box className={classes.canvasContainer}>
         <ColorPalette className={classes.colorPalette} />
+        <StrokeSize className={classes.strokeSize} />
         <Canvas
           className={classes.canvas}
           width={CANVAS_RESOLUTION}
