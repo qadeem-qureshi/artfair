@@ -8,7 +8,6 @@ import socket from '../services/socket';
 import { getCanvasPoint, getClientPoint, getDistance } from '../util/canvas';
 import { useAppContext } from './AppContextProvider';
 
-const STROKE_RADIUS = 10;
 const SEGMENT_SIZE = 5;
 
 const useStyles = makeStyles({
@@ -54,13 +53,14 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
         context.ellipse(
           dot.center.x,
           dot.center.y,
-          STROKE_RADIUS,
-          STROKE_RADIUS,
+          dot.stroke,
+          dot.stroke,
           0,
           0,
           Math.PI * 2,
         );
         context.fillStyle = dot.color;
+        context.lineWidth = dot.stroke * 2;
         context.fill();
       });
     },
@@ -71,7 +71,6 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     if (!context) return;
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
-    context.lineWidth = STROKE_RADIUS * 2;
   }, [context]);
 
   useEffect(() => {
@@ -91,7 +90,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       getClientPoint(event),
       canvasElementRef.current,
     );
-    const dot: Dot = { center: currentPoint, color: state.color };
+    const dot: Dot = { center: currentPoint, color: state.color, stroke: state.stroke };
     drawDot(dot);
     socket.emit('draw_dot', dot);
     setLastPoint(currentPoint);
@@ -118,6 +117,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       start: lastPoint,
       end: currentPoint,
       color: state.color,
+      stroke: state.stroke,
     };
     drawSegment(segment);
     socket.emit('draw_segment', segment);
