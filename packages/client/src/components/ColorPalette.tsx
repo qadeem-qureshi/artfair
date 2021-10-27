@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 import { useAppContext } from './AppContextProvider';
-import StrokeSize from './StrokeSize';
 
 const useStyles = makeStyles({
   root: {
@@ -10,13 +9,6 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'stretch',
-  },
-  stroke:
-  {
-    display: 'flex',
-    margin: '1rem',
-    width: '10rem',
-    alignItems: 'center',
   },
   item: {
     flex: 1,
@@ -53,7 +45,6 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ className, ...rest }) => {
           onClick={colorSelector(color)}
         />
       ))}
-      <StrokeSize className={classes.stroke} />
     </Box>
   );
 };

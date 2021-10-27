@@ -1,15 +1,17 @@
 import React from 'react';
 import {
-  Box, BoxProps, makeStyles, useMediaQuery,
+  Box,
+  BoxProps,
+  makeStyles,
+  useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import Canvas from './Canvas';
 import Chat from './Chat';
-import ColorPalette from './ColorPalette';
+import Toolbar from './Toolbar';
 
-const CANVAS_SIZE = 'min(100vw, 78vh)';
-const PALETTE_SIZE = `calc(0.05* ${CANVAS_SIZE})`;
-const CANVAS_CONTAINER_SIZE = `calc(${CANVAS_SIZE} + ${PALETTE_SIZE})`;
+const CANVAS_SIZE = 'min(50vw, 78vh)';
+const WRAPPED_CANVAS_SIZE = 'min(80vw, 50vh)';
 const CANVAS_RESOLUTION = 1000;
 
 const useStyles = makeStyles((theme) => ({
@@ -18,37 +20,40 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '2rem',
+    gap: '1rem',
   },
   wrappedRoot: {
     flexDirection: 'column',
   },
-  colorPalette: {
-    height: PALETTE_SIZE,
-    boxShadow: theme.shadows[2],
-    borderRadius: theme.shape.borderRadius,
-    overflow: 'hidden',
-  },
-  canvasContainer: {
+  easel: {
     display: 'flex',
     flexDirection: 'column',
-    boxShadow: theme.shadows[2],
-    borderRadius: theme.shape.borderRadius,
-    overflow: 'hidden',
+    gap: '1rem',
+  },
+  toolbar: {
+    height: '2rem',
   },
   canvas: {
     width: CANVAS_SIZE,
     height: CANVAS_SIZE,
-  },
-  chat: {
-    height: CANVAS_CONTAINER_SIZE,
-    width: '20rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
   },
+  wrappedCanvas: {
+    width: WRAPPED_CANVAS_SIZE,
+    height: WRAPPED_CANVAS_SIZE,
+  },
+  chat: {
+    height: CANVAS_SIZE,
+    width: '20rem',
+    boxShadow: theme.shadows[2],
+    borderRadius: theme.shape.borderRadius,
+    alignSelf: 'flex-end',
+  },
   wrappedChat: {
-    width: CANVAS_SIZE,
+    width: WRAPPED_CANVAS_SIZE,
     height: '15rem',
+    alignSelf: 'auto',
   },
 }));
 
@@ -56,7 +61,7 @@ export type GameProps = BoxProps;
 
 const Game: React.FC<GameProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const shouldWrap = useMediaQuery('(max-aspect-ratio: 3/2)');
+  const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   return (
     <Box
       className={clsx(
@@ -66,10 +71,10 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
       )}
       {...rest}
     >
-      <Box className={classes.canvasContainer}>
-        <ColorPalette className={classes.colorPalette} />
+      <Box className={classes.easel}>
+        <Toolbar className={classes.toolbar} />
         <Canvas
-          className={classes.canvas}
+          className={clsx(classes.canvas, shouldWrap && classes.wrappedCanvas)}
           width={CANVAS_RESOLUTION}
           height={CANVAS_RESOLUTION}
         />

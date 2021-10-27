@@ -38,6 +38,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
         context.moveTo(segment.start.x, segment.start.y);
         context.lineTo(segment.end.x, segment.end.y);
         context.strokeStyle = segment.color;
+        context.lineWidth = segment.thickness;
         context.stroke();
       });
     },
@@ -53,14 +54,13 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
         context.ellipse(
           dot.center.x,
           dot.center.y,
-          dot.stroke,
-          dot.stroke,
+          dot.thickness / 2,
+          dot.thickness / 2,
           0,
           0,
           Math.PI * 2,
         );
         context.fillStyle = dot.color;
-        context.lineWidth = dot.stroke * 2;
         context.fill();
       });
     },
@@ -90,7 +90,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       getClientPoint(event),
       canvasElementRef.current,
     );
-    const dot: Dot = { center: currentPoint, color: state.color, stroke: state.stroke };
+    const dot: Dot = { center: currentPoint, color: state.color, thickness: state.thickness };
     drawDot(dot);
     socket.emit('draw_dot', dot);
     setLastPoint(currentPoint);
@@ -117,7 +117,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       start: lastPoint,
       end: currentPoint,
       color: state.color,
-      stroke: state.stroke,
+      thickness: state.thickness,
     };
     drawSegment(segment);
     socket.emit('draw_segment', segment);
