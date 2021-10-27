@@ -27,9 +27,11 @@ export interface StrokeSegment {
   start: Point;
   end: Point;
   color: string;
+  thickness: number;
 }
 
 export interface Dot {
   center: Point;
   color: string;
+  thickness: number;
 }

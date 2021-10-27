@@ -4,17 +4,20 @@ interface AppData {
   username: string;
   room: string;
   color: string;
+  thickness: number;
 }
 
 const DEFAULT_APP_DATA: AppData = {
   username: '',
   room: '',
-  color: '',
+  color: 'black',
+  thickness: 10,
 };
 
 type AppAction =
   | { type: 'initialize-user'; username: string; room: string }
-  | { type: 'select-color'; color: string };
+  | { type: 'select-color'; color: string }
+  | { type: 'select-thickness'; thickness: number };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -28,6 +31,11 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         color: action.color,
+      };
+    case 'select-thickness':
+      return {
+        ...state,
+        thickness: action.thickness,
       };
     default:
       throw new Error('Invalid action.');
