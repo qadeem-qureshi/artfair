@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Box, CssBaseline, makeStyles, ThemeProvider,
 } from '@material-ui/core';
-import { HashRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import Home from './Home';
 import professional from '../themes/professional';
 import Game from './Game';
@@ -23,7 +23,7 @@ const App: React.FC = () => {
     <ThemeProvider theme={professional}>
       <CssBaseline />
       <AppContextProvider>
-        <HashRouter>
+        <BrowserRouter>
           <Box className={classes.content}>
             <Switch>
               <Route exact path="/">
@@ -34,7 +34,7 @@ const App: React.FC = () => {
               </Route>
             </Switch>
           </Box>
-        </HashRouter>
+        </BrowserRouter>
       </AppContextProvider>
     </ThemeProvider>
   );

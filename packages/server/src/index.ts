@@ -26,6 +26,10 @@ const rooms = new Map<string, RoomData>();
 
 app.use(express.static(root));
 
+app.get('*', (req, res) => {
+  res.redirect('/');
+});
+
 const usernameIsTaken = (username: string, room: string) => {
   const roomData = rooms.get(room);
   return roomData && roomData.members.has(username);
