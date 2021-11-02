@@ -27,7 +27,11 @@ const rooms = new Map<string, RoomData>();
 app.use(express.static(root));
 
 app.get('*', (req, res) => {
-  res.redirect('/');
+  res.sendFile(root.concat('/index.html'), (err) => {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
 });
 
 const usernameIsTaken = (username: string, room: string) => {
@@ -107,6 +111,18 @@ const addDrawDotListener = (socket: Socket) => {
   });
 };
 
+const addRequestPlayersListener = (socket: Socket) => {
+  socket.on('request_players', () => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+
+    const roomData = rooms.get(userData.room);
+    if (!roomData) return;
+
+    socket.emit('receive_players', Array.from(roomData.members));
+  });
+};
+
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
@@ -114,6 +130,7 @@ io.on('connection', (socket) => {
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);
   addDrawDotListener(socket);
+  addRequestPlayersListener(socket);
 });
 
 server.listen(port, () => console.log(`App listening at http://localhost:${port}`));

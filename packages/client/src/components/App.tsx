@@ -7,6 +7,7 @@ import Home from './Home';
 import professional from '../themes/professional';
 import Game from './Game';
 import AppContextProvider from './AppContextProvider';
+import Lobby from './Lobby';
 
 const useStyles = makeStyles({
   content: {
@@ -28,6 +29,9 @@ const App: React.FC = () => {
             <Switch>
               <Route exact path="/">
                 <Home />
+              </Route>
+              <Route path="/lobby/">
+                <Lobby />
               </Route>
               <Route path="/game">
                 <Game />
