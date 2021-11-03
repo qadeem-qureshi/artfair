@@ -2,7 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Dot, Point, StrokeSegment } from '@team-2/common';
+import { Dot, Point, StrokeSegment } from '@artfair/common';
 import clsx from 'clsx';
 import socket from '../services/socket';
 import { getCanvasPoint, getClientPoint, getDistance } from '../util/canvas';
