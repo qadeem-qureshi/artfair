@@ -2,10 +2,15 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Point, pointsAreEqual, StrokeSegment } from '@team-2/common';
+import { Point, StrokeSegment } from '@team-2/common';
 import clsx from 'clsx';
 import socket from '../services/socket';
-import { getCanvasPoint, getClientPoint, getDistance } from '../util/canvas';
+import {
+  areEqual,
+  getCanvasPoint,
+  getClientPoint,
+  getDistance,
+} from '../util/canvas';
 import { useAppContext } from './AppContextProvider';
 
 const SEGMENT_SIZE = 5;
@@ -65,7 +70,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
 
   const updateCanvas = useCallback(() => {
     segmentsRef.current.forEach((segment) => {
-      if (pointsAreEqual(segment.start, segment.end)) {
+      if (areEqual(segment.start, segment.end)) {
         drawCircle(segment);
       } else {
         drawLine(segment);
@@ -88,7 +93,10 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
     socket.on('draw_segment', queueSegment);
-    setInterval(() => requestAnimationFrame(updateCanvas), 1000 / TARGET_FRAMERATE);
+    setInterval(
+      () => requestAnimationFrame(updateCanvas),
+      1000 / TARGET_FRAMERATE,
+    );
   }, [context, queueSegment, updateCanvas]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {

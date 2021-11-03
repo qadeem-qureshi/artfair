@@ -8,8 +8,6 @@ export interface Point {
   y: number;
 }
 
-export const pointsAreEqual = (a: Point, b: Point): boolean => a.x === b.x && a.y === b.y;
-
 export interface UserData {
   name: string;
   room: string;
