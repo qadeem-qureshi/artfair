@@ -6,7 +6,6 @@ import {
   ChatMessage,
   StrokeSegment,
   UserData,
-  Dot,
   RoomData,
   RoomRequestData,
 } from '@team-2/common';
@@ -99,21 +98,12 @@ const addDrawSegmentListener = (socket: Socket) => {
   });
 };
 
-const addDrawDotListener = (socket: Socket) => {
-  socket.on('draw_dot', (dot: Dot) => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.room).emit('draw_dot', dot);
-  });
-};
-
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
   addUserLeaveListener(socket);
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);
-  addDrawDotListener(socket);
 });
 
 server.listen(port, () => console.log(`App listening at http://localhost:${port}`));

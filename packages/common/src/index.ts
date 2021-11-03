@@ -8,6 +8,8 @@ export interface Point {
   y: number;
 }
 
+export const pointsAreEqual = (a: Point, b: Point): boolean => a.x === b.x && a.y === b.y;
+
 export interface UserData {
   name: string;
   room: string;
@@ -26,12 +28,6 @@ export interface RoomRequestData {
 export interface StrokeSegment {
   start: Point;
   end: Point;
-  color: string;
-  thickness: number;
-}
-
-export interface Dot {
-  center: Point;
   color: string;
   thickness: number;
 }
