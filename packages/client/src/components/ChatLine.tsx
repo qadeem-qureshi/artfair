@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Box, BoxProps, makeStyles, Typography,
 } from '@material-ui/core';
-import { ChatMessage } from '@team-2/common';
+import { ChatMessage } from '@artfair/common';
 import clsx from 'clsx';
 
 const useStyles = makeStyles({
