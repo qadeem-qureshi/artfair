@@ -88,7 +88,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
     socket.on('draw_segment', queueSegment);
-    setInterval(updateCanvas, 1000 / TARGET_FRAMERATE);
+    setInterval(() => requestAnimationFrame(updateCanvas), 1000 / TARGET_FRAMERATE);
   }, [context, queueSegment, updateCanvas]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
