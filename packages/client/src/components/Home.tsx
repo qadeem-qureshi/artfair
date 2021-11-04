@@ -4,7 +4,7 @@ import {
   TextField, Button, Box, makeStyles, BoxProps,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomRequestData } from '@team-2/common';
+import { RoomRequestData } from '@artfair/common';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Point } from '@team-2/common';
+import { Point } from '@artfair/common';
 
 export const getCanvasPoint = (clientPoint: Point, canvasElement: HTMLCanvasElement): Point => {
   const rect = canvasElement.getBoundingClientRect();
