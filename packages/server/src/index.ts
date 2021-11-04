@@ -9,6 +9,7 @@ import {
   Dot,
   RoomData,
   RoomRequestData,
+  GameType,
 } from '@team-2/common';
 
 const app = express();
@@ -83,11 +84,11 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
 };
 
 const addStartGameListener = (socket: Socket) => {
-  socket.on('start_game', (mode: string) => {
+  socket.on('start_game', (mode: GameType) => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    if (!mode) return;
-    socket.broadcast.to(userData.room).emit('begin_game');
+    if (mode === GameType.None) return;
+    socket.broadcast.to(userData.room).emit('begin_game', mode);
   });
 };
 

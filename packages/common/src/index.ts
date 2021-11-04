@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface ChatMessage {
   sender: string;
   content: string;
@@ -36,4 +37,13 @@ export interface Dot {
   center: Point;
   color: string;
   thickness: number;
+}
+
+export enum GameType
+{
+  None,
+  Game1,
+  Game2,
+  Game3,
+  Game4
 }

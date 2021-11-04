@@ -46,15 +46,16 @@ export interface GameCardProps extends BoxProps {
   name: string;
   image: string;
   disable: boolean;
+  onChildClick: any;
 }
 
 const GameCard: React.FC<GameCardProps> = ({
-  name, image, className, disable,
+  name, image, className, disable, onChildClick,
 }) => {
   const classes = useStyles();
 
   return (
-    <GameButton className={clsx(classes.root, className)} disabled={!disable}>
+    <GameButton className={clsx(classes.root, className)} disabled={disable} onClick={onChildClick}>
       <img className={classes.media} src={image} alt={name} />
       <Typography
         align="center"

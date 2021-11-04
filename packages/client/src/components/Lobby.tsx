@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box, makeStyles, BoxProps,
   useMediaQuery,
@@ -6,6 +6,8 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
+
+import { GameType } from '@team-2/common';
 
 import socket from '../services/socket';
 import Chat from './Chat';
@@ -70,10 +72,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const MODES = [
-  'Game 1',
-  'Game 2',
-  'Game 3',
-  'Game 4',
+  { name: 'Game 1', gameType: GameType.Game1 },
+  { name: 'Game 2', gameType: GameType.Game2 },
+  { name: 'Game 3', gameType: GameType.Game3 },
+  { name: 'Game 4', gameType: GameType.Game4 },
 ];
 
 export type LobbyProps = BoxProps;
@@ -83,18 +85,20 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   const history = useHistory();
   const { state } = useAppContext();
+  const [gameMode, setGameMode] = useState(GameType.None);
+
+  const handleGameSelection = (mode: GameType) => {
+    setGameMode(mode);
+  };
 
   const handleStartGame = () => {
-    socket.emit('start_game', 'test');
+    socket.emit('start_game', gameMode);
     history.push('/game');
   };
 
-  const handleGameStarted = useCallback(
-    () => {
-      history.push('/game');
-    },
-    [history],
-  );
+  const handleGameStarted = useCallback(() => {
+    history.push('/game');
+  }, [history]);
 
   useEffect(() => {
     socket.on('begin_game', handleGameStarted);
@@ -106,10 +110,11 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
       <Box className={clsx(classes.gameMode, shouldWrap && classes.wrappedGameMode)}>
         {MODES.map((mode) => (
           <GameCard
-            key={mode}
-            name={mode}
-            image="https://th.bing.com/th/id/OIP.5kr8oTtwrwL3Tkw-lCD-3gHaHa?pid=ImgDet&rs=1"
-            disable={state.host}
+            key={mode.name}
+            name={mode.name}
+            image="https://cdn.pixabay.com/photo/2014/06/03/19/38/road-sign-361514_640.png"
+            disable={!state.host}
+            onChildClick={() => handleGameSelection(mode.gameType)}
           />
         ))}
       </Box>
@@ -120,7 +125,7 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
           variant="contained"
           color="primary"
           size="large"
-          disabled={!state.host}
+          disabled={!state.host || gameMode === GameType.None}
         >
           Start Game
         </Button>
