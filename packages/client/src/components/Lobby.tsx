@@ -7,7 +7,7 @@ import {
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
 
-import { GameType } from '@team-2/common';
+import { GameType } from '@artfair/common';
 
 import socket from '../services/socket';
 import Chat from './Chat';

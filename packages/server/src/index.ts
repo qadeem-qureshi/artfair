@@ -9,6 +9,7 @@ import {
   Dot,
   RoomData,
   RoomRequestData,
+  GameType,
 } from '@artfair/common';
 
 const app = express();
