@@ -33,12 +33,6 @@ export interface StrokeSegment {
   thickness: number;
 }
 
-export interface Dot {
-  center: Point;
-  color: string;
-  thickness: number;
-}
-
 export enum GameType
 {
   None,
