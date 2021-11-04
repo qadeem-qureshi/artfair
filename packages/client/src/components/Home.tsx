@@ -63,6 +63,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const handleRoomRequestAccepted = useCallback(
     (data: RoomRequestData) => {
       dispatch({ type: 'initialize-user', username: data.username, room: data.room });
+      dispatch({ type: 'set-players', players: data.players, host: data.host });
       history.push('/lobby');
     },
     [dispatch, history],

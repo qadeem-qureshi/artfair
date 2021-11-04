@@ -46,8 +46,14 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
     } else {
       users.set(socket.id, { name: data.username, room: data.room });
       rooms.set(data.room, { name: data.room, members: new Set([data.username]) });
+
+      const roomData = rooms.get(data.room);
+      if (!roomData) return;
+
       socket.join(data.room);
-      socket.emit('room_created', data);
+      socket.emit('room_created', {
+        username: data.username, room: data.room, host: true, players: Array.from(roomData.members),
+      });
     }
   });
 };
@@ -59,12 +65,29 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
     } else if (usernameIsTaken(data.username, data.room)) {
       socket.emit('username_taken');
     } else {
+      const roomData = rooms.get(data.room);
+      if (!roomData) return;
+
       users.set(socket.id, { name: data.username, room: data.room });
-      rooms.get(data.room)?.members.add(data.username);
+      roomData.members.add(data.username);
       socket.join(data.room);
-      socket.emit('room_joined', data);
+      socket.emit('room_joined', {
+        username: data.username,
+        room: data.room,
+        host: false,
+        players: Array.from(roomData.members),
+      });
       socket.broadcast.to(data.room).emit('user_join', data.username);
     }
+  });
+};
+
+const addStartGameListener = (socket: Socket) => {
+  socket.on('start_game', (mode: string) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    if (!mode) return;
+    socket.broadcast.to(userData.room).emit('begin_game');
   });
 };
 
@@ -111,18 +134,6 @@ const addDrawDotListener = (socket: Socket) => {
   });
 };
 
-const addRequestPlayersListener = (socket: Socket) => {
-  socket.on('request_players', () => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-
-    const roomData = rooms.get(userData.room);
-    if (!roomData) return;
-
-    socket.emit('receive_players', Array.from(roomData.members));
-  });
-};
-
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
@@ -130,7 +141,7 @@ io.on('connection', (socket) => {
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);
   addDrawDotListener(socket);
-  addRequestPlayersListener(socket);
+  addStartGameListener(socket);
 });
 
 server.listen(port, () => console.log(`App listening at http://localhost:${port}`));

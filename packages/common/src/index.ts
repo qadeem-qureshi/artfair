@@ -21,6 +21,8 @@ export interface RoomData {
 export interface RoomRequestData {
   username: string;
   room: string;
+  host: boolean;
+  players: string[];
 }
 
 export interface StrokeSegment {
