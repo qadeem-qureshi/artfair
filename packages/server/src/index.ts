@@ -8,7 +8,7 @@ import {
   UserData,
   RoomData,
   RoomRequestData,
-} from '@team-2/common';
+} from '@artfair/common';
 
 const app = express();
 const server = createServer(app);

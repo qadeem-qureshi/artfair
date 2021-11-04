@@ -1,5 +1,5 @@
 {
-  "name": "@team-2/common",
+  "name": "@artfair/common",
   "version": "0.1.0",
   "private": true,
   "main": "dist/index",

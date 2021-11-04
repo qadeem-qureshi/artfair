@@ -2,7 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Point, StrokeSegment } from '@team-2/common';
+import { Point, StrokeSegment } from '@artfair/common';
 import clsx from 'clsx';
 import socket from '../services/socket';
 import {

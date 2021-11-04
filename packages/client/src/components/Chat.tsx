@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { ChatMessage } from '@team-2/common';
+import { ChatMessage } from '@artfair/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
