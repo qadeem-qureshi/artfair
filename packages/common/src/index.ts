@@ -29,9 +29,3 @@ export interface StrokeSegment {
   color: string;
   thickness: number;
 }
-
-export interface Dot {
-  center: Point;
-  color: string;
-  thickness: number;
-}
