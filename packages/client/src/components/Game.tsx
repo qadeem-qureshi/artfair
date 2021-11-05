@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     gap: '1rem',
   },
   toolbar: {
-    height: '2rem',
+    height: '3rem',
   },
   canvas: {
     width: CANVAS_SIZE,

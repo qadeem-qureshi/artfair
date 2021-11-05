@@ -8,10 +8,13 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     alignItems: 'stretch',
+    overflow: 'hidden',
   },
   item: {
-    flex: 1,
+    width: '20%',
+    height: '50%',
   },
 });
 
@@ -21,6 +24,7 @@ const COLORS = [
   'yellow',
   'green',
   'blue',
+  'brown',
   'indigo',
   'violet',
   'white',

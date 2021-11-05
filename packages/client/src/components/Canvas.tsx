@@ -34,7 +34,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   const segmentsRef = useRef<StrokeSegment[]>([]);
   const [context, setContext] = useState<CanvasRenderingContext2D | null>();
   const [lastPoint, setLastPoint] = useState<Point>({ x: 0, y: 0 });
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
 
   const drawLine = useCallback(
     (segment: StrokeSegment) => {
@@ -68,6 +68,17 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     [context],
   );
 
+  const clearCanvas = useCallback(() => {
+    if (!context) return;
+    context.save();
+
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
+    context.restore();
+    dispatch({ type: 'set-clear', clear: false });
+  }, [context, dispatch]);
+
   const updateCanvas = useCallback(() => {
     segmentsRef.current.forEach((segment) => {
       if (areEqual(segment.start, segment.end)) {
@@ -85,6 +96,10 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   );
 
   useEffect(() => {
+    if (state.clear) { clearCanvas(); }
+  }, [clearCanvas, state]);
+
+  useEffect(() => {
     setContext(canvasElementRef.current?.getContext('2d'));
   }, []);
 
@@ -93,11 +108,13 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     context.translate(0.5, 0.5);
     context.lineCap = 'round';
     socket.on('draw_segment', queueSegment);
+    socket.on('clear_canvas', clearCanvas);
+
     setInterval(
       () => requestAnimationFrame(updateCanvas),
       1000 / TARGET_FRAMERATE,
     );
-  }, [context, queueSegment, updateCanvas]);
+  }, [context, queueSegment, clearCanvas, updateCanvas]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasElementRef.current) return;

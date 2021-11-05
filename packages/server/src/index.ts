@@ -98,12 +98,21 @@ const addDrawSegmentListener = (socket: Socket) => {
   });
 };
 
+const addClearCanvasListener = (socket: Socket) => {
+  socket.on('request_clear', () => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.room).emit('clear_canvas');
+  });
+};
+
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
   addUserLeaveListener(socket);
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);
+  addClearCanvasListener(socket);
 });
 
 server.listen(port, () => console.log(`App listening at http://localhost:${port}`));
