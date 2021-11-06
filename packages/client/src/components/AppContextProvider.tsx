@@ -5,7 +5,7 @@ interface AppData {
   room: string;
   color: string;
   thickness: number;
-  clear: boolean;
+  context: CanvasRenderingContext2D | null;
 }
 
 const DEFAULT_APP_DATA: AppData = {
@@ -13,14 +13,14 @@ const DEFAULT_APP_DATA: AppData = {
   room: '',
   color: 'black',
   thickness: 10,
-  clear: false,
+  context: null,
 };
 
 type AppAction =
   | { type: 'initialize-user'; username: string; room: string }
   | { type: 'select-color'; color: string }
   | { type: 'select-thickness'; thickness: number }
-  | { type: 'set-clear'; clear: boolean };
+  | { type: 'set-context'; context: CanvasRenderingContext2D };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -40,10 +40,10 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
         ...state,
         thickness: action.thickness,
       };
-    case 'set-clear':
+    case 'set-context':
       return {
         ...state,
-        clear: action.clear,
+        context: action.context,
       };
     default:
       throw new Error('Invalid action.');

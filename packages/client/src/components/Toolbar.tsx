@@ -1,13 +1,11 @@
 import React from 'react';
-import {
-  Box, BoxProps, Button, makeStyles,
-} from '@material-ui/core';
+import { Box, BoxProps, makeStyles } from '@material-ui/core';
 
 import clsx from 'clsx';
-import socket from '../services/socket';
 import ColorPalette from './ColorPalette';
 import ThicknessSlider from './ThicknessSlider';
 import { useAppContext } from './AppContextProvider';
+import ClearButton from './ClearButton';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,12 +36,7 @@ export type ToolbarProps = BoxProps;
 
 const Toolbar: React.FC<ToolbarProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
-
-  const clearButton = () => {
-    dispatch({ type: 'set-clear', clear: true });
-    socket.emit('request_clear');
-  };
+  const { state } = useAppContext();
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
@@ -54,9 +47,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ className, ...rest }) => {
       />
       <ColorPalette className={classes.colorPalette} />
       <ThicknessSlider className={classes.thicknessSlider} />
-      <Button variant="contained" className={classes.deleteButton} color="primary" onClick={clearButton}>
-        Clear
-      </Button>
+      <ClearButton />
     </Box>
   );
 };

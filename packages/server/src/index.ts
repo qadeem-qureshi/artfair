@@ -99,7 +99,7 @@ const addDrawSegmentListener = (socket: Socket) => {
 };
 
 const addClearCanvasListener = (socket: Socket) => {
-  socket.on('request_clear', () => {
+  socket.on('clear_canvas', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
     socket.broadcast.to(userData.room).emit('clear_canvas');
