@@ -6,7 +6,7 @@ interface AppData {
   color: string;
   thickness: number;
   players: string[];
-  host: boolean;
+  isHost: boolean;
 }
 
 const DEFAULT_APP_DATA: AppData = {
@@ -15,40 +15,55 @@ const DEFAULT_APP_DATA: AppData = {
   color: 'black',
   thickness: 10,
   players: [],
-  host: false,
+  isHost: false,
 };
 
 type AppAction =
-  | { type: 'initialize-user'; username: string; room: string }
-  | { type: 'select-color'; color: string }
-  | { type: 'select-thickness'; thickness: number }
-  | { type: 'set-players'; players: string[], host: boolean };
+  | { type: 'set-color'; color: string }
+  | { type: 'set-thickness'; thickness: number }
+  | { type: 'create-room'; username: string; room: string }
+  | { type: 'join-room'; username: string; room: string; players: string[] }
+  | { type: 'user-join'; username: string }
+  | { type: 'user-leave'; username: string }
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
-    case 'initialize-user':
-      return {
-        ...state,
-        username: action.username,
-        room: action.room,
-      };
-    case 'select-color':
+    case 'set-color':
       return {
         ...state,
         color: action.color,
       };
-    case 'select-thickness':
+    case 'set-thickness':
       return {
         ...state,
         thickness: action.thickness,
       };
-    case 'set-players':
+    case 'create-room':
       return {
         ...state,
-        players: action.players,
-        host: action.host,
+        username: action.username,
+        room: action.room,
+        isHost: true,
+        players: [action.username],
       };
-
+    case 'join-room':
+      return {
+        ...state,
+        username: action.username,
+        room: action.room,
+        players: action.players,
+        isHost: false,
+      };
+    case 'user-join':
+      return {
+        ...state,
+        players: [...state.players, action.username],
+      };
+    case 'user-leave':
+      return {
+        ...state,
+        players: state.players.filter((player) => player !== action.username),
+      };
     default:
       throw new Error('Invalid action.');
   }

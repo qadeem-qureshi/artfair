@@ -1,10 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  TextField, Button, Box, makeStyles, BoxProps,
+  TextField,
+  Button,
+  Box,
+  makeStyles,
+  BoxProps,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomRequestData } from '@artfair/common';
+import { RoomCreationData, RoomJoinData } from '@artfair/common';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
 
@@ -30,22 +34,32 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const history = useHistory();
   const { dispatch } = useAppContext();
 
-  const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUsernameInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRequestedUsernameError('');
     setRequestedUsername(event.target.value.trimLeft());
   };
 
-  const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleRoomInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRequestedRoomError('');
     setRequestedRoom(event.target.value.trimLeft());
   };
 
-  const handleCreateRoom = () => {
-    socket.emit('create_room_attempt', { username: requestedUsername, room: requestedRoom });
+  const handleCreateRoomAttempt = () => {
+    socket.emit('create_room_attempt', {
+      username: requestedUsername,
+      room: requestedRoom,
+    });
   };
 
-  const handleJoinRoom = () => {
-    socket.emit('join_room_attempt', { username: requestedUsername, room: requestedRoom });
+  const handleJoinRoomAttempt = () => {
+    socket.emit('join_room_attempt', {
+      username: requestedUsername,
+      room: requestedRoom,
+    });
   };
 
   const handleTakenRoom = useCallback(() => {
@@ -60,10 +74,26 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     setRequestedUsernameError('This username is taken.');
   }, []);
 
-  const handleRoomRequestAccepted = useCallback(
-    (data: RoomRequestData) => {
-      dispatch({ type: 'initialize-user', username: data.username, room: data.room });
-      dispatch({ type: 'set-players', players: data.players, host: data.host });
+  const handleRoomCreated = useCallback(
+    (data: RoomCreationData) => {
+      dispatch({
+        type: 'create-room',
+        username: data.username,
+        room: data.room,
+      });
+      history.push('/lobby');
+    },
+    [dispatch, history],
+  );
+
+  const handleRoomJoined = useCallback(
+    (data: RoomJoinData) => {
+      dispatch({
+        type: 'join-room',
+        username: data.username,
+        room: data.room,
+        players: data.players,
+      });
       history.push('/lobby');
     },
     [dispatch, history],
@@ -73,9 +103,15 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     socket.on('room_taken', handleTakenRoom);
     socket.on('room_does_not_exist', handleNonexistentRoom);
     socket.on('username_taken', handleTakenUsername);
-    socket.on('room_created', handleRoomRequestAccepted);
-    socket.on('room_joined', handleRoomRequestAccepted);
-  }, [handleTakenRoom, handleNonexistentRoom, handleTakenUsername, handleRoomRequestAccepted]);
+    socket.on('room_created', handleRoomCreated);
+    socket.on('room_joined', handleRoomJoined);
+  }, [
+    handleTakenRoom,
+    handleNonexistentRoom,
+    handleTakenUsername,
+    handleRoomCreated,
+    handleRoomJoined,
+  ]);
 
   const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoom.length === 0;
 
@@ -102,7 +138,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         helperText={requestedRoomError}
       />
       <Button
-        onClick={handleCreateRoom}
+        onClick={handleCreateRoomAttempt}
         disabled={textFieldsAreEmpty}
         variant="contained"
         color="primary"
@@ -111,7 +147,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         Create Room
       </Button>
       <Button
-        onClick={handleJoinRoom}
+        onClick={handleJoinRoomAttempt}
         disabled={textFieldsAreEmpty}
         variant="contained"
         color="primary"

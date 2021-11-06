@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 export interface ChatMessage {
   sender: string;
   content: string;
@@ -22,7 +21,16 @@ export interface RoomData {
 export interface RoomRequestData {
   username: string;
   room: string;
-  host: boolean;
+}
+
+export interface RoomCreationData {
+  username: string;
+  room: string;
+}
+
+export interface RoomJoinData {
+  username: string;
+  room: string;
   players: string[];
 }
 
@@ -31,13 +39,4 @@ export interface StrokeSegment {
   end: Point;
   color: string;
   thickness: number;
-}
-
-export enum GameType
-{
-  None,
-  Game1,
-  Game2,
-  Game3,
-  Game4
 }

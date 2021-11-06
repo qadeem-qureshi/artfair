@@ -12,7 +12,6 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: '1rem',
   },
   messageContainer: {
     overflowY: 'auto',
@@ -28,7 +27,6 @@ export type ChatProps = BoxProps;
 
 const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { state } = useAppContext();
 
@@ -39,29 +37,29 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
 
   const handleUserJoin = useCallback(
     (name: string) => {
-      addMessage({ sender: '', content: `${name} joined the chat` });
+      addMessage({ sender: '', content: `${name} joined the room` });
     },
     [addMessage],
   );
 
   const handleUserLeave = useCallback(
     (name: string) => {
-      addMessage({ sender: '', content: `${name} left the chat` });
+      addMessage({ sender: '', content: `${name} left the room` });
     },
     [addMessage],
   );
-
-  useEffect(() => {
-    socket.on('chat_message', addMessage);
-    socket.on('user_join', handleUserJoin);
-    socket.on('user_leave', handleUserLeave);
-  }, [addMessage, handleUserJoin, handleUserLeave]);
 
   const handleSend = (content: string) => {
     const message: ChatMessage = { sender: state.username, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };
+
+  useEffect(() => {
+    socket.on('chat_message', addMessage);
+    socket.on('user_join', handleUserJoin);
+    socket.on('user_leave', handleUserLeave);
+  }, [addMessage, handleUserJoin, handleUserLeave]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
