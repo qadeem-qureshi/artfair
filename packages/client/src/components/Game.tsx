@@ -1,9 +1,6 @@
 import React from 'react';
 import {
-  Box,
-  BoxProps,
-  makeStyles,
-  useMediaQuery,
+  Box, BoxProps, makeStyles, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import Canvas from './Canvas';
@@ -31,7 +28,10 @@ const useStyles = makeStyles((theme) => ({
     gap: '1rem',
   },
   toolbar: {
-    height: '3rem',
+    height: `0.1 * ${CANVAS_SIZE}`,
+  },
+  wrappedToolbar: {
+    height: `0.1 * ${WRAPPED_CANVAS_SIZE}`,
   },
   canvas: {
     width: CANVAS_SIZE,
@@ -72,7 +72,12 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
       {...rest}
     >
       <Box className={classes.easel}>
-        <Toolbar className={classes.toolbar} />
+        <Toolbar
+          className={clsx(
+            classes.toolbar,
+            shouldWrap && classes.wrappedToolbar,
+          )}
+        />
         <Canvas
           className={clsx(classes.canvas, shouldWrap && classes.wrappedCanvas)}
           width={CANVAS_RESOLUTION}

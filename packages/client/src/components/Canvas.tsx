@@ -97,7 +97,6 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
 
   useEffect(() => {
     if (!state.context) return;
-    state.context.translate(0.5, 0.5);
     state.context.lineCap = 'round';
     state.context.fillStyle = 'white';
     state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
