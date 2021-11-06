@@ -27,12 +27,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     gap: '1rem',
   },
-  toolbar: {
-    height: `0.1 * ${CANVAS_SIZE}`,
-  },
-  wrappedToolbar: {
-    height: `0.1 * ${WRAPPED_CANVAS_SIZE}`,
-  },
   canvas: {
     width: CANVAS_SIZE,
     height: CANVAS_SIZE,
@@ -72,12 +66,7 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
       {...rest}
     >
       <Box className={classes.easel}>
-        <Toolbar
-          className={clsx(
-            classes.toolbar,
-            shouldWrap && classes.wrappedToolbar,
-          )}
-        />
+        <Toolbar />
         <Canvas
           className={clsx(classes.canvas, shouldWrap && classes.wrappedCanvas)}
           width={CANVAS_RESOLUTION}
