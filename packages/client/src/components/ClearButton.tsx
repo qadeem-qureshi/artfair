@@ -1,5 +1,5 @@
 import { IconButton, IconButtonProps } from '@material-ui/core';
-import { DeleteRounded } from '@material-ui/icons';
+import DeleteRounded from '@material-ui/icons/DeleteRounded';
 import React from 'react';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
