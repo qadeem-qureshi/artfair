@@ -40,3 +40,5 @@ export interface StrokeSegment {
   color: string;
   thickness: number;
 }
+
+export type Activity = 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer' | 'art-critic';

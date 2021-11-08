@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
+import { Activity } from '@artfair/common';
 
 interface AppData {
   username: string;
@@ -7,6 +8,7 @@ interface AppData {
   thickness: number;
   players: string[];
   isHost: boolean;
+  activity: Activity;
 }
 
 const DEFAULT_APP_DATA: AppData = {
@@ -16,6 +18,7 @@ const DEFAULT_APP_DATA: AppData = {
   thickness: 10,
   players: [],
   isHost: false,
+  activity: 'con-artist',
 };
 
 type AppAction =
@@ -25,6 +28,7 @@ type AppAction =
   | { type: 'join-room'; username: string; room: string; players: string[] }
   | { type: 'user-join'; username: string }
   | { type: 'user-leave'; username: string }
+  | { type: 'set-activity'; activity: Activity };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -63,6 +67,11 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         players: state.players.filter((player) => player !== action.username),
+      };
+    case 'set-activity':
+      return {
+        ...state,
+        activity: action.activity,
       };
     default:
       throw new Error('Invalid action.');

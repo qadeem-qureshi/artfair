@@ -20,11 +20,11 @@ const useStyles = makeStyles({
   },
 });
 
-export interface ArtistCardProps extends BoxProps {
+export interface ArtistProfileProps extends BoxProps {
   name: string;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({
+const ArtistProfile: React.FC<ArtistProfileProps> = ({
   className,
   name,
   ...rest
@@ -40,4 +40,4 @@ const ArtistCard: React.FC<ArtistCardProps> = ({
   );
 };
 
-export default ArtistCard;
+export default ArtistProfile;

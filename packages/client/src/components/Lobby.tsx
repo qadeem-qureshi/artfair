@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Box,
   BoxProps,
   Button,
   makeStyles,
-  Typography,
   useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
+import { useHistory } from 'react-router-dom';
+import socket from '../services/socket';
 import Chat from './Chat';
+import ArtistList from './ArtistList';
+import RoomName from './RoomName';
+import ActivityCarousel from './ActivityCarousel';
 import { useAppContext } from './AppContextProvider';
-import ArtistCard from './ArtistCard';
-import ActivityCard from './ActivityCard';
 
 const MAIN_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_MAIN_SIZE = 'min(80vw, 50vh)';
@@ -21,21 +23,19 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'stretch',
     gap: '1rem',
+  },
+  roomName: {
+    maxWidth: '80vw',
   },
   panelContainer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'stretch',
     gap: '1rem',
   },
   wrappedPanelContainer: {
     flexDirection: 'column',
-  },
-  room: {
-    textAlign: 'center',
   },
   main: {
     height: MAIN_SIZE,
@@ -48,24 +48,11 @@ const useStyles = makeStyles((theme) => ({
     height: WRAPPED_MAIN_SIZE,
     width: WRAPPED_MAIN_SIZE,
   },
-  artistPanel: {
+  artistList: {
     padding: '1rem',
-    display: 'flex',
-    flexDirection: 'row',
-    gap: '1rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
     overflowX: 'auto',
-  },
-  activitiesPanel: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'stretch',
-    padding: '1rem',
-    gap: '1rem',
-    flex: 1,
-    boxShadow: theme.shadows[2],
-    borderRadius: theme.shape.borderRadius,
   },
   chat: {
     height: MAIN_SIZE,
@@ -78,18 +65,21 @@ const useStyles = makeStyles((theme) => ({
     width: WRAPPED_MAIN_SIZE,
     height: '15rem',
   },
-  activityCard: {
-    boxShadow: theme.shadows[2],
-    borderRadius: theme.shape.borderRadius,
-  },
-  activityCardContainer: {
+  activityContentContainer: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
+    boxShadow: theme.shadows[2],
+    borderRadius: theme.shape.borderRadius,
     padding: '1rem',
     gap: '1rem',
-    flex: 1,
+    overflow: 'auto',
   },
-  playButton: {},
+  activityCarousel: {
+    flex: 1,
+    minHeight: 0,
+  },
 }));
 
 export type LobbyProps = BoxProps;
@@ -97,13 +87,25 @@ export type LobbyProps = BoxProps;
 const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
+  const history = useHistory();
   const { state } = useAppContext();
+
+  const handlePlay = () => {
+    socket.emit('start_game');
+    history.push('/game');
+  };
+
+  const startGame = useCallback(() => {
+    history.push('/game');
+  }, [history]);
+
+  useEffect(() => {
+    socket.on('start_game', startGame);
+  }, [startGame]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Typography className={classes.room} variant="h2">
-        {state.room}
-      </Typography>
+      <RoomName className={classes.roomName} />
       <Box
         className={clsx(
           classes.panelContainer,
@@ -111,31 +113,15 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
         )}
       >
         <Box className={clsx(classes.main, shouldWrap && classes.wrappedMain)}>
-          <Box className={classes.artistPanel}>
-            {state.players.map((player) => (
-              <ArtistCard name={player} />
-            ))}
-          </Box>
-          <Box className={classes.activitiesPanel}>
-            <Box className={classes.activityCardContainer}>
-              <ActivityCard
-                className={classes.activityCard}
-                name="Art Collab"
-                description="Draw some stuff"
-              />
-              <ActivityCard
-                className={classes.activityCard}
-                name="Con Artist"
-                description="Draw some more stuff"
-              />
-              <ActivityCard
-                className={classes.activityCard}
-                name="Canvas Swap"
-                description="Draw even more stuff"
-              />
-            </Box>
+          <ArtistList className={classes.artistList} />
+          <Box className={classes.activityContentContainer}>
+            <ActivityCarousel className={classes.activityCarousel} />
             {state.isHost && (
-              <Button color="primary" variant="contained">
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={handlePlay}
+              >
                 Play
               </Button>
             )}
