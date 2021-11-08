@@ -3,11 +3,9 @@ import {
   Box, BoxProps, IconButton, makeStyles,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import {
-  ArrowBackIosRounded,
-  ArrowForwardIosRounded,
-} from '@material-ui/icons';
 import { Activity } from '@artfair/common';
+import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
+import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import SampleActivityImage from '../assets/activity.png';
 import ActivityCarouselItem from './ActivityCarouselItem';
 import { useAppContext } from './AppContextProvider';
