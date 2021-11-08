@@ -9,6 +9,7 @@ interface AppData {
   players: string[];
   isHost: boolean;
   activity: Activity;
+  context: CanvasRenderingContext2D | null;
 }
 
 const DEFAULT_APP_DATA: AppData = {
@@ -19,6 +20,7 @@ const DEFAULT_APP_DATA: AppData = {
   players: [],
   isHost: false,
   activity: 'con-artist',
+  context: null,
 };
 
 type AppAction =
@@ -28,7 +30,8 @@ type AppAction =
   | { type: 'join-room'; username: string; room: string; players: string[] }
   | { type: 'user-join'; username: string }
   | { type: 'user-leave'; username: string }
-  | { type: 'set-activity'; activity: Activity };
+  | { type: 'set-activity'; activity: Activity }
+  | { type: 'set-context'; context: CanvasRenderingContext2D };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -72,6 +75,11 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         activity: action.activity,
+      };
+    case 'set-context':
+      return {
+        ...state,
+        context: action.context,
       };
     default:
       throw new Error('Invalid action.');
