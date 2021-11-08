@@ -20,15 +20,8 @@ const root = path.join(__dirname, '../../client/dist');
 const users = new Map<string, UserData>();
 const rooms = new Map<string, RoomData>();
 
-app.use(express.static(root));
-
-app.get('*', (req, res) => {
-  res.sendFile(root.concat('/index.html'), (err) => {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
+app.use('/', express.static(root));
+app.use('*', express.static(root));
 
 const usernameIsTaken = (username: string, room: string) => {
   const roomData = rooms.get(room);
