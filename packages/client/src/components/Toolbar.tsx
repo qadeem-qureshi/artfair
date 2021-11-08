@@ -1,27 +1,26 @@
 import React from 'react';
-import {
-  Box, BoxProps, makeStyles,
-} from '@material-ui/core';
-import clsx from 'clsx';
-import ColorPalette from './ColorPalette';
-import ThicknessSlider from './ThicknessSlider';
+import { Box, BoxProps, makeStyles } from '@material-ui/core';
 
-const useStyles = makeStyles((theme) => ({
+import clsx from 'clsx';
+import ColorPicker from './ColorPicker';
+import ThicknessSlider from './ThicknessSlider';
+import ClearButton from './ClearButton';
+
+const useStyles = makeStyles({
   root: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     gap: '1rem',
   },
-  colorPalette: {
-    boxShadow: theme.shadows[2],
-    borderRadius: theme.shape.borderRadius,
-    flex: 2,
+  colorPicker: {
+    flex: 1,
   },
   thicknessSlider: {
     flex: 1,
   },
-}));
+});
 
 export type ToolbarProps = BoxProps;
 
@@ -30,8 +29,9 @@ const Toolbar: React.FC<ToolbarProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <ColorPalette className={classes.colorPalette} />
+      <ColorPicker className={classes.colorPicker} />
       <ThicknessSlider className={classes.thicknessSlider} />
+      <ClearButton />
     </Box>
   );
 };
