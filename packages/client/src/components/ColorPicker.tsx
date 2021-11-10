@@ -19,7 +19,7 @@ const COLORS = [
 ];
 
 const NUM_ROWS = 2;
-const PREVIEW_SIZE = '3rem';
+const PREVIEW_SIZE = 'min(5.5vw, 6vh)';
 const COLOR_ITEM_SIZE = `calc(${PREVIEW_SIZE} / ${NUM_ROWS})`;
 
 const useStyles = makeStyles((theme) => ({
