@@ -41,6 +41,11 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
+
+    return () => {
+      socket.off('user_join', handleUserJoin);
+      socket.off('user_leave', handleUserLeave);
+    };
   }, [handleUserJoin, handleUserLeave]);
 
   useEffect(() => {

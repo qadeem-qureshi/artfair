@@ -105,10 +105,17 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     socket.on('draw_segment', queueSegment);
     socket.on('clear_canvas', clearCanvas);
 
-    setInterval(
+    const timer = setInterval(
       () => requestAnimationFrame(updateCanvas),
       1000 / TARGET_FRAMERATE,
     );
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      socket.off('draw_segment', queueSegment);
+      socket.off('clear_canvas', clearCanvas);
+      clearInterval(timer);
+    };
   }, [queueSegment, clearCanvas, updateCanvas, state.context]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {

@@ -101,6 +101,10 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
 
   useEffect(() => {
     socket.on('start_game', startGame);
+
+    return () => {
+      socket.off('start_game', startGame);
+    };
   }, [startGame]);
 
   return (

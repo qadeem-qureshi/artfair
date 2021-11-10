@@ -105,6 +105,14 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     socket.on('username_taken', handleTakenUsername);
     socket.on('room_created', handleRoomCreated);
     socket.on('room_joined', handleRoomJoined);
+
+    return () => {
+      socket.off('room_taken', handleTakenRoom);
+      socket.off('room_does_not_exist', handleNonexistentRoom);
+      socket.off('username_taken', handleTakenUsername);
+      socket.off('room_created', handleRoomCreated);
+      socket.off('room_joined', handleRoomJoined);
+    };
   }, [
     handleTakenRoom,
     handleNonexistentRoom,

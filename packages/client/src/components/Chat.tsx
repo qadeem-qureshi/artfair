@@ -59,6 +59,12 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     socket.on('chat_message', addMessage);
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
+
+    return () => {
+      socket.off('chat_message', addMessage);
+      socket.off('user_join', handleUserJoin);
+      socket.off('user_leave', handleUserLeave);
+    };
   }, [addMessage, handleUserJoin, handleUserLeave]);
 
   return (
