@@ -16,14 +16,14 @@ const EraserButton: React.FC<EraserButtonProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { dispatch } = useAppContext();
 
-  const handleClick = () => {
-    dispatch({ type: 'select-color', color: 'white' });
+  const handleEraserEnable = () => {
+    dispatch({ type: 'set-color', color: 'white' });
   };
 
   return (
     <IconButton
       className={clsx(classes.root, className)}
-      onClick={handleClick}
+      onClick={handleEraserEnable}
       color="primary"
       {...rest}
     >

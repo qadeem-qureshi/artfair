@@ -68,9 +68,11 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   );
 
   const clearCanvas = useCallback(() => {
-    if (!state.context) return;
-    state.context.fillStyle = 'white';
-    state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    requestAnimationFrame(() => {
+      if (!state.context) return;
+      state.context.fillStyle = 'white';
+      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    });
   }, [state.context]);
 
   const updateCanvas = useCallback(() => {

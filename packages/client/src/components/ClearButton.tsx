@@ -9,15 +9,17 @@ export type ClearButtonProps = IconButtonProps;
 const ClearButton: React.FC<ClearButtonProps> = (props) => {
   const { state } = useAppContext();
 
-  const handleClick = () => {
-    if (!state.context) return;
-    state.context.fillStyle = 'white';
-    state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+  const handleClear = () => {
+    requestAnimationFrame(() => {
+      if (!state.context) return;
+      state.context.fillStyle = 'white';
+      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    });
     socket.emit('clear_canvas');
   };
 
   return (
-    <IconButton onClick={handleClick} color="primary" {...props}>
+    <IconButton onClick={handleClear} color="primary" {...props}>
       <DeleteRounded />
     </IconButton>
   );
