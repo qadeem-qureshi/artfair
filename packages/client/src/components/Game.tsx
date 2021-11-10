@@ -4,8 +4,8 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import Canvas from './Canvas';
-import Chat from './Chat';
 import Toolbar from './Toolbar';
+import GameTab from './GameTab';
 
 const CANVAS_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_CANVAS_SIZE = 'min(80vw, 50vh)';
@@ -37,17 +37,16 @@ const useStyles = makeStyles((theme) => ({
     width: WRAPPED_CANVAS_SIZE,
     height: WRAPPED_CANVAS_SIZE,
   },
-  chat: {
+  tabs: {
     height: CANVAS_SIZE,
     width: '20rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
     alignSelf: 'flex-end',
   },
-  wrappedChat: {
+  wrappedTabs: {
     width: WRAPPED_CANVAS_SIZE,
     height: '15rem',
-    alignSelf: 'auto',
   },
 }));
 
@@ -73,7 +72,9 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
           height={CANVAS_RESOLUTION}
         />
       </Box>
-      <Chat className={clsx(classes.chat, shouldWrap && classes.wrappedChat)} />
+      <Box className={clsx(classes.tabs, shouldWrap && classes.wrappedTabs)}>
+        <GameTab />
+      </Box>
     </Box>
   );
 };
