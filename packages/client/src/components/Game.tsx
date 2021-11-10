@@ -5,7 +5,7 @@ import {
 import clsx from 'clsx';
 import Canvas from './Canvas';
 import Toolbar from './Toolbar';
-import GameTab from './GameTab';
+import GameTabs from './GameTabs';
 
 const CANVAS_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_CANVAS_SIZE = 'min(80vw, 50vh)';
@@ -37,14 +37,14 @@ const useStyles = makeStyles((theme) => ({
     width: WRAPPED_CANVAS_SIZE,
     height: WRAPPED_CANVAS_SIZE,
   },
-  tabs: {
+  gameTabs: {
     height: CANVAS_SIZE,
     width: '20rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
     alignSelf: 'flex-end',
   },
-  wrappedTabs: {
+  wrappedGameTabs: {
     width: WRAPPED_CANVAS_SIZE,
     height: '15rem',
   },
@@ -72,9 +72,12 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
           height={CANVAS_RESOLUTION}
         />
       </Box>
-      <Box className={clsx(classes.tabs, shouldWrap && classes.wrappedTabs)}>
-        <GameTab />
-      </Box>
+      <GameTabs
+        className={clsx(
+          classes.gameTabs,
+          shouldWrap && classes.wrappedGameTabs,
+        )}
+      />
     </Box>
   );
 };
