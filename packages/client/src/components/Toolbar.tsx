@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import ColorPicker from './ColorPicker';
 import ThicknessSlider from './ThicknessSlider';
 import ClearButton from './ClearButton';
+import ExportButton from './ExportButton';
 import EraserButton from './EraserButton';
 
 const useStyles = makeStyles({
@@ -34,6 +35,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ className, ...rest }) => {
       <ThicknessSlider className={classes.thicknessSlider} />
       <EraserButton />
       <ClearButton />
+      <ExportButton />
     </Box>
   );
 };
