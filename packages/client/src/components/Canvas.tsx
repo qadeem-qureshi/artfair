@@ -68,9 +68,11 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   );
 
   const clearCanvas = useCallback(() => {
-    if (!state.context) return;
-    state.context.fillStyle = 'white';
-    state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    requestAnimationFrame(() => {
+      if (!state.context) return;
+      state.context.fillStyle = 'white';
+      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    });
   }, [state.context]);
 
   const updateCanvas = useCallback(() => {
@@ -103,10 +105,17 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     socket.on('draw_segment', queueSegment);
     socket.on('clear_canvas', clearCanvas);
 
-    setInterval(
+    const timer = setInterval(
       () => requestAnimationFrame(updateCanvas),
       1000 / TARGET_FRAMERATE,
     );
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      socket.off('draw_segment', queueSegment);
+      socket.off('clear_canvas', clearCanvas);
+      clearInterval(timer);
+    };
   }, [queueSegment, clearCanvas, updateCanvas, state.context]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {

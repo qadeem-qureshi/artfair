@@ -24,7 +24,7 @@ const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
     event: React.ChangeEvent<{}>,
     value: number | number[],
   ) => {
-    dispatch({ type: 'select-thickness', thickness: value as number });
+    dispatch({ type: 'set-thickness', thickness: value as number });
   };
 
   return (
