@@ -17,7 +17,7 @@ const io = new Server(server, {
     origin: '*',
   },
 });
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
 const users = new Map<string, UserData>();
