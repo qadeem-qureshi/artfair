@@ -14,6 +14,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    gap: '0.5rem',
   },
   name: {
     textAlign: 'center',

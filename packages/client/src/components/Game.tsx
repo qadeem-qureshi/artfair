@@ -40,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
   gameTabs: {
     height: CANVAS_SIZE,
     width: '20rem',
-    padding: '1rem',
     boxShadow: theme.shadows[2],
     borderRadius: theme.shape.borderRadius,
     alignSelf: 'flex-end',
