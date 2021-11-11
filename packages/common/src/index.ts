@@ -23,9 +23,22 @@ export interface RoomRequestData {
   room: string;
 }
 
+export interface RoomCreationData {
+  username: string;
+  room: string;
+}
+
+export interface RoomJoinData {
+  username: string;
+  room: string;
+  players: string[];
+}
+
 export interface StrokeSegment {
   start: Point;
   end: Point;
   color: string;
   thickness: number;
 }
+
+export type Activity = 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer' | 'art-critic';

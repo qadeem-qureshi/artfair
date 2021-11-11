@@ -51,7 +51,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { state, dispatch } = useAppContext();
 
-  const colorSelector = (color: string) => () => dispatch({ type: 'select-color', color });
+  const colorSelector = (color: string) => () => dispatch({ type: 'set-color', color });
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>

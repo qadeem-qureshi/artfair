@@ -18,7 +18,7 @@ const useStyles = makeStyles({
     display: 'inline',
   },
   announcement: {
-    opacity: 0.5,
+    opacity: 0.8,
     fontWeight: 'lighter',
     fontStyle: 'italic',
   },
