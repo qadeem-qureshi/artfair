@@ -1,4 +1,7 @@
-# How to run the docker image:
+### How to build the docker image:
+# From the directory containing 'Dockerfile', run:
+# docker build -t artfair .
+### How to run the docker image:
 # docker run -p3333:3333 -e "PORT=3333" artfair
 # -p to specify which port from inside the container should map to a port on your computer
 #    NOTE: Make sure the ports you specify match the port being used by the container.
