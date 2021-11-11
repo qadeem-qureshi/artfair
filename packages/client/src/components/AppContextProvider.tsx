@@ -15,7 +15,7 @@ interface AppData {
 const DEFAULT_APP_DATA: AppData = {
   username: '',
   room: '',
-  color: 'black',
+  color: '#1e272e',
   thickness: 10,
   players: [],
   isHost: false,
