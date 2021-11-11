@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
   wrappedGameTabs: {
     width: WRAPPED_CANVAS_SIZE,
     height: '15rem',
+    alignSelf: 'flex-start',
   },
 }));
 
