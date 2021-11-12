@@ -9,6 +9,7 @@ import {
   RoomData,
   RoomCreationData,
   RoomRequestData,
+  PersistentUserData,
 } from '@artfair/common';
 
 const app = express();
@@ -36,6 +37,7 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
       const userData: UserData = { name: data.username, room: data.room };
       const roomData: RoomData = {
         name: data.room,
+        uid: data.room + Math.random().toString(36),
         members: new Set([data.username]),
       };
       users.set(socket.id, userData);
@@ -44,6 +46,7 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
       socket.emit('room_created', {
         username: data.username,
         room: data.room,
+        uid: roomData.uid,
         host: true,
         players: Array.from(roomData.members),
       });
@@ -67,9 +70,33 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
       socket.emit('room_joined', {
         username: data.username,
         room: data.room,
+        uid: roomData.uid,
         players: Array.from(roomData.members),
       });
       socket.broadcast.to(data.room).emit('user_join', data.username);
+    }
+  });
+};
+
+const addRetrieveRoomAttemptListener = (socket: Socket) => {
+  socket.on('retrieve-room-attempt', (data: PersistentUserData) => {
+    const roomName = Array.from(rooms.keys()).find((room) => rooms.get(room)?.uid === data.uid);
+    if (!roomName) {
+      socket.emit('retrieve-room-error');
+    } else {
+      const roomData = rooms.get(roomName);
+      if (!roomData) return;
+
+      const userData: UserData = { name: data.username, room: roomData.name };
+      users.set(socket.id, userData);
+      roomData.members.add(data.username);
+      socket.join(roomName);
+      socket.emit('retrieve-room-success', {
+        username: data.username,
+        room: roomName,
+        players: Array.from(roomData.members),
+      });
+      socket.broadcast.to(roomName).emit('user_join', data.username);
     }
   });
 };
@@ -128,6 +155,7 @@ const addClearCanvasListener = (socket: Socket) => {
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
+  addRetrieveRoomAttemptListener(socket);
   addUserLeaveListener(socket);
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);

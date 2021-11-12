@@ -7,6 +7,7 @@ import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
+import SessionRestore from './SessionRestore';
 
 const useStyles = makeStyles({
   root: {
@@ -23,6 +24,7 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { state, dispatch } = useAppContext();
   const history = useHistory();
+  const hasPersistentData = localStorage.getItem('roomInfo') !== null;
 
   const handleUserJoin = useCallback(
     (username: string) => {
@@ -41,7 +43,6 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
-
     return () => {
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
@@ -60,6 +61,7 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
       <Switch>
         <Route path="/home">
           <Home />
+          {hasPersistentData && <SessionRestore />}
         </Route>
         <Route path="/lobby">
           <Lobby />

@@ -8,7 +8,7 @@ import {
   BoxProps,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomCreationData, RoomJoinData } from '@artfair/common';
+import { PersistentUserData, RoomCreationData, RoomJoinData } from '@artfair/common';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
 
@@ -81,6 +81,10 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         username: data.username,
         room: data.room,
       });
+
+      const roomInfo: PersistentUserData = { username: data.username, uid: data.uid };
+      localStorage.setItem('roomInfo', JSON.stringify(roomInfo));
+
       history.push('/lobby');
     },
     [dispatch, history],
@@ -94,6 +98,10 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         room: data.room,
         players: data.players,
       });
+
+      const roomInfo: PersistentUserData = { username: data.username, uid: data.uid };
+      localStorage.setItem('roomInfo', JSON.stringify(roomInfo));
+
       history.push('/lobby');
     },
     [dispatch, history],

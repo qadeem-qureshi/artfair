@@ -13,8 +13,14 @@ export interface UserData {
   room: string;
 }
 
+export interface PersistentUserData {
+  username: string;
+  uid: string;
+}
+
 export interface RoomData {
   name: string;
+  uid: string;
   members: Set<string>;
 }
 
@@ -26,11 +32,13 @@ export interface RoomRequestData {
 export interface RoomCreationData {
   username: string;
   room: string;
+  uid: string;
 }
 
 export interface RoomJoinData {
   username: string;
   room: string;
+  uid: string;
   players: string[];
 }
 
