@@ -93,8 +93,10 @@ const SessionRestore: React.FC<SessionProps> = ({ className, ...rest }) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRoomNotFoundError}>No</Button>
-          <Button onClick={handleRejoinRoom} autoFocus>
+          <Button onClick={handleRoomNotFoundError}>
+            No
+          </Button>
+          <Button onClick={handleRejoinRoom} variant="contained" color="primary">
             Yes
           </Button>
         </DialogActions>
