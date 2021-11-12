@@ -6,25 +6,22 @@ import {
   ChatMessage,
   StrokeSegment,
   UserData,
-  Dot,
   RoomData,
+  RoomCreationData,
   RoomRequestData,
-} from '@team-2/common';
+} from '@artfair/common';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-  },
-});
+const io = new Server(server, { cors: { origin: '*' } });
 const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
 const users = new Map<string, UserData>();
 const rooms = new Map<string, RoomData>();
 
-app.use(express.static(root));
+app.use('/', express.static(root));
+app.use('*', express.static(root));
 
 const usernameIsTaken = (username: string, room: string) => {
   const roomData = rooms.get(room);
@@ -32,14 +29,24 @@ const usernameIsTaken = (username: string, room: string) => {
 };
 
 const addCreateRoomAttemptListener = (socket: Socket) => {
-  socket.on('create_room_attempt', (data: RoomRequestData) => {
+  socket.on('create_room_attempt', (data: RoomCreationData) => {
     if (rooms.has(data.room)) {
       socket.emit('room_taken');
     } else {
-      users.set(socket.id, { name: data.username, room: data.room });
-      rooms.set(data.room, { name: data.room, members: new Set([data.username]) });
+      const userData: UserData = { name: data.username, room: data.room };
+      const roomData: RoomData = {
+        name: data.room,
+        members: new Set([data.username]),
+      };
+      users.set(socket.id, userData);
+      rooms.set(data.room, roomData);
       socket.join(data.room);
-      socket.emit('room_created', data);
+      socket.emit('room_created', {
+        username: data.username,
+        room: data.room,
+        host: true,
+        players: Array.from(roomData.members),
+      });
     }
   });
 };
@@ -51,12 +58,27 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
     } else if (usernameIsTaken(data.username, data.room)) {
       socket.emit('username_taken');
     } else {
-      users.set(socket.id, { name: data.username, room: data.room });
-      rooms.get(data.room)?.members.add(data.username);
+      const userData: UserData = { name: data.username, room: data.room };
+      const roomData = rooms.get(data.room);
+      if (!roomData) return;
+      users.set(socket.id, userData);
+      roomData.members.add(data.username);
       socket.join(data.room);
-      socket.emit('room_joined', data);
+      socket.emit('room_joined', {
+        username: data.username,
+        room: data.room,
+        players: Array.from(roomData.members),
+      });
       socket.broadcast.to(data.room).emit('user_join', data.username);
     }
+  });
+};
+
+const addStartGameListener = (socket: Socket) => {
+  socket.on('start_game', () => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.room).emit('start_game');
   });
 };
 
@@ -95,11 +117,11 @@ const addDrawSegmentListener = (socket: Socket) => {
   });
 };
 
-const addDrawDotListener = (socket: Socket) => {
-  socket.on('draw_dot', (dot: Dot) => {
+const addClearCanvasListener = (socket: Socket) => {
+  socket.on('clear_canvas', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('draw_dot', dot);
+    socket.broadcast.to(userData.room).emit('clear_canvas');
   });
 };
 
@@ -109,7 +131,8 @@ io.on('connection', (socket) => {
   addUserLeaveListener(socket);
   addChatMessageListener(socket);
   addDrawSegmentListener(socket);
-  addDrawDotListener(socket);
+  addStartGameListener(socket);
+  addClearCanvasListener(socket);
 });
 
 server.listen(port, () => console.log(`App listening at http://localhost:${port}`));

@@ -2,14 +2,19 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import { makeStyles } from '@material-ui/core';
-import { Dot, Point, StrokeSegment } from '@team-2/common';
+import { Point, StrokeSegment } from '@artfair/common';
 import clsx from 'clsx';
 import socket from '../services/socket';
-import { getCanvasPoint, getClientPoint, getDistance } from '../util/canvas';
+import {
+  areEqual,
+  getCanvasPoint,
+  getClientPoint,
+  getDistance,
+} from '../util/canvas';
 import { useAppContext } from './AppContextProvider';
 
-const STROKE_RADIUS = 10;
 const SEGMENT_SIZE = 5;
+const TARGET_FRAMERATE = 60;
 
 const useStyles = makeStyles({
   root: {
@@ -26,63 +31,92 @@ export type CanvasProps = React.DetailedHTMLProps<
 const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const canvasElementRef = useRef<HTMLCanvasElement>(null);
-  const [context, setContext] = useState<CanvasRenderingContext2D | null>();
+  const segmentsRef = useRef<StrokeSegment[]>([]);
   const [lastPoint, setLastPoint] = useState<Point>({ x: 0, y: 0 });
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
 
-  const drawSegment = useCallback(
+  const drawLine = useCallback(
     (segment: StrokeSegment) => {
-      if (!context) return;
-
-      requestAnimationFrame(() => {
-        context.beginPath();
-        context.moveTo(segment.start.x, segment.start.y);
-        context.lineTo(segment.end.x, segment.end.y);
-        context.strokeStyle = segment.color;
-        context.stroke();
-      });
+      if (!state.context) return;
+      state.context.beginPath();
+      state.context.moveTo(segment.start.x, segment.start.y);
+      state.context.lineTo(segment.end.x, segment.end.y);
+      state.context.strokeStyle = segment.color;
+      state.context.lineWidth = segment.thickness;
+      state.context.stroke();
     },
-    [context],
+    [state.context],
   );
 
-  const drawDot = useCallback(
-    (dot: Dot) => {
-      if (!context) return;
-
-      requestAnimationFrame(() => {
-        context.beginPath();
-        context.ellipse(
-          dot.center.x,
-          dot.center.y,
-          STROKE_RADIUS,
-          STROKE_RADIUS,
-          0,
-          0,
-          Math.PI * 2,
-        );
-        context.fillStyle = dot.color;
-        context.fill();
-      });
+  const drawCircle = useCallback(
+    (segment: StrokeSegment) => {
+      if (!state.context) return;
+      state.context.beginPath();
+      state.context.ellipse(
+        segment.start.x,
+        segment.start.y,
+        segment.thickness / 2,
+        segment.thickness / 2,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      state.context.fillStyle = segment.color;
+      state.context.fill();
     },
-    [context],
+    [state.context],
   );
 
-  const setupContext = useCallback(() => {
+  const clearCanvas = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (!state.context) return;
+      state.context.fillStyle = 'white';
+      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    });
+  }, [state.context]);
+
+  const updateCanvas = useCallback(() => {
+    segmentsRef.current.forEach((segment) => {
+      if (areEqual(segment.start, segment.end)) {
+        drawCircle(segment);
+      } else {
+        drawLine(segment);
+      }
+    });
+    segmentsRef.current = [];
+  }, [drawCircle, drawLine]);
+
+  const queueSegment = useCallback(
+    (segment: StrokeSegment) => segmentsRef.current.push(segment),
+    [],
+  );
+
+  useEffect(() => {
+    const context = canvasElementRef.current?.getContext('2d');
     if (!context) return;
-    context.translate(0.5, 0.5);
-    context.lineCap = 'round';
-    context.lineWidth = STROKE_RADIUS * 2;
-  }, [context]);
+    dispatch({ type: 'set-context', context });
+  }, [dispatch]);
 
   useEffect(() => {
-    setContext(canvasElementRef.current?.getContext('2d'));
-  }, []);
+    if (!state.context) return;
+    state.context.lineCap = 'round';
+    state.context.fillStyle = 'white';
+    state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    socket.on('draw_segment', queueSegment);
+    socket.on('clear_canvas', clearCanvas);
 
-  useEffect(() => {
-    setupContext();
-    socket.on('draw_segment', drawSegment);
-    socket.on('draw_dot', drawDot);
-  }, [setupContext, drawSegment, drawDot]);
+    const timer = setInterval(
+      () => requestAnimationFrame(updateCanvas),
+      1000 / TARGET_FRAMERATE,
+    );
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      socket.off('draw_segment', queueSegment);
+      socket.off('clear_canvas', clearCanvas);
+      clearInterval(timer);
+    };
+  }, [queueSegment, clearCanvas, updateCanvas, state.context]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasElementRef.current) return;
@@ -91,9 +125,16 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       getClientPoint(event),
       canvasElementRef.current,
     );
-    const dot: Dot = { center: currentPoint, color: state.color };
-    drawDot(dot);
-    socket.emit('draw_dot', dot);
+
+    const segment: StrokeSegment = {
+      start: currentPoint,
+      end: currentPoint,
+      color: state.color,
+      thickness: state.thickness,
+    };
+
+    queueSegment(segment);
+    socket.emit('draw_segment', segment);
     setLastPoint(currentPoint);
   };
 
@@ -118,8 +159,9 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       start: lastPoint,
       end: currentPoint,
       color: state.color,
+      thickness: state.thickness,
     };
-    drawSegment(segment);
+    queueSegment(segment);
     socket.emit('draw_segment', segment);
     setLastPoint(currentPoint);
   };
