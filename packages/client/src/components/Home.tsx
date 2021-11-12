@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import {
-  TextField,
-  Button,
-  Box,
-  makeStyles,
-  BoxProps,
+  TextField, Button, Box, makeStyles, BoxProps,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { RoomCreationData, RoomJoinData } from '@artfair/common';
@@ -27,23 +23,19 @@ export type HomeProps = BoxProps;
 
 const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const [requestedUsername, setRequestedUsername] = useState('');
-  const [requestedRoom, setRequestedRoom] = useState('');
+  const [requestedUsername, setRequestedUsername] = useState(sessionStorage.getItem('username') ?? '');
+  const [requestedRoom, setRequestedRoom] = useState(sessionStorage.getItem('room') ?? '');
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomError, setRequestedRoomError] = useState('');
   const history = useHistory();
   const { dispatch } = useAppContext();
 
-  const handleUsernameInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedUsernameError('');
     setRequestedUsername(event.target.value.trimLeft());
   };
 
-  const handleRoomInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedRoomError('');
     setRequestedRoom(event.target.value.trimLeft());
   };
@@ -74,6 +66,11 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     setRequestedUsernameError('This username is taken.');
   }, []);
 
+  const saveSessionInfo = useCallback((username: string, room: string) => {
+    sessionStorage.setItem('username', username);
+    sessionStorage.setItem('room', room);
+  }, []);
+
   const handleRoomCreated = useCallback(
     (data: RoomCreationData) => {
       dispatch({
@@ -81,9 +78,10 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         username: data.username,
         room: data.room,
       });
+      saveSessionInfo(data.username, data.room);
       history.push('/lobby');
     },
-    [dispatch, history],
+    [dispatch, history, saveSessionInfo],
   );
 
   const handleRoomJoined = useCallback(
@@ -94,9 +92,10 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         room: data.room,
         players: data.players,
       });
+      saveSessionInfo(data.username, data.room);
       history.push('/lobby');
     },
-    [dispatch, history],
+    [dispatch, history, saveSessionInfo],
   );
 
   useEffect(() => {
