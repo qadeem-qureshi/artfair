@@ -84,19 +84,10 @@ const addRetrieveRoomAttemptListener = (socket: Socket) => {
     if (!roomName) {
       socket.emit('retrieve-room-error');
     } else {
-      const roomData = rooms.get(roomName);
-      if (!roomData) return;
-
-      const userData: UserData = { name: data.username, room: roomData.name };
-      users.set(socket.id, userData);
-      roomData.members.add(data.username);
-      socket.join(roomName);
       socket.emit('retrieve-room-success', {
         username: data.username,
         room: roomName,
-        players: Array.from(roomData.members),
       });
-      socket.broadcast.to(roomName).emit('user_join', data.username);
     }
   });
 };

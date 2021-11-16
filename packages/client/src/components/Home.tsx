@@ -83,7 +83,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
       });
 
       const roomInfo: PersistentUserData = { username: data.username, uid: data.uid };
-      localStorage.setItem('roomInfo', JSON.stringify(roomInfo));
+      sessionStorage.setItem('roomInfo', JSON.stringify(roomInfo));
 
       history.push('/lobby');
     },
@@ -100,7 +100,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
       });
 
       const roomInfo: PersistentUserData = { username: data.username, uid: data.uid };
-      localStorage.setItem('roomInfo', JSON.stringify(roomInfo));
+      sessionStorage.setItem('roomInfo', JSON.stringify(roomInfo));
 
       history.push('/lobby');
     },
