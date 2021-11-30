@@ -7,6 +7,7 @@ import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
+// import BackgroundImage from '../assets/snowflakes.png';
 
 const useStyles = makeStyles({
   root: {
@@ -14,6 +15,9 @@ const useStyles = makeStyles({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    // backgroundImage: `url(${BackgroundImage})`,
+    // backgroundRepeat: 'repeat',
+    // backgroundSize: '100rem',
   },
 });
 

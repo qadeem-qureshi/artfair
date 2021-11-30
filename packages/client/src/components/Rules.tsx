@@ -6,7 +6,6 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles({
   root: {
-    padding: '1rem',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
