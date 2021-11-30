@@ -2,6 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import clsx from 'clsx';
+import { MemberData } from '@artfair/common';
 import Home from './Home';
 import Game from './Game';
 import Lobby from './Lobby';
@@ -30,8 +31,12 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const history = useHistory();
 
   const handleUserJoin = useCallback(
-    (username: string) => {
-      dispatch({ type: 'user-join', username });
+    (memberData: MemberData) => {
+      dispatch({
+        type: 'user-join',
+        username: memberData.name,
+        avatarIndex: memberData.avatarIndex,
+      });
     },
     [dispatch],
   );
@@ -55,10 +60,10 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
 
   useEffect(() => {
     // Redirect users who are not in a room
-    if (!state.room) {
+    if (!state.roomname) {
       history.push('/home');
     }
-  }, [history, state.room]);
+  }, [history, state.roomname]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>

@@ -3,7 +3,7 @@ import {
   Box, BoxProps, Button, makeStyles, TextField,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomCreationData, RoomJoinData } from '@artfair/common';
+import { RoomCreationData, RoomJoinData, UserData } from '@artfair/common';
 import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
@@ -24,11 +24,11 @@ const useStyles = makeStyles({
 const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [requestedUsername, setRequestedUsername] = useState('');
-  const [requestedRoom, setRequestedRoom] = useState('');
+  const [requestedRoomname, setRequestedRoomname] = useState('');
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
-  const [requestedRoomError, setRequestedRoomError] = useState('');
+  const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
-  const { dispatch } = useAppContext();
+  const { state, dispatch } = useAppContext();
 
   const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedUsernameError('');
@@ -36,30 +36,34 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   };
 
   const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRequestedRoomError('');
-    setRequestedRoom(event.target.value.trimLeft());
+    setRequestedRoomnameError('');
+    setRequestedRoomname(event.target.value.trimLeft());
   };
 
   const handleCreateRoomAttempt = () => {
-    socket.emit('create_room_attempt', {
-      username: requestedUsername,
-      room: requestedRoom,
-    });
+    const userData: UserData = {
+      name: requestedUsername,
+      roomname: requestedRoomname,
+      avatarIndex: state.avatarIndex,
+    };
+    socket.emit('create_room_attempt', userData);
   };
 
   const handleJoinRoomAttempt = () => {
-    socket.emit('join_room_attempt', {
-      username: requestedUsername,
-      room: requestedRoom,
-    });
+    const userData: UserData = {
+      name: requestedUsername,
+      roomname: requestedRoomname,
+      avatarIndex: state.avatarIndex,
+    };
+    socket.emit('join_room_attempt', userData);
   };
 
-  const handleTakenRoom = useCallback(() => {
-    setRequestedRoomError('This room already exists.');
+  const handleTakenRoomname = useCallback(() => {
+    setRequestedRoomnameError('This room already exists.');
   }, []);
 
   const handleNonexistentRoom = useCallback(() => {
-    setRequestedRoomError('This room does not exist.');
+    setRequestedRoomnameError('This room does not exist.');
   }, []);
 
   const handleTakenUsername = useCallback(() => {
@@ -71,7 +75,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
       dispatch({
         type: 'create-room',
         username: data.username,
-        room: data.room,
+        roomname: data.roomname,
       });
       history.push('/lobby');
     },
@@ -83,8 +87,8 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
       dispatch({
         type: 'join-room',
         username: data.username,
-        room: data.room,
-        players: data.players,
+        roomname: data.roomname,
+        roomMembers: data.roomMembers,
       });
       history.push('/lobby');
     },
@@ -92,34 +96,34 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   );
 
   useEffect(() => {
-    socket.on('room_taken', handleTakenRoom);
+    socket.on('room_taken', handleTakenRoomname);
     socket.on('room_does_not_exist', handleNonexistentRoom);
     socket.on('username_taken', handleTakenUsername);
     socket.on('room_created', handleRoomCreated);
     socket.on('room_joined', handleRoomJoined);
 
     return () => {
-      socket.off('room_taken', handleTakenRoom);
+      socket.off('room_taken', handleTakenRoomname);
       socket.off('room_does_not_exist', handleNonexistentRoom);
       socket.off('username_taken', handleTakenUsername);
       socket.off('room_created', handleRoomCreated);
       socket.off('room_joined', handleRoomJoined);
     };
   }, [
-    handleTakenRoom,
+    handleTakenRoomname,
     handleNonexistentRoom,
     handleTakenUsername,
     handleRoomCreated,
     handleRoomJoined,
   ]);
 
-  const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoom.length === 0;
+  const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoomname.length === 0;
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <AvatarSelector />
       <TextField
-        placeholder="Username"
+        placeholder="Name"
         variant="outlined"
         color="primary"
         value={requestedUsername}
@@ -132,11 +136,11 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
         placeholder="Room"
         color="primary"
         variant="outlined"
-        value={requestedRoom}
+        value={requestedRoomname}
         onChange={handleRoomInputChange}
         spellCheck={false}
-        error={requestedRoomError.length !== 0}
-        helperText={requestedRoomError}
+        error={requestedRoomnameError.length !== 0}
+        helperText={requestedRoomnameError}
       />
       <Button
         onClick={handleCreateRoomAttempt}

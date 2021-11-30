@@ -10,28 +10,28 @@ export interface Point {
 
 export interface UserData {
   name: string;
-  room: string;
+  roomname: string;
+  avatarIndex: number;
 }
 
-export interface RoomData {
+export interface MemberData {
   name: string;
-  members: Set<string>;
-}
-
-export interface RoomRequestData {
-  username: string;
-  room: string;
+  avatarIndex: number;
 }
 
 export interface RoomCreationData {
   username: string;
-  room: string;
+  roomname: string;
 }
 
 export interface RoomJoinData {
   username: string;
-  room: string;
-  players: string[];
+  roomname: string;
+  roomMembers: MemberData[];
+}
+
+export interface RoomData {
+  members: MemberData[];
 }
 
 export interface StrokeSegment {

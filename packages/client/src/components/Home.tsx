@@ -22,7 +22,7 @@ const useStyles = makeStyles({
     padding: '2rem',
   },
   logo: {
-    width: '20rem',
+    width: 'min(20rem, 15vh)',
   },
   logoContainer: {
     flex: 1,

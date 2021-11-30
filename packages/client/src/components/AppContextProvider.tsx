@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity } from '@artfair/common';
+import { Activity, MemberData } from '@artfair/common';
 
 interface AppData {
   username: string;
-  room: string;
+  roomname: string;
   color: string;
   thickness: number;
-  players: string[];
+  roomMembers: MemberData[];
   isHost: boolean;
   activity: Activity;
   context: CanvasRenderingContext2D | null;
@@ -15,10 +15,10 @@ interface AppData {
 
 const DEFAULT_APP_DATA: AppData = {
   username: '',
-  room: '',
+  roomname: '',
   color: '#1e272e',
   thickness: 10,
-  players: [],
+  roomMembers: [],
   isHost: false,
   activity: 'con-artist',
   context: null,
@@ -28,9 +28,9 @@ const DEFAULT_APP_DATA: AppData = {
 type AppAction =
   | { type: 'set-color'; color: string }
   | { type: 'set-thickness'; thickness: number }
-  | { type: 'create-room'; username: string; room: string }
-  | { type: 'join-room'; username: string; room: string; players: string[] }
-  | { type: 'user-join'; username: string }
+  | { type: 'create-room'; username: string; roomname: string }
+  | { type: 'join-room'; username: string; roomname: string; roomMembers: MemberData[] }
+  | { type: 'user-join'; username: string, avatarIndex: number }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
   | { type: 'set-context'; context: CanvasRenderingContext2D }
@@ -52,27 +52,30 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         username: action.username,
-        room: action.room,
+        roomname: action.roomname,
         isHost: true,
-        players: [action.username],
+        roomMembers: [{ name: action.username, avatarIndex: state.avatarIndex }],
       };
     case 'join-room':
       return {
         ...state,
         username: action.username,
-        room: action.room,
-        players: action.players,
+        roomname: action.roomname,
+        roomMembers: action.roomMembers,
         isHost: false,
       };
     case 'user-join':
       return {
         ...state,
-        players: [...state.players, action.username],
+        roomMembers: [
+          ...state.roomMembers,
+          { name: action.username, avatarIndex: action.avatarIndex },
+        ],
       };
     case 'user-leave':
       return {
         ...state,
-        players: state.players.filter((player) => player !== action.username),
+        roomMembers: state.roomMembers.filter((member) => member.name !== action.username),
       };
     case 'set-activity':
       return {
@@ -109,11 +112,7 @@ export const useAppContext = (): AppContextData => {
 
 const AppContextProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(AppReducer, DEFAULT_APP_DATA);
-  return (
-    <AppContext.Provider value={{ state, dispatch }}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
 };
 
 export default AppContextProvider;
