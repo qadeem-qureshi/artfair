@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottom: `0.1rem solid ${theme.palette.divider}`,
+    borderBottom: '0.2rem solid #eeeeee',
   },
   tab: {
     flex: 1,
@@ -21,8 +21,8 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    borderBottom: '0.15rem solid transparent',
-    marginBottom: '-0.12rem',
+    borderBottom: '0.2rem solid transparent',
+    marginBottom: '-0.2rem',
   },
   active: {
     borderBottomColor: theme.palette.primary.main,
@@ -32,11 +32,11 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'stretch',
     flex: 1,
-    padding: '1rem',
     minHeight: '0',
   },
   content: {
     flex: 1,
+    padding: '1rem',
     overflowY: 'auto',
   },
   hidden: {

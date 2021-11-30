@@ -7,17 +7,18 @@ import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
-// import BackgroundImage from '../assets/snowflakes.png';
+import BackgroundImage from '../assets/snowflakes.png';
 
 const useStyles = makeStyles({
   root: {
     height: '100vh',
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
-    // backgroundImage: `url(${BackgroundImage})`,
-    // backgroundRepeat: 'repeat',
-    // backgroundSize: '100rem',
+    alignItems: 'stretch',
+    backgroundImage: `url(${BackgroundImage})`,
+    backgroundRepeat: 'repeat',
+    backgroundSize: '100rem',
   },
 });
 

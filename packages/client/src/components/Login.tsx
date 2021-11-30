@@ -150,7 +150,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
         onClick={handleJoinRoomAttempt}
         disabled={textFieldsAreEmpty}
         variant="contained"
-        color="primary"
+        color="secondary"
         size="large"
       >
         Join Room

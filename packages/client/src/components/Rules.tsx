@@ -11,6 +11,9 @@ const useStyles = makeStyles({
     justifyContent: 'flex-start',
     gap: '1rem',
   },
+  header: {
+    fontWeight: 'bold',
+  },
 });
 
 export type RulesProps = BoxProps;
@@ -19,7 +22,7 @@ const Rules: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Typography variant="h5" color="textPrimary">
+      <Typography variant="h5" color="textPrimary" className={classes.header}>
         Welcome to ArtFair!
       </Typography>
       <Typography variant="body1" color="textSecondary">
