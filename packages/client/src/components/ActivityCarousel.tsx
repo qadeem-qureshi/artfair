@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { Activity } from '@artfair/common';
 import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
+import { modulo } from '../util/math';
 import SampleActivityImage from '../assets/activity.png';
 import ActivityCarouselItem from './ActivityCarouselItem';
 import { useAppContext } from './AppContextProvider';
@@ -38,9 +39,6 @@ const useStyles = makeStyles({
     minHeight: 0,
   },
 });
-
-// Adjust modulo to return correct value for negative inputs
-const modulo = (m: number, n: number) => ((m % n) + n) % n;
 
 export type ActivityCarouselProps = BoxProps;
 

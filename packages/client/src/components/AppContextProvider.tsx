@@ -10,6 +10,7 @@ interface AppData {
   isHost: boolean;
   activity: Activity;
   context: CanvasRenderingContext2D | null;
+  avatarIndex: number;
 }
 
 const DEFAULT_APP_DATA: AppData = {
@@ -21,6 +22,7 @@ const DEFAULT_APP_DATA: AppData = {
   isHost: false,
   activity: 'con-artist',
   context: null,
+  avatarIndex: 0,
 };
 
 type AppAction =
@@ -31,7 +33,8 @@ type AppAction =
   | { type: 'user-join'; username: string }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-context'; context: CanvasRenderingContext2D };
+  | { type: 'set-context'; context: CanvasRenderingContext2D }
+  | { type: 'set-avatar-index'; index: number };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -80,6 +83,11 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         context: action.context,
+      };
+    case 'set-avatar-index':
+      return {
+        ...state,
+        avatarIndex: action.index,
       };
     default:
       throw new Error('Invalid action.');

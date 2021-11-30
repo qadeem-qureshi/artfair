@@ -7,6 +7,7 @@ import { RoomCreationData, RoomJoinData } from '@artfair/common';
 import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
+import AvatarSelector from './AvatarSelector';
 
 export type LoginProps = BoxProps;
 
@@ -116,7 +117,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Box bgcolor="black" height="10rem" />
+      <AvatarSelector />
       <TextField
         placeholder="Username"
         variant="outlined"
