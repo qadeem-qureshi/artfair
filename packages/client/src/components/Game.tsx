@@ -38,6 +38,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
+    userSelect: 'none',
   },
   canvasContainer: {
     width: CANVAS_SIZE,
