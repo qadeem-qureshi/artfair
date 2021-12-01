@@ -8,7 +8,7 @@ import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
-import BackgroundImage from '../assets/snowflakes.png';
+import BackgroundImage from '../assets/snowflakes.jpg';
 
 const useStyles = makeStyles({
   root: {
