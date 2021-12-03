@@ -1,21 +1,15 @@
 # See the Docker section of README.md for help
 FROM node
 
-# Environment Variables
-ENV PORT=3000
-
 # Add Work Directory
 WORKDIR /app
 
 # Install App Dependencies
 COPY package.json .
 COPY yarn.lock .
-COPY packages/client ./packages/client
-COPY packages/common ./packages/common
-COPY packages/server ./packages/server
+COPY packages ./packages
 RUN yarn install
 
-# Build App
-WORKDIR /app
-EXPOSE $PORT
+# Start App
+EXPOSE 3000
 CMD [ "yarn", "full-start"]

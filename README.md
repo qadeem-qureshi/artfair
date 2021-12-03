@@ -128,17 +128,15 @@ From the app's root directory, (directory containing 'Dockerfile'), run:
 
 With the Artfair Docker Image on your system, run:
 
- `docker run -d -p3000:3000 -e "PORT=3000" --name artfair artfair`
+ `docker run -d -p3000:3000 --name artfair artfair`
 
  -d : Runs the container in the background as a daemon. Prevents the container from freezing our terminal.
  -p : Maps your one of your host's ports (left) to one of the container's ports (right)
- -e : Use to specify environment variables. If omitted, the default PORT value will be 3000
  --name : Gives the container a name to be easily referenced by
 
 ### Stopping a Docker Container
 
 `docker stop artfair`
-
 
 ### One-Liner for working on the Dockerfile
 
@@ -150,4 +148,4 @@ The following one-liner:
 1. Builds the new Docker image without a cache
 1. Runs a container from the newly built image
 
-`docker stop artfair; docker rm artfair; docker image rm artfair; docker build --no-cache -t artfair . && docker run -d -p3000:3000 -e "PORT=3000" --name artfair artfair`
+`docker stop artfair; docker rm artfair; docker image rm artfair; docker build --no-cache -t artfair . && docker run -d -p3000:3000 --name artfair artfair`
