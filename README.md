@@ -115,3 +115,39 @@ At a high level, this project is made up of three packages: `client`, `server`, 
 11. Add at least one programmer as a reviewer for your pull request. If any changes are requested by the reviewer(s), just commit those changes and the pull request will automatically include those changes.
 
 12. Once your pull request is approved by the reviewer(s), you may merge the pull request into `dev`.
+
+## Docker
+
+### Building the Docker Image
+
+From the app's root directory, (directory containing 'Dockerfile'), run:
+
+`docker build --no-cache -t artfair .`
+
+### Running a Docker Container
+
+With the Artfair Docker Image on your system, run:
+
+ `docker run -d -p3000:3000 -e "PORT=3000" --name artfair artfair`
+
+ -d : Runs the container in the background as a daemon. Prevents the container from freezing our terminal.
+ -p : Maps your one of your host's ports (left) to one of the container's ports (right)
+ -e : Use to specify environment variables. If omitted, the default PORT value will be 3000
+ --name : Gives the container a name to be easily referenced by
+
+### Stopping a Docker Container
+
+`docker stop artfair`
+
+
+### One-Liner for working on the Dockerfile
+
+The following one-liner:
+
+1. Stops any running artfair container
+1. Deletes any existing artfair container
+1. Deletes any exiting artfair image
+1. Builds the new Docker image without a cache
+1. Runs a container from the newly built image
+
+`docker stop artfair; docker rm artfair; docker image rm artfair; docker build --no-cache -t artfair . && docker run -d -p3000:3000 -e "PORT=3000" --name artfair artfair`
