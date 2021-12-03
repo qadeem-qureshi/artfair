@@ -1,0 +1,17 @@
+# .git and .vscode folders
+.git
+.vscode
+
+# dependencies
+node_modules
+
+# build artifacts
+dist
+build
+
+# logs
+yarn-debug.log*
+yarn-error.log*
+
+# macOS metadata
+.DS_Store

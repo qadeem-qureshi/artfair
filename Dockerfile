@@ -2,15 +2,15 @@
 # From the directory containing 'Dockerfile', run:
 # docker build -t artfair .
 ### How to run the docker image:
-# docker run -p3333:3333 -e "PORT=3333" artfair
+# docker run -p3000:3000 -e "PORT=3000" artfair
 # -p to specify which port from inside the container should map to a port on your computer
 #    NOTE: Make sure the ports you specify match the port being used by the container.
-# -e to specify environment variables. If omitted, the default PORT value will be 3333
+# -e to specify environment variables. If omitted, the default PORT value will be 3000
 FROM node
 WORKDIR /app
 
 # Environment Variables
-ENV PORT=3333
+ENV PORT=3000
 
 # Prepare dependencies
 COPY package.json .
