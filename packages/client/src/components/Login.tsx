@@ -10,6 +10,10 @@ import { useAppContext } from './AppContextProvider';
 import AvatarSelector from './AvatarSelector';
 
 const saveSessionInfo = (userData: UserData) => sessionStorage.setItem('userData', JSON.stringify(userData));
+const getSessionInfo = () => {
+  const serializedData = sessionStorage.getItem('userData');
+  return serializedData ? JSON.parse(serializedData) as UserData : null;
+};
 
 export type LoginProps = BoxProps;
 
@@ -25,19 +29,21 @@ const useStyles = makeStyles({
 
 const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(
-    Number.parseInt(sessionStorage.getItem('avatarIndex') ?? '0', 10),
-  );
-  const [requestedUsername, setRequestedUsername] = useState(
-    sessionStorage.getItem('username') ?? '',
-  );
-  const [requestedRoomname, setRequestedRoomname] = useState(
-    sessionStorage.getItem('roomname') ?? '',
-  );
+  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(0);
+  const [requestedUsername, setRequestedUsername] = useState('');
+  const [requestedRoomname, setRequestedRoomname] = useState('');
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
   const { dispatch } = useAppContext();
+
+  useEffect(() => {
+    const sessionUserData: UserData | null = getSessionInfo();
+    if (!sessionUserData) return;
+    setSelectedAvatarIndex(sessionUserData.avatarIndex);
+    setRequestedUsername(sessionUserData.name);
+    setRequestedRoomname(sessionUserData.roomname);
+  }, []);
 
   const handleAvatarIndexChange = (index: number) => {
     setSelectedAvatarIndex(index);
