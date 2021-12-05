@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { ChatMessage } from '@artfair/common';
+import { ChatMessage, MemberData } from '@artfair/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
@@ -36,8 +36,8 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   }, []);
 
   const handleUserJoin = useCallback(
-    (name: string) => {
-      addMessage({ sender: '', content: `${name} joined the room` });
+    (memberData: MemberData) => {
+      addMessage({ sender: '', content: `${memberData.name} joined the room` });
     },
     [addMessage],
   );
@@ -50,7 +50,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   );
 
   const handleSend = (content: string) => {
-    const message: ChatMessage = { sender: state.username, content };
+    const message: ChatMessage = { sender: state.userData.name, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };
