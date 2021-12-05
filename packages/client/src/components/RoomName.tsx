@@ -18,6 +18,9 @@ const useStyles = makeStyles({
     alignItems: 'center',
     gap: '1rem',
   },
+  name: {
+    fontWeight: 'bold',
+  },
 });
 
 export type RoomNameProps = BoxProps;
@@ -28,13 +31,13 @@ const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
   const [copied, setCopied] = useState(false);
 
   const handleRoomCopy = () => {
-    navigator.clipboard.writeText(state.room);
+    navigator.clipboard.writeText(state.roomname);
     setCopied(true);
   };
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Typography noWrap variant="h2">{state.room}</Typography>
+      <Typography noWrap variant="h2" className={classes.name}>{state.roomname}</Typography>
       <IconButton size="medium" onClick={handleRoomCopy}>
         {copied ? <CheckRounded /> : <FileCopyRounded />}
       </IconButton>
