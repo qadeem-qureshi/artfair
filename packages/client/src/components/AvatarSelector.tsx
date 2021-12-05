@@ -1,6 +1,10 @@
 import React from 'react';
 import {
-  Avatar, Box, BoxProps, IconButton, makeStyles,
+  Avatar,
+  Box,
+  BoxProps,
+  IconButton,
+  makeStyles,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
@@ -25,16 +29,25 @@ const useStyles = makeStyles({
 
 export type AvatarSelectorProps = BoxProps;
 
-const AvatarSelector: React.FC<AvatarSelectorProps> = ({ className, ...rest }) => {
+const AvatarSelector: React.FC<AvatarSelectorProps> = ({
+  className,
+  ...rest
+}) => {
   const classes = useStyles();
   const { state, dispatch } = useAppContext();
 
   const selectNextAvatar = () => {
-    dispatch({ type: 'set-avatar-index', index: modulo(state.avatarIndex + 1, AVATARS.length) });
+    dispatch({
+      type: 'set-avatar-index',
+      index: modulo(state.avatarIndex + 1, AVATARS.length),
+    });
   };
 
   const selectPreviousAvatar = () => {
-    dispatch({ type: 'set-avatar-index', index: modulo(state.avatarIndex - 1, AVATARS.length) });
+    dispatch({
+      type: 'set-avatar-index',
+      index: modulo(state.avatarIndex - 1, AVATARS.length),
+    });
   };
 
   return (
@@ -42,7 +55,11 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({ className, ...rest }) =
       <IconButton onClick={selectPreviousAvatar}>
         <ArrowBackIosRounded />
       </IconButton>
-      <Avatar className={classes.preview} src={AVATARS[state.avatarIndex]} />
+      <Avatar
+        className={classes.preview}
+        src={AVATARS[state.avatarIndex]}
+        variant="square"
+      />
       <IconButton onClick={selectNextAvatar}>
         <ArrowForwardIosRounded />
       </IconButton>

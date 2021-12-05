@@ -37,7 +37,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Avatar src={AVATARS[avatarIndex]} />
+      <Avatar src={AVATARS[avatarIndex]} variant="square" />
       <Typography variant="subtitle1" className={classes.name}>
         {name}
       </Typography>
