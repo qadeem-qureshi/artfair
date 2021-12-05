@@ -5,18 +5,20 @@ import { useAppContext } from './AppContextProvider';
 
 const COLORS = [
   // color pallette used in game
+  '#1e272e', // Black
+  '#28543c', // Forrest Green
   '#b33939', // Maroon Red
   '#fa4c4c', // Bright Red
-  '#fac824', // Yellow
   '#997b4e', // Dark Brown
-  '#cda173', // Light Brown
-  '#cdd873', // Green Yellow
-  '#28543c', // Forrest Green
-  '#caefef', // Teal Blue
   '#98b9f8', // Baby Blue
+  '#cda173', // Light Brown
   '#ffa781', // Orange
-  '#141414', // Black
-  '#fffffa', // White
+  '#fac824', // Yellow
+  '#cdd873', // Green Yellow
+  '#caefef', // Teal Blue
+  '#f5f6fa', // White
+  // '#141414', // Black
+  // '#fffffa', // White
 ];
 
 const NUM_ROWS = 2;
