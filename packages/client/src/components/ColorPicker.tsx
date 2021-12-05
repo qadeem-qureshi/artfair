@@ -4,25 +4,13 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { useAppContext } from './AppContextProvider';
-
-const COLORS = [
-  '#b33939',
-  '#f53b57',
-  '#ffa801',
-  '#ffdd59',
-  '#05c46b',
-  '#0be881',
-  '#0984e3',
-  '#74b9ff',
-  '#6c5ce7',
-  '#a29bfe',
-  '#1e272e',
-  '#f5f6fa',
-];
+import { PALETTES } from '../util/palette';
 
 const NUM_ROWS = 2;
 const PREVIEW_SIZE = 'min(5.5vw, 6vh)';
 const COLOR_ITEM_SIZE = `calc(${PREVIEW_SIZE} / ${NUM_ROWS})`;
+
+const PALETTE = PALETTES.WINTER;
 
 const useStyles = makeStyles({
   root: {
@@ -36,7 +24,7 @@ const useStyles = makeStyles({
   },
   palette: {
     display: 'grid',
-    gridTemplateColumns: `repeat(${Math.ceil(COLORS.length / NUM_ROWS)}, ${COLOR_ITEM_SIZE})`,
+    gridTemplateColumns: `repeat(${Math.ceil(PALETTE.length / NUM_ROWS)}, ${COLOR_ITEM_SIZE})`,
     gridTemplateRows: `repeat(${NUM_ROWS}, ${COLOR_ITEM_SIZE})`,
     justifyItems: 'stretch',
     overflow: 'hidden',
@@ -55,7 +43,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ className, ...rest }) => {
     <Box className={clsx(classes.root, className)} {...rest}>
       <Paper className={classes.preview} style={{ backgroundColor: state.color }} />
       <Paper className={classes.palette}>
-        {COLORS.map((color) => (
+        {PALETTE.map((color) => (
           <Box key={color} bgcolor={color} onClick={colorSelector(color)} />
         ))}
       </Paper>
