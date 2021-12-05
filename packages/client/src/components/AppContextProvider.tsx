@@ -27,7 +27,7 @@ type AppAction =
   | { type: 'set-thickness'; thickness: number }
   | { type: 'create-room'; userData: UserData }
   | { type: 'join-room'; userData: UserData; roomMembers: MemberData[] }
-  | { type: 'user-join'; username: string; avatarIndex: number }
+  | { type: 'user-join'; memberData: MemberData }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
   | { type: 'set-context'; context: CanvasRenderingContext2D };
@@ -61,10 +61,7 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
     case 'user-join':
       return {
         ...state,
-        roomMembers: [
-          ...state.roomMembers,
-          { name: action.username, avatarIndex: action.avatarIndex },
-        ],
+        roomMembers: [...state.roomMembers, action.memberData],
       };
     case 'user-leave':
       return {

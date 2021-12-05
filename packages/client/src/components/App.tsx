@@ -34,8 +34,7 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
     (memberData: MemberData) => {
       dispatch({
         type: 'user-join',
-        username: memberData.name,
-        avatarIndex: memberData.avatarIndex,
+        memberData,
       });
     },
     [dispatch],
