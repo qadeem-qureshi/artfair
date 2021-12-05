@@ -26,8 +26,10 @@ const playful = responsiveFontSizes(
     shadows: Array(25).fill('none') as Shadows,
     overrides: {
       MuiPaper: {
-        root: {
-          outline: '0.2rem solid #eeeeee',
+        elevation1: {
+          boxShadow: '0 0 0 0.2rem #eeeeee',
+          // Hack to fix overflow not hiding with border radius on certain browsers
+          transform: 'translateZ(0)',
         },
       },
       MuiButton: {
