@@ -4,18 +4,21 @@ import clsx from 'clsx';
 import { useAppContext } from './AppContextProvider';
 
 const COLORS = [
-  '#b33939',
-  '#f53b57',
-  '#ffa801',
-  '#ffdd59',
-  '#05c46b',
-  '#0be881',
-  '#0984e3',
-  '#74b9ff',
-  '#6c5ce7',
-  '#a29bfe',
-  '#1e272e',
-  '#f5f6fa',
+  // color pallette used in game
+  '#1e272e', // Black
+  '#28543c', // Forrest Green
+  '#b33939', // Maroon Red
+  '#fa4c4c', // Bright Red
+  '#997b4e', // Dark Brown
+  '#98b9f8', // Baby Blue
+  '#cda173', // Light Brown
+  '#ffa781', // Orange
+  '#fac824', // Yellow
+  '#cdd873', // Green Yellow
+  '#caefef', // Teal Blue
+  '#f5f6fa', // White
+  // '#141414', // Black
+  // '#fffffa', // White
 ];
 
 const NUM_ROWS = 2;
