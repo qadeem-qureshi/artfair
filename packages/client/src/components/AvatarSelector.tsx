@@ -11,7 +11,6 @@ import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import { AVATARS } from '../util/avatar';
 import { modulo } from '../util/math';
-import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -27,27 +26,25 @@ const useStyles = makeStyles({
   },
 });
 
-export type AvatarSelectorProps = BoxProps;
+export interface AvatarSelectorProps extends BoxProps {
+  avatarIndex: number;
+  onAvatarSelect: (index: number) => void;
+}
 
 const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   className,
+  avatarIndex,
+  onAvatarSelect,
   ...rest
 }) => {
   const classes = useStyles();
-  const { state, dispatch } = useRoomContext();
 
   const selectNextAvatar = () => {
-    dispatch({
-      type: 'set-avatar-index',
-      index: modulo(state.avatarIndex + 1, AVATARS.length),
-    });
+    onAvatarSelect(modulo(avatarIndex + 1, AVATARS.length));
   };
 
   const selectPreviousAvatar = () => {
-    dispatch({
-      type: 'set-avatar-index',
-      index: modulo(state.avatarIndex - 1, AVATARS.length),
-    });
+    onAvatarSelect(modulo(avatarIndex - 1, AVATARS.length));
   };
 
   return (
@@ -57,7 +54,7 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       </IconButton>
       <Avatar
         className={classes.preview}
-        src={AVATARS[state.avatarIndex]}
+        src={AVATARS[avatarIndex]}
         variant="square"
       />
       <IconButton onClick={selectNextAvatar}>

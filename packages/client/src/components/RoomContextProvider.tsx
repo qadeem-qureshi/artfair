@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity, MemberData } from '@artfair/common';
+import { Activity, MemberData, UserData } from '@artfair/common';
 
 interface RoomData {
-  username: string;
-  roomname: string;
+  userData: UserData;
   roomMembers: MemberData[];
   isHost: boolean;
   activity: Activity;
@@ -11,8 +10,7 @@ interface RoomData {
 }
 
 const DEFAULT_ROOM_DATA: RoomData = {
-  username: '',
-  roomname: '',
+  userData: { name: '', roomname: '', avatarIndex: 0 },
   roomMembers: [],
   isHost: false,
   activity: 'con-artist',
@@ -20,38 +18,32 @@ const DEFAULT_ROOM_DATA: RoomData = {
 };
 
 type RoomAction =
-  | { type: 'create-room'; username: string; roomname: string }
-  | { type: 'join-room'; username: string; roomname: string; roomMembers: MemberData[] }
-  | { type: 'user-join'; username: string, avatarIndex: number }
-  | { type: 'user-leave'; username: string }
-  | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-avatar-index'; index: number };
+| { type: 'create-room'; userData: UserData }
+| { type: 'join-room'; userData: UserData; roomMembers: MemberData[] }
+| { type: 'user-join'; memberData: MemberData }
+| { type: 'user-leave'; username: string }
+| { type: 'set-activity'; activity: Activity };
 
 const RoomReducer = (state: RoomData, action: RoomAction): RoomData => {
   switch (action.type) {
     case 'create-room':
       return {
         ...state,
-        username: action.username,
-        roomname: action.roomname,
+        userData: action.userData,
         isHost: true,
-        roomMembers: [{ name: action.username, avatarIndex: state.avatarIndex }],
+        roomMembers: [{ name: action.userData.name, avatarIndex: action.userData.avatarIndex }],
       };
     case 'join-room':
       return {
         ...state,
-        username: action.username,
-        roomname: action.roomname,
+        userData: action.userData,
         roomMembers: action.roomMembers,
         isHost: false,
       };
     case 'user-join':
       return {
         ...state,
-        roomMembers: [
-          ...state.roomMembers,
-          { name: action.username, avatarIndex: action.avatarIndex },
-        ],
+        roomMembers: [...state.roomMembers, action.memberData],
       };
     case 'user-leave':
       return {
@@ -62,11 +54,6 @@ const RoomReducer = (state: RoomData, action: RoomAction): RoomData => {
       return {
         ...state,
         activity: action.activity,
-      };
-    case 'set-avatar-index':
-      return {
-        ...state,
-        avatarIndex: action.index,
       };
     default:
       throw new Error('Invalid action.');

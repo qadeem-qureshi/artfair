@@ -9,6 +9,12 @@ import socket from '../services/socket';
 import { useRoomContext } from './RoomContextProvider';
 import AvatarSelector from './AvatarSelector';
 
+const saveSessionInfo = (userData: UserData) => sessionStorage.setItem('userData', JSON.stringify(userData));
+const getSessionInfo = () => {
+  const serializedData = sessionStorage.getItem('userData');
+  return serializedData ? JSON.parse(serializedData) as UserData : null;
+};
+
 export type LoginProps = BoxProps;
 
 const useStyles = makeStyles({
@@ -23,12 +29,25 @@ const useStyles = makeStyles({
 
 const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   const classes = useStyles();
+  const [selectedAvatarIndex, setSelectedAvatarIndex] = useState(0);
   const [requestedUsername, setRequestedUsername] = useState('');
   const [requestedRoomname, setRequestedRoomname] = useState('');
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
-  const { state, dispatch } = useRoomContext();
+  const { dispatch } = useRoomContext();
+
+  useEffect(() => {
+    const sessionUserData: UserData | null = getSessionInfo();
+    if (!sessionUserData) return;
+    setSelectedAvatarIndex(sessionUserData.avatarIndex);
+    setRequestedUsername(sessionUserData.name);
+    setRequestedRoomname(sessionUserData.roomname);
+  }, []);
+
+  const handleAvatarIndexChange = (index: number) => {
+    setSelectedAvatarIndex(index);
+  };
 
   const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedUsernameError('');
@@ -44,7 +63,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
     const userData: UserData = {
       name: requestedUsername,
       roomname: requestedRoomname,
-      avatarIndex: state.avatarIndex,
+      avatarIndex: selectedAvatarIndex,
     };
     socket.emit('create_room_attempt', userData);
   };
@@ -53,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
     const userData: UserData = {
       name: requestedUsername,
       roomname: requestedRoomname,
-      avatarIndex: state.avatarIndex,
+      avatarIndex: selectedAvatarIndex,
     };
     socket.emit('join_room_attempt', userData);
   };
@@ -72,27 +91,37 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
 
   const handleRoomCreated = useCallback(
     (data: RoomCreationData) => {
+      const userData: UserData = {
+        name: data.username,
+        roomname: data.roomname,
+        avatarIndex: selectedAvatarIndex,
+      };
       dispatch({
         type: 'create-room',
-        username: data.username,
-        roomname: data.roomname,
+        userData,
       });
+      saveSessionInfo(userData);
       history.push('/lobby');
     },
-    [dispatch, history],
+    [dispatch, history, selectedAvatarIndex],
   );
 
   const handleRoomJoined = useCallback(
     (data: RoomJoinData) => {
+      const userData: UserData = {
+        name: data.username,
+        roomname: data.roomname,
+        avatarIndex: selectedAvatarIndex,
+      };
       dispatch({
         type: 'join-room',
-        username: data.username,
-        roomname: data.roomname,
         roomMembers: data.roomMembers,
+        userData,
       });
+      saveSessionInfo(userData);
       history.push('/lobby');
     },
-    [dispatch, history],
+    [dispatch, history, selectedAvatarIndex],
   );
 
   useEffect(() => {
@@ -121,7 +150,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <AvatarSelector />
+      <AvatarSelector avatarIndex={selectedAvatarIndex} onAvatarSelect={handleAvatarIndexChange} />
       <TextField
         placeholder="Name"
         variant="outlined"

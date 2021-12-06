@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
+import { PALETTES } from '../util/palette';
 
 interface CanvasData {
   strokeColor: string;
@@ -7,7 +8,7 @@ interface CanvasData {
 }
 
 const DEFAULT_CANVAS_DATA: CanvasData = {
-  strokeColor: '#1e272e',
+  strokeColor: PALETTES.WINTER[0],
   strokeThickness: 10,
 };
 
