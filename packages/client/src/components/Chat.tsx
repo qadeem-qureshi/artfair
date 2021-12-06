@@ -50,7 +50,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   );
 
   const handleSend = (content: string) => {
-    const message: ChatMessage = { sender: state.username, content };
+    const message: ChatMessage = { sender: state.userData.name, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };

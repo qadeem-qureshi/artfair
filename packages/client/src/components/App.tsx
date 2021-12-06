@@ -34,8 +34,7 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
     (memberData: MemberData) => {
       dispatch({
         type: 'user-join',
-        username: memberData.name,
-        avatarIndex: memberData.avatarIndex,
+        memberData,
       });
     },
     [dispatch],
@@ -60,10 +59,10 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
 
   useEffect(() => {
     // Redirect users who are not in a room
-    if (!state.roomname) {
+    if (!state.userData.roomname) {
       history.push('/home');
     }
-  }, [history, state.roomname]);
+  }, [history, state.userData.roomname]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>

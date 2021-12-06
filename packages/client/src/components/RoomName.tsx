@@ -31,13 +31,13 @@ const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
   const [copied, setCopied] = useState(false);
 
   const handleRoomCopy = () => {
-    navigator.clipboard.writeText(state.roomname);
+    navigator.clipboard.writeText(state.userData.roomname);
     setCopied(true);
   };
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Typography noWrap variant="h2" className={classes.name}>{state.roomname}</Typography>
+      <Typography noWrap variant="h2" className={classes.name}>{state.userData.roomname}</Typography>
       <IconButton size="medium" onClick={handleRoomCopy}>
         {copied ? <CheckRounded /> : <FileCopyRounded />}
       </IconButton>

@@ -1,40 +1,36 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity, MemberData } from '@artfair/common';
+import { Activity, MemberData, UserData } from '@artfair/common';
+import { PALETTES } from '../util/palette';
 
 interface AppData {
-  username: string;
-  roomname: string;
+  userData: UserData;
   color: string;
   thickness: number;
   roomMembers: MemberData[];
   isHost: boolean;
   activity: Activity;
   context: CanvasRenderingContext2D | null;
-  avatarIndex: number;
 }
 
 const DEFAULT_APP_DATA: AppData = {
-  username: '',
-  roomname: '',
-  color: '#1e272e',
+  userData: { name: '', roomname: '', avatarIndex: 0 },
+  color: PALETTES.WINTER[0],
   thickness: 10,
   roomMembers: [],
   isHost: false,
   activity: 'con-artist',
   context: null,
-  avatarIndex: 0,
 };
 
 type AppAction =
   | { type: 'set-color'; color: string }
   | { type: 'set-thickness'; thickness: number }
-  | { type: 'create-room'; username: string; roomname: string }
-  | { type: 'join-room'; username: string; roomname: string; roomMembers: MemberData[] }
-  | { type: 'user-join'; username: string, avatarIndex: number }
+  | { type: 'create-room'; userData: UserData }
+  | { type: 'join-room'; userData: UserData; roomMembers: MemberData[] }
+  | { type: 'user-join'; memberData: MemberData }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-context'; context: CanvasRenderingContext2D }
-  | { type: 'set-avatar-index'; index: number };
+  | { type: 'set-context'; context: CanvasRenderingContext2D };
 
 const AppReducer = (state: AppData, action: AppAction): AppData => {
   switch (action.type) {
@@ -51,26 +47,21 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
     case 'create-room':
       return {
         ...state,
-        username: action.username,
-        roomname: action.roomname,
+        userData: action.userData,
         isHost: true,
-        roomMembers: [{ name: action.username, avatarIndex: state.avatarIndex }],
+        roomMembers: [{ name: action.userData.name, avatarIndex: action.userData.avatarIndex }],
       };
     case 'join-room':
       return {
         ...state,
-        username: action.username,
-        roomname: action.roomname,
+        userData: action.userData,
         roomMembers: action.roomMembers,
         isHost: false,
       };
     case 'user-join':
       return {
         ...state,
-        roomMembers: [
-          ...state.roomMembers,
-          { name: action.username, avatarIndex: action.avatarIndex },
-        ],
+        roomMembers: [...state.roomMembers, action.memberData],
       };
     case 'user-leave':
       return {
@@ -86,11 +77,6 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
       return {
         ...state,
         context: action.context,
-      };
-    case 'set-avatar-index':
-      return {
-        ...state,
-        avatarIndex: action.index,
       };
     default:
       throw new Error('Invalid action.');
