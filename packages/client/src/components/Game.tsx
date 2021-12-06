@@ -1,6 +1,10 @@
 import React from 'react';
 import {
-  Box, BoxProps, makeStyles, Paper, useMediaQuery,
+  Box,
+  BoxProps,
+  makeStyles,
+  Paper,
+  useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import ChatRounded from '@material-ui/icons/ChatRounded';
@@ -50,10 +54,6 @@ const useStyles = makeStyles({
     width: WRAPPED_CANVAS_SIZE,
     height: WRAPPED_CANVAS_SIZE,
   },
-  canvas: {
-    width: '100%',
-    height: '100%',
-  },
   gameTabs: {
     height: CANVAS_SIZE,
     width: '20rem',
@@ -72,17 +72,32 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   return (
-    <Box className={clsx(classes.root, shouldWrap && classes.wrappedRoot, className)} {...rest}>
+    <Box
+      className={clsx(
+        classes.root,
+        shouldWrap && classes.wrappedRoot,
+        className,
+      )}
+      {...rest}
+    >
       <CanvasContextProvider>
         <Box className={classes.easel}>
           <Toolbar />
-          <Paper className={clsx(classes.canvasContainer, shouldWrap && classes.wrappedCanvasContainer)}>
-            <Canvas className={classes.canvas} width={CANVAS_RESOLUTION} height={CANVAS_RESOLUTION} />
-          </Paper>
+          <Canvas
+            className={clsx(
+              classes.canvasContainer,
+              shouldWrap && classes.wrappedCanvasContainer,
+            )}
+            component={Paper}
+            resolution={CANVAS_RESOLUTION}
+          />
         </Box>
       </CanvasContextProvider>
       <GameTabs
-        className={clsx(classes.gameTabs, shouldWrap && classes.wrappedGameTabs)}
+        className={clsx(
+          classes.gameTabs,
+          shouldWrap && classes.wrappedGameTabs,
+        )}
         component={Paper}
         items={TAB_ITEMS}
       />
