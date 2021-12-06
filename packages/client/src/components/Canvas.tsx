@@ -11,7 +11,7 @@ import {
   getClientPoint,
   getDistance,
 } from '../util/canvas';
-import { useAppContext } from './AppContextProvider';
+import { useCanvasContext } from './CanvasContextProvider';
 
 const SEGMENT_SIZE = 5;
 const TARGET_FRAMERATE = 60;
@@ -32,27 +32,28 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const canvasElementRef = useRef<HTMLCanvasElement>(null);
   const segmentsRef = useRef<StrokeSegment[]>([]);
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
   const [lastPoint, setLastPoint] = useState<Point>({ x: 0, y: 0 });
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useCanvasContext();
 
   const drawLine = useCallback(
     (segment: StrokeSegment) => {
-      if (!state.context) return;
-      state.context.beginPath();
-      state.context.moveTo(segment.start.x, segment.start.y);
-      state.context.lineTo(segment.end.x, segment.end.y);
-      state.context.strokeStyle = segment.color;
-      state.context.lineWidth = segment.thickness;
-      state.context.stroke();
+      if (!context) return;
+      context.beginPath();
+      context.moveTo(segment.start.x, segment.start.y);
+      context.lineTo(segment.end.x, segment.end.y);
+      context.strokeStyle = segment.color;
+      context.lineWidth = segment.thickness;
+      context.stroke();
     },
-    [state.context],
+    [context],
   );
 
   const drawCircle = useCallback(
     (segment: StrokeSegment) => {
-      if (!state.context) return;
-      state.context.beginPath();
-      state.context.ellipse(
+      if (!context) return;
+      context.beginPath();
+      context.ellipse(
         segment.start.x,
         segment.start.y,
         segment.thickness / 2,
@@ -61,19 +62,19 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
         0,
         Math.PI * 2,
       );
-      state.context.fillStyle = segment.color;
-      state.context.fill();
+      context.fillStyle = segment.color;
+      context.fill();
     },
-    [state.context],
+    [context],
   );
 
   const clearCanvas = useCallback(() => {
     requestAnimationFrame(() => {
-      if (!state.context) return;
-      state.context.fillStyle = 'white';
-      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+      if (!context) return;
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
     });
-  }, [state.context]);
+  }, [context]);
 
   const updateCanvas = useCallback(() => {
     segmentsRef.current.forEach((segment) => {
@@ -92,19 +93,30 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
   );
 
   useEffect(() => {
-    const context = canvasElementRef.current?.getContext('2d');
-    if (!context) return;
-    dispatch({ type: 'set-context', context });
+    // Set canvas element
+    const canvasElement = canvasElementRef.current;
+    if (!canvasElement) return;
+    dispatch({ type: 'set-canvas-element', canvasElement });
+
+    // Set context
+    const ctx = canvasElement.getContext('2d');
+    if (!ctx) return;
+    setContext(ctx);
   }, [dispatch]);
 
   useEffect(() => {
-    if (!state.context) return;
-    state.context.lineCap = 'round';
-    state.context.fillStyle = 'white';
-    state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
+    if (!context) return;
+
+    // Set up context
+    context.lineCap = 'round';
+    context.fillStyle = 'white';
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+
+    // Register event listeners
     socket.on('draw_segment', queueSegment);
     socket.on('clear_canvas', clearCanvas);
 
+    // Initialize render loop
     const timer = setInterval(
       () => requestAnimationFrame(updateCanvas),
       1000 / TARGET_FRAMERATE,
@@ -116,7 +128,12 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
       socket.off('clear_canvas', clearCanvas);
       clearInterval(timer);
     };
-  }, [queueSegment, clearCanvas, updateCanvas, state.context]);
+  }, [queueSegment, clearCanvas, updateCanvas, context]);
+
+  useEffect(() => {
+    if (!state.canvasElement) return;
+    state.canvasElement.addEventListener('clear', clearCanvas);
+  }, [clearCanvas, state.canvasElement]);
 
   const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!canvasElementRef.current) return;
@@ -129,8 +146,8 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     const segment: StrokeSegment = {
       start: currentPoint,
       end: currentPoint,
-      color: state.color,
-      thickness: state.thickness,
+      color: state.strokeColor,
+      thickness: state.strokeThickness,
     };
 
     queueSegment(segment);
@@ -158,8 +175,8 @@ const Canvas: React.FC<CanvasProps> = ({ className, ...rest }) => {
     const segment: StrokeSegment = {
       start: lastPoint,
       end: currentPoint,
-      color: state.color,
-      thickness: state.thickness,
+      color: state.strokeColor,
+      thickness: state.strokeThickness,
     };
     queueSegment(segment);
     socket.emit('draw_segment', segment);

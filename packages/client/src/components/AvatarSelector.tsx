@@ -11,7 +11,7 @@ import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import { AVATARS } from '../util/avatar';
 import { modulo } from '../util/math';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -34,7 +34,7 @@ const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
 
   const selectNextAvatar = () => {
     dispatch({

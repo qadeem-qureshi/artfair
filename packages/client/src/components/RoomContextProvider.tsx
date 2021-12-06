@@ -1,53 +1,34 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { Activity, MemberData } from '@artfair/common';
 
-interface AppData {
+interface RoomData {
   username: string;
   roomname: string;
-  color: string;
-  thickness: number;
   roomMembers: MemberData[];
   isHost: boolean;
   activity: Activity;
-  context: CanvasRenderingContext2D | null;
   avatarIndex: number;
 }
 
-const DEFAULT_APP_DATA: AppData = {
+const DEFAULT_ROOM_DATA: RoomData = {
   username: '',
   roomname: '',
-  color: '#1e272e',
-  thickness: 10,
   roomMembers: [],
   isHost: false,
   activity: 'con-artist',
-  context: null,
   avatarIndex: 0,
 };
 
-type AppAction =
-  | { type: 'set-color'; color: string }
-  | { type: 'set-thickness'; thickness: number }
+type RoomAction =
   | { type: 'create-room'; username: string; roomname: string }
   | { type: 'join-room'; username: string; roomname: string; roomMembers: MemberData[] }
   | { type: 'user-join'; username: string, avatarIndex: number }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-context'; context: CanvasRenderingContext2D }
   | { type: 'set-avatar-index'; index: number };
 
-const AppReducer = (state: AppData, action: AppAction): AppData => {
+const RoomReducer = (state: RoomData, action: RoomAction): RoomData => {
   switch (action.type) {
-    case 'set-color':
-      return {
-        ...state,
-        color: action.color,
-      };
-    case 'set-thickness':
-      return {
-        ...state,
-        thickness: action.thickness,
-      };
     case 'create-room':
       return {
         ...state,
@@ -82,11 +63,6 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
         ...state,
         activity: action.activity,
       };
-    case 'set-context':
-      return {
-        ...state,
-        context: action.context,
-      };
     case 'set-avatar-index':
       return {
         ...state,
@@ -97,22 +73,22 @@ const AppReducer = (state: AppData, action: AppAction): AppData => {
   }
 };
 
-interface AppContextData {
-  state: AppData;
-  dispatch: React.Dispatch<AppAction>;
+interface RoomContextData {
+  state: RoomData;
+  dispatch: React.Dispatch<RoomAction>;
 }
 
-const AppContext = createContext<AppContextData | null>(null);
+const RoomContext = createContext<RoomContextData | null>(null);
 
-export const useAppContext = (): AppContextData => {
-  const context = useContext(AppContext);
-  if (context == null) throw new Error('App context has not been initialized.');
+export const useRoomContext = (): RoomContextData => {
+  const context = useContext(RoomContext);
+  if (context == null) throw new Error('Room context has not been initialized.');
   return context;
 };
 
-const AppContextProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(AppReducer, DEFAULT_APP_DATA);
-  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>;
+const RoomContextProvider: React.FC = ({ children }) => {
+  const [state, dispatch] = useReducer(RoomReducer, DEFAULT_ROOM_DATA);
+  return <RoomContext.Provider value={{ state, dispatch }}>{children}</RoomContext.Provider>;
 };
 
-export default AppContextProvider;
+export default RoomContextProvider;

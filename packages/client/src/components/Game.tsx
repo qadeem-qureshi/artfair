@@ -12,10 +12,11 @@ import GameTabs, { TabItem } from './GameTabs';
 import Chat from './Chat';
 import Rules from './Rules';
 import Artists from './Artists';
+import CanvasContextProvider from './CanvasContextProvider';
 
 const CANVAS_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_CANVAS_SIZE = 'min(80vw, 50vh)';
-const CANVAS_RESOLUTION = 1000;
+const CANVAS_RESOLUTION = 1024;
 
 const TAB_ITEMS: TabItem[] = [
   { label: 'Chat', icon: ChatRounded, content: Chat },
@@ -72,12 +73,14 @@ const Game: React.FC<GameProps> = ({ className, ...rest }) => {
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   return (
     <Box className={clsx(classes.root, shouldWrap && classes.wrappedRoot, className)} {...rest}>
-      <Box className={classes.easel}>
-        <Toolbar />
-        <Paper className={clsx(classes.canvasContainer, shouldWrap && classes.wrappedCanvasContainer)}>
-          <Canvas className={classes.canvas} width={CANVAS_RESOLUTION} height={CANVAS_RESOLUTION} />
-        </Paper>
-      </Box>
+      <CanvasContextProvider>
+        <Box className={classes.easel}>
+          <Toolbar />
+          <Paper className={clsx(classes.canvasContainer, shouldWrap && classes.wrappedCanvasContainer)}>
+            <Canvas className={classes.canvas} width={CANVAS_RESOLUTION} height={CANVAS_RESOLUTION} />
+          </Paper>
+        </Box>
+      </CanvasContextProvider>
       <GameTabs
         className={clsx(classes.gameTabs, shouldWrap && classes.wrappedGameTabs)}
         component={Paper}

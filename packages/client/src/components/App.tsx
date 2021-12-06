@@ -7,7 +7,7 @@ import Home from './Home';
 import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import BackgroundImage from '../assets/snowflakes.jpg';
 
 const useStyles = makeStyles({
@@ -27,7 +27,7 @@ export type AppProps = BoxProps;
 
 const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
   const history = useHistory();
 
   const handleUserJoin = useCallback(

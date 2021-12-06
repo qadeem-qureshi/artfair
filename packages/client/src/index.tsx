@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { BrowserRouter } from 'react-router-dom';
 import playful from './themes/playful';
-import AppContextProvider from './components/AppContextProvider';
+import RoomContextProvider from './components/RoomContextProvider';
 import App from './components/App';
 
 const rootElement = document.getElementById('root');
@@ -11,9 +11,9 @@ render(
   <BrowserRouter>
     <ThemeProvider theme={playful}>
       <CssBaseline />
-      <AppContextProvider>
+      <RoomContextProvider>
         <App />
-      </AppContextProvider>
+      </RoomContextProvider>
     </ThemeProvider>
   </BrowserRouter>,
   rootElement,

@@ -9,7 +9,7 @@ import Chat from './Chat';
 import ArtistList from './ArtistList';
 import RoomName from './RoomName';
 import ActivityCarousel from './ActivityCarousel';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const MAIN_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_MAIN_SIZE = 'min(80vw, 50vh)';
@@ -86,7 +86,7 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   const history = useHistory();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   const handlePlay = () => {
     socket.emit('start_game');
