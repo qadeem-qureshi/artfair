@@ -2653,11 +2653,6 @@ csstype@^3.0.2:
   resolved "https://registry.npmjs.org/csstype/-/csstype-3.0.8.tgz"
   integrity sha512-jXKhWqXPmlUeoQnF/EhTtTl4C9SnrxSH/jZUih3jmO6lBKr99rP3/+FmrMj4EFpOXzMtXHAZkd3x0E6h6Fgflw==
 
-curve-interpolator@^2.0.8:
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/curve-interpolator/-/curve-interpolator-2.0.8.tgz#700106e9e9c2331349011178c6814148307491b1"
-  integrity sha512-2yzZLrzyysQe7BheosIOZqIsGGeQNYuZg9EBjem9V8VmKgEsiFrS7bN2+xd7CAeRLF8z+NlV5mq+Lo3bO2+tqA==
-
 damerau-levenshtein@^1.0.6:
   version "1.0.7"
   resolved "https://registry.npmjs.org/damerau-levenshtein/-/damerau-levenshtein-1.0.7.tgz"
