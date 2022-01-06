@@ -116,5 +116,23 @@ export const drawPoints = (
     context.ellipse(start.x, start.y, thickness / 2, thickness / 2, 0, 0, Math.PI * 2);
     context.fill();
   });
+
+  // Ensure final point is drawn
+  if (segments.length) {
+    const lastSegment = segments[segments.length - 1];
+    if (lastSegment.end) {
+      context.beginPath();
+      context.ellipse(
+        lastSegment.end.x,
+        lastSegment.end.y,
+        thickness / 2,
+        thickness / 2,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      context.fill();
+    }
+  }
   context.restore();
 };
