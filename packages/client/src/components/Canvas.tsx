@@ -19,6 +19,7 @@ const TARGET_FRAMERATE = 60;
 const useStyles = makeStyles({
   root: {
     userSelect: 'none',
+    touchAction: 'none',
     backgroundColor: 'white',
   },
 });
