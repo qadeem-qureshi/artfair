@@ -6,9 +6,10 @@ import {
   ChatMessage,
   StrokeSegment,
   UserData,
-  RoomData,
   RoomCreationData,
-  RoomRequestData,
+  RoomData,
+  MemberData,
+  RoomJoinData,
 } from '@artfair/common';
 
 const app = express();
@@ -23,53 +24,50 @@ const rooms = new Map<string, RoomData>();
 app.use('/', express.static(root));
 app.use('*', express.static(root));
 
-const usernameIsTaken = (username: string, room: string) => {
-  const roomData = rooms.get(room);
-  return roomData && roomData.members.has(username);
+const usernameIsTaken = (username: string, roomname: string) => {
+  const roomData = rooms.get(roomname);
+  return roomData && roomData.members.some((member) => member.name === username);
 };
 
 const addCreateRoomAttemptListener = (socket: Socket) => {
-  socket.on('create_room_attempt', (data: RoomCreationData) => {
-    if (rooms.has(data.room)) {
+  socket.on('create_room_attempt', (userData: UserData) => {
+    if (rooms.has(userData.roomname)) {
       socket.emit('room_taken');
     } else {
-      const userData: UserData = { name: data.username, room: data.room };
-      const roomData: RoomData = {
-        name: data.room,
-        members: new Set([data.username]),
+      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
+      const roomData: RoomData = { members: [memberData] };
+      const roomCreationData: RoomCreationData = {
+        username: userData.name,
+        roomname: userData.roomname,
       };
       users.set(socket.id, userData);
-      rooms.set(data.room, roomData);
-      socket.join(data.room);
-      socket.emit('room_created', {
-        username: data.username,
-        room: data.room,
-        host: true,
-        players: Array.from(roomData.members),
-      });
+      rooms.set(userData.roomname, roomData);
+      socket.join(userData.roomname);
+      socket.emit('room_created', roomCreationData);
     }
   });
 };
 
 const addJoinRoomAttemptListener = (socket: Socket) => {
-  socket.on('join_room_attempt', (data: RoomRequestData) => {
-    if (!rooms.has(data.room)) {
+  socket.on('join_room_attempt', (userData: UserData) => {
+    if (!rooms.has(userData.roomname)) {
       socket.emit('room_does_not_exist');
-    } else if (usernameIsTaken(data.username, data.room)) {
+    } else if (usernameIsTaken(userData.name, userData.roomname)) {
       socket.emit('username_taken');
     } else {
-      const userData: UserData = { name: data.username, room: data.room };
-      const roomData = rooms.get(data.room);
+      const roomData = rooms.get(userData.roomname);
       if (!roomData) return;
       users.set(socket.id, userData);
-      roomData.members.add(data.username);
-      socket.join(data.room);
-      socket.emit('room_joined', {
-        username: data.username,
-        room: data.room,
-        players: Array.from(roomData.members),
-      });
-      socket.broadcast.to(data.room).emit('user_join', data.username);
+      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
+      roomData.members.push(memberData);
+      const roomJoinData: RoomJoinData = {
+        username: userData.name,
+        roomname: userData.roomname,
+        roomMembers: roomData.members,
+      };
+      socket.join(userData.roomname);
+      socket.emit('room_joined', roomJoinData);
+      socket.broadcast.to(userData.roomname).emit('user_join', memberData);
     }
   });
 };
@@ -78,7 +76,7 @@ const addStartGameListener = (socket: Socket) => {
   socket.on('start_game', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('start_game');
+    socket.broadcast.to(userData.roomname).emit('start_game');
   });
 };
 
@@ -86,17 +84,17 @@ const addUserLeaveListener = (socket: Socket) => {
   socket.on('disconnect', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('user_leave', userData.name);
+    socket.broadcast.to(userData.roomname).emit('user_leave', userData.name);
 
-    const roomData = rooms.get(userData.room);
+    const roomData = rooms.get(userData.roomname);
     if (!roomData) return;
 
     // Remove user from room and delete room if everybody has left
-    roomData.members.delete(userData.name);
-    if (roomData.members.size === 0) {
-      rooms.delete(userData.room);
+    const index = roomData.members.findIndex((member) => member.name === userData.name);
+    roomData.members.splice(index);
+    if (roomData.members.length === 0) {
+      rooms.delete(userData.roomname);
     }
-
     users.delete(socket.id);
   });
 };
@@ -105,7 +103,7 @@ const addChatMessageListener = (socket: Socket) => {
   socket.on('chat_message', (message: ChatMessage) => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('chat_message', message);
+    socket.broadcast.to(userData.roomname).emit('chat_message', message);
   });
 };
 
@@ -113,7 +111,7 @@ const addDrawSegmentListener = (socket: Socket) => {
   socket.on('draw_segment', (segment: StrokeSegment) => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('draw_segment', segment);
+    socket.broadcast.to(userData.roomname).emit('draw_segment', segment);
   });
 };
 
@@ -121,7 +119,7 @@ const addClearCanvasListener = (socket: Socket) => {
   socket.on('clear_canvas', () => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.room).emit('clear_canvas');
+    socket.broadcast.to(userData.roomname).emit('clear_canvas');
   });
 };
 

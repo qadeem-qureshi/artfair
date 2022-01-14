@@ -20,8 +20,8 @@ const ArtistList: React.FC<ArtistListProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      {state.players.map((player) => (
-        <ArtistProfile name={player} key={player} />
+      {state.roomMembers.map((member) => (
+        <ArtistProfile name={member.name} avatarIndex={member.avatarIndex} key={member.name} />
       ))}
     </Box>
   );

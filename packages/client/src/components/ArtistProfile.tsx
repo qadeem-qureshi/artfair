@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
+import { AVATARS } from '../util/avatar';
 
 const useStyles = makeStyles({
   root: {
@@ -23,17 +24,20 @@ const useStyles = makeStyles({
 
 export interface ArtistProfileProps extends BoxProps {
   name: string;
+  avatarIndex: number;
 }
 
 const ArtistProfile: React.FC<ArtistProfileProps> = ({
   className,
   name,
+  avatarIndex,
   ...rest
 }) => {
   const classes = useStyles();
+
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Avatar />
+      <Avatar src={AVATARS[avatarIndex]} variant="square" />
       <Typography variant="subtitle1" className={classes.name}>
         {name}
       </Typography>
