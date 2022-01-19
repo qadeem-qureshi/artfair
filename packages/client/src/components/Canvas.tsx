@@ -23,6 +23,7 @@ const MAX_DYNAMIC_SEGMENTS_AFTER_SPLIT = 3;
 const useStyles = makeStyles({
   root: {
     userSelect: 'none',
+    touchAction: 'none',
   },
   canvas: {
     position: 'absolute',
