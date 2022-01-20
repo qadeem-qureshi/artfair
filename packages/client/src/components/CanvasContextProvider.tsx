@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { PALETTES } from '../util/palette';
+import { DEFAULT_COLOR } from './ColorPicker';
+import { DEFAULT_THICKNESS } from './ThicknessSlider';
 
 interface CanvasData {
   strokeColor: string;
@@ -8,8 +9,8 @@ interface CanvasData {
 }
 
 const DEFAULT_CANVAS_DATA: CanvasData = {
-  strokeColor: PALETTES.WINTER[0],
-  strokeThickness: 10,
+  strokeColor: DEFAULT_COLOR,
+  strokeThickness: DEFAULT_THICKNESS,
 };
 
 type CanvasAction =

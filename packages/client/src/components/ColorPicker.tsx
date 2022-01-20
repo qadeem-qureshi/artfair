@@ -12,6 +12,8 @@ const COLOR_ITEM_SIZE = `calc(${PREVIEW_SIZE} / ${NUM_ROWS})`;
 
 const PALETTE = PALETTES.WINTER;
 
+export const DEFAULT_COLOR = PALETTE[0];
+
 const useStyles = makeStyles({
   root: {
     display: 'flex',

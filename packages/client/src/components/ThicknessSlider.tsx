@@ -10,14 +10,13 @@ const useStyles = makeStyles({
 const MIN_THICKNESS = 3;
 const MAX_THICKNESS = 100;
 
+export const DEFAULT_THICKNESS = 20;
+
 export type ThicknessSliderProps = SliderProps;
 
-const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
-  className,
-  ...rest
-}) => {
+const ThicknessSlider: React.FC<ThicknessSliderProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state, dispatch } = useCanvasContext();
+  const { dispatch } = useCanvasContext();
 
   const handleSliderChange = (
     // eslint-disable-next-line @typescript-eslint/ban-types
@@ -30,10 +29,10 @@ const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
   return (
     <Slider
       className={clsx(classes.root, className)}
+      defaultValue={DEFAULT_THICKNESS}
       min={MIN_THICKNESS}
       max={MAX_THICKNESS}
-      value={state.strokeThickness}
-      onChange={handleSliderChange}
+      onChangeCommitted={handleSliderChange}
       {...rest}
     />
   );
