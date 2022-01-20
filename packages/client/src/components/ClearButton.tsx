@@ -2,13 +2,13 @@ import { IconButton, IconButtonProps } from '@material-ui/core';
 import DeleteRounded from '@material-ui/icons/DeleteRounded';
 import React, { useState } from 'react';
 import socket from '../services/socket';
-import { useAppContext } from './AppContextProvider';
+import { useCanvasContext } from './CanvasContextProvider';
 import ConfirmationDialog from './ConfirmationDialog';
 
 export type ClearButtonProps = IconButtonProps;
 
 const ClearButton: React.FC<ClearButtonProps> = (props) => {
-  const { state } = useAppContext();
+  const { state } = useCanvasContext();
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
   const handleClose = () => {
@@ -20,11 +20,9 @@ const ClearButton: React.FC<ClearButtonProps> = (props) => {
   };
 
   const handleClear = () => {
-    requestAnimationFrame(() => {
-      if (!state.context) return;
-      state.context.fillStyle = 'white';
-      state.context.fillRect(0, 0, state.context.canvas.width, state.context.canvas.height);
-    });
+    if (!state.canvasElement) return;
+    const clearEvent = new Event('clear');
+    state.canvasElement.dispatchEvent(clearEvent);
     socket.emit('clear_canvas');
     handleClose();
   };

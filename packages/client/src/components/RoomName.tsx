@@ -9,7 +9,7 @@ import {
 import clsx from 'clsx';
 import CheckRounded from '@material-ui/icons/CheckRounded';
 import FileCopyRounded from '@material-ui/icons/FileCopyRounded';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -27,7 +27,7 @@ export type RoomNameProps = BoxProps;
 
 const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
   const [copied, setCopied] = useState(false);
 
   const handleRoomCopy = () => {

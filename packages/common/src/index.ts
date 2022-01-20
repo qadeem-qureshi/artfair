@@ -8,6 +8,11 @@ export interface Point {
   y: number;
 }
 
+export interface Vector {
+  x: number;
+  y: number;
+}
+
 export interface UserData {
   name: string;
   roomname: string;
@@ -34,11 +39,21 @@ export interface RoomData {
   members: MemberData[];
 }
 
-export interface StrokeSegment {
-  start: Point;
-  end: Point;
-  color: string;
-  thickness: number;
+export interface StrokeBeginData {
+  strokeId: string;
+  strokeColor: string;
+  strokeThickness: number;
+  point: Point;
+}
+
+export interface StrokeContinueData {
+  strokeId: string;
+  point: Point;
+}
+
+export interface StrokeEndData {
+  strokeId: string;
+  point: Point;
 }
 
 export type Activity = 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer' | 'art-critic';

@@ -6,7 +6,7 @@ import clsx from 'clsx';
 import { RoomCreationData, RoomJoinData, UserData } from '@artfair/common';
 import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import AvatarSelector from './AvatarSelector';
 
 const saveSessionInfo = (userData: UserData) => sessionStorage.setItem('userData', JSON.stringify(userData));
@@ -35,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
-  const { dispatch } = useAppContext();
+  const { dispatch } = useRoomContext();
 
   useEffect(() => {
     const sessionUserData: UserData | null = getSessionInfo();

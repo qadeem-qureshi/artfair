@@ -2,7 +2,7 @@ import { IconButton, IconButtonProps, makeStyles } from '@material-ui/core';
 import CreateRounded from '@material-ui/icons/CreateRounded';
 import clsx from 'clsx';
 import React from 'react';
-import { useAppContext } from './AppContextProvider';
+import { useCanvasContext } from './CanvasContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -14,10 +14,10 @@ export type EraserButtonProps = IconButtonProps;
 
 const EraserButton: React.FC<EraserButtonProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { dispatch } = useAppContext();
+  const { dispatch } = useCanvasContext();
 
   const handleEraserEnable = () => {
-    dispatch({ type: 'set-color', color: 'white' });
+    dispatch({ type: 'set-stroke-color', color: 'white' });
   };
 
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles, Slider, SliderProps } from '@material-ui/core';
 import clsx from 'clsx';
-import { useAppContext } from './AppContextProvider';
+import { useCanvasContext } from './CanvasContextProvider';
 
 const useStyles = makeStyles({
   root: {},
@@ -17,14 +17,14 @@ const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useCanvasContext();
 
   const handleSliderChange = (
     // eslint-disable-next-line @typescript-eslint/ban-types
     event: React.ChangeEvent<{}>,
     value: number | number[],
   ) => {
-    dispatch({ type: 'set-thickness', thickness: value as number });
+    dispatch({ type: 'set-stroke-thickness', thickness: value as number });
   };
 
   return (
@@ -32,7 +32,7 @@ const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
       className={clsx(classes.root, className)}
       min={MIN_THICKNESS}
       max={MAX_THICKNESS}
-      value={state.thickness}
+      value={state.strokeThickness}
       onChange={handleSliderChange}
       {...rest}
     />

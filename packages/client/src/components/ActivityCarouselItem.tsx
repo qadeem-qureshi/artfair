@@ -4,7 +4,7 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { Activity } from '@artfair/common';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -43,7 +43,7 @@ const ActivityCarouselItem: React.FC<ActivityCarouselItemProps> = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   // Only render if this activity is selected
   if (state.activity !== activity) {

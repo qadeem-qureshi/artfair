@@ -5,7 +5,7 @@ import { ChatMessage, MemberData } from '@artfair/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -28,7 +28,7 @@ export type ChatProps = BoxProps;
 const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse

@@ -4,12 +4,14 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import {
   ChatMessage,
-  StrokeSegment,
   UserData,
   RoomCreationData,
   RoomData,
   MemberData,
   RoomJoinData,
+  StrokeBeginData,
+  StrokeContinueData,
+  StrokeEndData,
 } from '@artfair/common';
 
 const app = express();
@@ -26,7 +28,9 @@ app.use('*', express.static(root));
 
 const usernameIsTaken = (username: string, roomname: string) => {
   const roomData = rooms.get(roomname);
-  return roomData && roomData.members.some((member) => member.name === username);
+  return (
+    roomData && roomData.members.some((member) => member.name === username)
+  );
 };
 
 const addCreateRoomAttemptListener = (socket: Socket) => {
@@ -34,7 +38,10 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
     if (rooms.has(userData.roomname)) {
       socket.emit('room_taken');
     } else {
-      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
+      const memberData: MemberData = {
+        name: userData.name,
+        avatarIndex: userData.avatarIndex,
+      };
       const roomData: RoomData = { members: [memberData] };
       const roomCreationData: RoomCreationData = {
         username: userData.name,
@@ -58,7 +65,10 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
       const roomData = rooms.get(userData.roomname);
       if (!roomData) return;
       users.set(socket.id, userData);
-      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
+      const memberData: MemberData = {
+        name: userData.name,
+        avatarIndex: userData.avatarIndex,
+      };
       roomData.members.push(memberData);
       const roomJoinData: RoomJoinData = {
         username: userData.name,
@@ -90,7 +100,9 @@ const addUserLeaveListener = (socket: Socket) => {
     if (!roomData) return;
 
     // Remove user from room and delete room if everybody has left
-    const index = roomData.members.findIndex((member) => member.name === userData.name);
+    const index = roomData.members.findIndex(
+      (member) => member.name === userData.name,
+    );
     roomData.members.splice(index);
     if (roomData.members.length === 0) {
       rooms.delete(userData.roomname);
@@ -107,11 +119,31 @@ const addChatMessageListener = (socket: Socket) => {
   });
 };
 
-const addDrawSegmentListener = (socket: Socket) => {
-  socket.on('draw_segment', (segment: StrokeSegment) => {
+const addBeginStrokeListener = (socket: Socket) => {
+  socket.on('begin_stroke', (strokeBeginData: StrokeBeginData) => {
     const userData = users.get(socket.id);
     if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('draw_segment', segment);
+    socket.broadcast
+      .to(userData.roomname)
+      .emit('begin_stroke', strokeBeginData);
+  });
+};
+
+const addContinueStrokeListener = (socket: Socket) => {
+  socket.on('continue_stroke', (strokeContinueData: StrokeContinueData) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast
+      .to(userData.roomname)
+      .emit('continue_stroke', strokeContinueData);
+  });
+};
+
+const addEndStrokeListener = (socket: Socket) => {
+  socket.on('end_stroke', (strokeEndData: StrokeEndData) => {
+    const userData = users.get(socket.id);
+    if (!userData) return;
+    socket.broadcast.to(userData.roomname).emit('end_stroke', strokeEndData);
   });
 };
 
@@ -128,7 +160,9 @@ io.on('connection', (socket) => {
   addJoinRoomAttemptListener(socket);
   addUserLeaveListener(socket);
   addChatMessageListener(socket);
-  addDrawSegmentListener(socket);
+  addBeginStrokeListener(socket);
+  addContinueStrokeListener(socket);
+  addEndStrokeListener(socket);
   addStartGameListener(socket);
   addClearCanvasListener(socket);
 });

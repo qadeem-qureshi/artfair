@@ -9,7 +9,7 @@ import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import { modulo } from '../util/math';
 import SampleActivityImage from '../assets/activity.png';
 import ActivityCarouselItem from './ActivityCarouselItem';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const ACTIVITIES: Activity[] = [
   'art-collab',
@@ -47,7 +47,7 @@ const ActivityCarousel: React.FC<ActivityCarouselProps> = ({
   ...rest
 }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
 
   const selectNextActivity = () => {
     const nextActivity = ACTIVITIES[
