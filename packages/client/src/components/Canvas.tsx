@@ -15,7 +15,7 @@ import { useCanvasContext } from './CanvasContextProvider';
 
 const MIN_SEGMENT_LENGTH = 2;
 const MAX_SEGMENT_LENGTH = 12;
-const TARGET_FRAMERATE = 60;
+const TARGET_FRAMERATE = 144;
 const SIMPLIFICATION_TOLERANCE = 2;
 const SEGMENTS_UNTIL_SPLIT = 3;
 const MAX_DYNAMIC_SEGMENTS_AFTER_SPLIT = 3;
