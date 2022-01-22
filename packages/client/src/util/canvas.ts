@@ -2,7 +2,15 @@ import React from 'react';
 import { Point } from '@artfair/common';
 import { CurveSegment } from './interpolation';
 
-export const getCanvasPoint = (clientPoint: Point, canvasElement: HTMLCanvasElement): Point => {
+export const getCanvasPoint = (
+  event: React.PointerEvent<HTMLCanvasElement>,
+  canvasElement: HTMLCanvasElement,
+): Point => {
+  const clientPoint: Point = {
+    x: event.clientX,
+    y: event.clientY,
+  };
+
   const rect = canvasElement.getBoundingClientRect();
 
   const scale = {
@@ -17,11 +25,6 @@ export const getCanvasPoint = (clientPoint: Point, canvasElement: HTMLCanvasElem
 
   return canvasPoint;
 };
-
-export const getClientPoint = (event: React.PointerEvent<HTMLCanvasElement>): Point => ({
-  x: event.clientX,
-  y: event.clientY,
-});
 
 export const clear = (context: CanvasRenderingContext2D): void => {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
@@ -134,5 +137,19 @@ export const drawPoints = (
       context.fill();
     }
   }
+  context.restore();
+};
+
+export const drawCursor = (
+  context: CanvasRenderingContext2D,
+  point: Point,
+  color: string,
+  thickness: number,
+): void => {
+  context.save();
+  context.fillStyle = color;
+  context.beginPath();
+  context.ellipse(point.x, point.y, thickness / 2, thickness / 2, 0, 0, Math.PI * 2);
+  context.fill();
   context.restore();
 };
