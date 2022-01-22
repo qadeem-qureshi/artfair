@@ -1,16 +1,10 @@
-import React from 'react';
 import { Point } from '@artfair/common';
 import { CurveSegment } from './interpolation';
 
 export const getCanvasPoint = (
-  event: React.PointerEvent<HTMLCanvasElement>,
+  clientPoint: Point,
   canvasElement: HTMLCanvasElement,
 ): Point => {
-  const clientPoint: Point = {
-    x: event.clientX,
-    y: event.clientY,
-  };
-
   const rect = canvasElement.getBoundingClientRect();
 
   const scale = {

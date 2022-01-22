@@ -1,15 +1,23 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import {
-  Point, StrokeBeginData, StrokeContinueData, StrokeEndData, Vector,
+  Point,
+  StrokeBeginData,
+  StrokeContinueData,
+  StrokeEndData,
+  Vector,
 } from '@artfair/common';
 import clsx from 'clsx';
 import { nanoid } from 'nanoid';
 import { segmentize, simplify, split } from '../util/interpolation';
-import { pointDistance } from '../util/math';
+import { createPoint, pointDistance } from '../util/math';
 import socket from '../services/socket';
 import {
-  clear, drawCursor, drawCurveSegments, fill, getCanvasPoint,
+  clear,
+  drawCursor,
+  drawCurveSegments,
+  fill,
+  getCanvasPoint,
 } from '../util/canvas';
 import { useCanvasContext } from './CanvasContextProvider';
 
@@ -68,7 +76,9 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
   const dynamicCanvasContextRef = useRef<CanvasRenderingContext2D | null>(null);
 
   // Map of strokes in progress
-  const strokeBufferMapRef = useRef<Map<string, StrokeBuffer>>(new Map<string, StrokeBuffer>());
+  const strokeBufferMapRef = useRef<Map<string, StrokeBuffer>>(
+    new Map<string, StrokeBuffer>(),
+  );
 
   // Local stroke drawing data
   const localStrokeIdRef = useRef<string | null>(null);
@@ -80,7 +90,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
   const cursorThicknessRef = useRef<number>(state.strokeThickness);
 
   const clearCanvas = () => {
-    if (!staticCanvasContextRef.current || !dynamicCanvasContextRef.current) return;
+    if (!staticCanvasContextRef.current || !dynamicCanvasContextRef.current) { return; }
 
     // Bottom canvas should be solid white
     fill(staticCanvasContextRef.current, 'white');
@@ -97,7 +107,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
   };
 
   const updateCanvas = () => {
-    if (!staticCanvasContextRef.current || !dynamicCanvasContextRef.current) return;
+    if (!staticCanvasContextRef.current || !dynamicCanvasContextRef.current) { return; }
 
     // Clear top canvas because interpolation may change stroke
     clear(dynamicCanvasContextRef.current);
@@ -105,29 +115,49 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
     // Draw each stroke in progress
     strokeBufferMapRef.current.forEach((buffer, strokeId) => {
       // Reduce noise in the raw stroke data
-      const simplified = simplify(buffer.points, SIMPLIFICATION_TOLERANCE, MAX_SEGMENT_LENGTH);
+      const simplified = simplify(
+        buffer.points,
+        SIMPLIFICATION_TOLERANCE,
+        MAX_SEGMENT_LENGTH,
+      );
 
       // Transform simplified points into cubic bezier segments to be drawn
       const segments = segmentize(simplified, buffer.tangent, buffer.tension);
 
       if (buffer.completed) {
         // Stroke is finished, so draw remaining segments to bottom canvas and delete the buffer
-        drawCurveSegments(staticCanvasContextRef.current!, segments, buffer.color, buffer.thickness);
+        drawCurveSegments(
+          staticCanvasContextRef.current!,
+          segments,
+          buffer.color,
+          buffer.thickness,
+        );
         strokeBufferMapRef.current.delete(strokeId);
       } else if (segments.length > SEGMENTS_UNTIL_SPLIT) {
         // Stroke is long enough to be split into static and dynamic parts destined for the bottom and top canvases, respectively
         const {
-          staticSegments, dynamicSegments, dynamicPoints, splitTangent, splitTension,
-        } = split(
-          segments,
-          -MAX_DYNAMIC_SEGMENTS_AFTER_SPLIT,
-        );
+          staticSegments,
+          dynamicSegments,
+          dynamicPoints,
+          splitTangent,
+          splitTension,
+        } = split(segments, -MAX_DYNAMIC_SEGMENTS_AFTER_SPLIT);
 
         // Draw static segments on bottom canvas, because they are permanent
-        drawCurveSegments(staticCanvasContextRef.current!, staticSegments, buffer.color, buffer.thickness);
+        drawCurveSegments(
+          staticCanvasContextRef.current!,
+          staticSegments,
+          buffer.color,
+          buffer.thickness,
+        );
 
         // Draw dynamic segments on top canvas, because they are subject to change
-        drawCurveSegments(dynamicCanvasContextRef.current!, dynamicSegments, buffer.color, buffer.thickness);
+        drawCurveSegments(
+          dynamicCanvasContextRef.current!,
+          dynamicSegments,
+          buffer.color,
+          buffer.thickness,
+        );
 
         // Update the buffer
         buffer.points = dynamicPoints;
@@ -135,7 +165,12 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
         buffer.tension = splitTension;
       } else {
         // Stroke is too short to be split, so all segments are considered dynamic and drawn to top canvas
-        drawCurveSegments(dynamicCanvasContextRef.current!, segments, buffer.color, buffer.thickness);
+        drawCurveSegments(
+          dynamicCanvasContextRef.current!,
+          segments,
+          buffer.color,
+          buffer.thickness,
+        );
       }
     });
 
@@ -152,7 +187,10 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
 
   // Put static canvas element in context
   useEffect(() => {
-    dispatch({ type: 'set-canvas-element', canvasElement: staticCanvasElementRef.current! });
+    dispatch({
+      type: 'set-canvas-element',
+      canvasElement: staticCanvasElementRef.current!,
+    });
   }, [dispatch]);
 
   // Update cursor color
@@ -196,7 +234,9 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
 
   // Add point to stroke
   const continueStroke = (strokeContinueData: StrokeContinueData) => {
-    strokeBufferMapRef.current.get(strokeContinueData.strokeId)?.points.push(strokeContinueData.point);
+    strokeBufferMapRef.current
+      .get(strokeContinueData.strokeId)
+      ?.points.push(strokeContinueData.point);
   };
 
   // Mark stroke buffer as completed
@@ -252,69 +292,105 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
     state.canvasElement.addEventListener('clear', clearCanvas);
   }, [state.canvasElement]);
 
-  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    const currentPoint = getCanvasPoint(event, dynamicCanvasElementRef.current!);
+  const getCurrentPoint = (clientX: number, clientY: number) => {
+    const clientPoint = createPoint(clientX, clientY);
+    const currentPoint = getCanvasPoint(
+      clientPoint,
+      dynamicCanvasElementRef.current!,
+    );
+    return currentPoint;
+  };
+
+  const handleBrushDown = (point: Point) => {
     const strokeId = nanoid();
     const strokeBeginData: StrokeBeginData = {
       strokeId,
       strokeColor: state.strokeColor,
       strokeThickness: state.strokeThickness,
-      point: currentPoint,
+      point,
     };
     beginStroke(strokeBeginData);
     localStrokeIdRef.current = strokeId;
-    previousPointRef.current = currentPoint;
-    cursorPointRef.current = null;
+    previousPointRef.current = point;
     socket.emit('begin_stroke', strokeBeginData);
   };
 
-  const handlePointerEnter = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (event.buttons !== 1) {
-      cursorPointRef.current = getCanvasPoint(event, dynamicCanvasElementRef.current!);
-    } else {
-      handlePointerDown(event);
-    }
-  };
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    const currentPoint = getCanvasPoint(event, dynamicCanvasElementRef.current!);
-    if (event.buttons !== 1) {
-      cursorPointRef.current = currentPoint;
-    } else if (previousPointRef.current) {
-      const pointDelta = pointDistance(previousPointRef.current, currentPoint);
-      if (localStrokeIdRef.current && pointDelta >= MIN_SEGMENT_LENGTH) {
-        const strokeContinueData: StrokeContinueData = {
-          strokeId: localStrokeIdRef.current,
-          point: currentPoint,
-        };
-        continueStroke(strokeContinueData);
-        previousPointRef.current = currentPoint;
-        socket.emit('continue_stroke', strokeContinueData);
+  const handleBrushMove = (point: Point) => {
+    if (localStrokeIdRef.current) {
+      if (previousPointRef.current) {
+        const pointDelta = pointDistance(previousPointRef.current, point);
+        if (pointDelta >= MIN_SEGMENT_LENGTH) {
+          const strokeContinueData: StrokeContinueData = {
+            strokeId: localStrokeIdRef.current,
+            point,
+          };
+          continueStroke(strokeContinueData);
+          previousPointRef.current = point;
+          socket.emit('continue_stroke', strokeContinueData);
+        }
       }
     }
   };
 
-  const handlePointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (localStrokeIdRef.current && previousPointRef.current) {
-      const currentPoint = getCanvasPoint(event, dynamicCanvasElementRef.current!);
+  const handleBrushUp = (point: Point) => {
+    if (localStrokeIdRef.current) {
       const strokeEndData: StrokeEndData = {
         strokeId: localStrokeIdRef.current,
-        point: currentPoint,
+        point,
       };
       endStroke(strokeEndData);
       localStrokeIdRef.current = null;
       previousPointRef.current = null;
-      cursorPointRef.current = currentPoint;
       socket.emit('end_stroke', strokeEndData);
     }
   };
 
-  const handlePointerLeave = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (event.buttons !== 1) {
-      cursorPointRef.current = null;
-    } else {
-      handlePointerUp(event);
+  const handleCursorDown = (point: Point) => {
+    cursorPointRef.current = point;
+  };
+
+  const handleCursorMove = (point: Point) => {
+    if (!localStrokeIdRef.current) {
+      cursorPointRef.current = point;
     }
+  };
+
+  const handleCursorUp = () => {
+    cursorPointRef.current = null;
+  };
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    handleCursorUp();
+    handleBrushDown(getCurrentPoint(event.clientX, event.clientY));
+  };
+
+  const handlePointerEnter = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    handleCursorDown(getCurrentPoint(event.clientX, event.clientY));
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const currentPoint = getCurrentPoint(event.clientX, event.clientY);
+    handleCursorMove(currentPoint);
+    handleBrushMove(currentPoint);
+  };
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    const currentPoint = getCurrentPoint(event.clientX, event.clientY);
+    handleBrushUp(currentPoint);
+    handleCursorDown(currentPoint);
+  };
+
+  const handlePointerLeave = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    handleBrushUp(getCurrentPoint(event.clientX, event.clientY));
+    handleCursorUp();
+  };
+
+  const handleContextMenu = (
+    event: React.MouseEvent<HTMLCanvasElement, MouseEvent>,
+  ) => {
+    const currentPoint = getCurrentPoint(event.clientX, event.clientY);
+    handleBrushUp(currentPoint);
+    handleCursorDown(currentPoint);
   };
 
   return (
@@ -333,6 +409,7 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
         onPointerMove={handlePointerMove}
         onPointerLeave={handlePointerLeave}
         onPointerUp={handlePointerUp}
+        onContextMenu={handleContextMenu}
         width={resolution}
         height={resolution}
       />
