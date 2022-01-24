@@ -88,11 +88,11 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   const history = useHistory();
   const { state, dispatch } = useAppContext();
-  const [currentActivity, setCurrentActivity] = useState(state.room.activity);
+  const [currentActivity, setCurrentActivity] = useState<Activity>(state.room.activity);
 
-  const handleActivityChange = (activity: Activity) => {
+  const handleActivityChange = useCallback((activity: Activity) => {
     setCurrentActivity(activity);
-  };
+  }, []);
 
   const handlePlay = () => {
     dispatch({ type: 'set-activity', activity: currentActivity });

@@ -82,7 +82,7 @@ const addStartGameListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     room.activity = activity;
-    socket.broadcast.to(user.roomname).emit('start_game');
+    socket.broadcast.to(user.roomname).emit('start_game', activity);
   });
 };
 

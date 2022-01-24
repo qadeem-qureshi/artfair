@@ -57,9 +57,11 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const handleHostPromotion = useCallback(
     (hostname: string) => {
       dispatch({ type: 'set-host', hostname });
-      openHostAlert();
+      if (state.artist.name === hostname) {
+        openHostAlert();
+      }
     },
-    [dispatch],
+    [dispatch, state.artist],
   );
 
   useEffect(() => {
