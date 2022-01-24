@@ -1,15 +1,16 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box, BoxProps, Button, makeStyles, Paper, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
+import { Activity } from '@artfair/common';
 import socket from '../services/socket';
 import Chat from './Chat';
-import ArtistList from './ArtistList';
+import HorizontalArtistList from './HorizontalArtistList';
 import RoomName from './RoomName';
 import ActivityCarousel from './ActivityCarousel';
-import { useRoomContext } from './RoomContextProvider';
+import { useAppContext } from './AppContextProvider';
 
 const MAIN_SIZE = 'min(50vw, 78vh)';
 const WRAPPED_MAIN_SIZE = 'min(80vw, 50vh)';
@@ -86,16 +87,23 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const shouldWrap = useMediaQuery('(max-aspect-ratio: 1/1)');
   const history = useHistory();
-  const { state } = useRoomContext();
+  const { state, dispatch } = useAppContext();
+  const [currentActivity, setCurrentActivity] = useState(state.room.activity);
+
+  const handleActivityChange = (activity: Activity) => {
+    setCurrentActivity(activity);
+  };
 
   const handlePlay = () => {
-    socket.emit('start_game');
+    dispatch({ type: 'set-activity', activity: currentActivity });
+    socket.emit('start_game', currentActivity);
     history.push('/game');
   };
 
-  const startGame = useCallback(() => {
+  const startGame = useCallback((activity: Activity) => {
+    dispatch({ type: 'set-activity', activity });
     history.push('/game');
-  }, [history]);
+  }, [dispatch, history]);
 
   useEffect(() => {
     socket.on('start_game', startGame);
@@ -111,10 +119,10 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
         <RoomName className={classes.roomName} />
         <Box className={clsx(classes.panelContainer, shouldWrap && classes.wrappedPanelContainer)}>
           <Box className={clsx(classes.main, shouldWrap && classes.wrappedMain)}>
-            <ArtistList className={classes.artistList} component={Paper} />
+            <HorizontalArtistList className={classes.artistList} component={Paper} />
             <Paper className={classes.activityContentContainer}>
-              <ActivityCarousel className={classes.activityCarousel} />
-              {state.isHost && (
+              <ActivityCarousel className={classes.activityCarousel} onActivityChange={handleActivityChange} />
+              {state.room.hostname === state.artist.name && (
                 <Button color="primary" variant="contained" onClick={handlePlay}>
                   Play
                 </Button>

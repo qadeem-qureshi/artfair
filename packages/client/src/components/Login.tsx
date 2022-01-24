@@ -3,16 +3,16 @@ import {
   Box, BoxProps, Button, makeStyles, TextField,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomCreationData, RoomJoinData, UserData } from '@artfair/common';
 import { useHistory } from 'react-router-dom';
+import { JoinRoomData, User } from '@artfair/common';
 import socket from '../services/socket';
-import { useRoomContext } from './RoomContextProvider';
+import { useAppContext } from './AppContextProvider';
 import AvatarSelector from './AvatarSelector';
 
-const saveSessionInfo = (userData: UserData) => sessionStorage.setItem('userData', JSON.stringify(userData));
+const saveSessionInfo = (user: User) => sessionStorage.setItem('user', JSON.stringify(user));
 const getSessionInfo = () => {
-  const serializedData = sessionStorage.getItem('userData');
-  return serializedData ? JSON.parse(serializedData) as UserData : null;
+  const serializedData = sessionStorage.getItem('user');
+  return serializedData ? (JSON.parse(serializedData) as User) : null;
 };
 
 export type LoginProps = BoxProps;
@@ -35,14 +35,14 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
-  const { dispatch } = useRoomContext();
+  const { dispatch } = useAppContext();
 
   useEffect(() => {
-    const sessionUserData: UserData | null = getSessionInfo();
-    if (!sessionUserData) return;
-    setSelectedAvatarIndex(sessionUserData.avatarIndex);
-    setRequestedUsername(sessionUserData.name);
-    setRequestedRoomname(sessionUserData.roomname);
+    const user: User | null = getSessionInfo();
+    if (!user) return;
+    setSelectedAvatarIndex(user.avatarIndex);
+    setRequestedUsername(user.name);
+    setRequestedRoomname(user.roomname);
   }, []);
 
   const handleAvatarIndexChange = (index: number) => {
@@ -60,21 +60,21 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
   };
 
   const handleCreateRoomAttempt = () => {
-    const userData: UserData = {
+    const user: User = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('create_room_attempt', userData);
+    socket.emit('create_room_attempt', user);
   };
 
   const handleJoinRoomAttempt = () => {
-    const userData: UserData = {
+    const user: User = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('join_room_attempt', userData);
+    socket.emit('join_room_attempt', user);
   };
 
   const handleTakenRoomname = useCallback(() => {
@@ -89,62 +89,33 @@ const Login: React.FC<LoginProps> = ({ className, ...rest }) => {
     setRequestedUsernameError('This username is taken.');
   }, []);
 
-  const handleRoomCreated = useCallback(
-    (data: RoomCreationData) => {
-      const userData: UserData = {
-        name: data.username,
-        roomname: data.roomname,
-        avatarIndex: selectedAvatarIndex,
-      };
-      dispatch({
-        type: 'create-room',
-        userData,
-      });
-      saveSessionInfo(userData);
-      history.push('/lobby');
-    },
-    [dispatch, history, selectedAvatarIndex],
-  );
-
   const handleRoomJoined = useCallback(
-    (data: RoomJoinData) => {
-      const userData: UserData = {
-        name: data.username,
-        roomname: data.roomname,
-        avatarIndex: selectedAvatarIndex,
+    (joinRoomData: JoinRoomData) => {
+      const user: User = {
+        name: joinRoomData.artist.name,
+        roomname: joinRoomData.room.name,
+        avatarIndex: joinRoomData.artist.avatarIndex,
       };
-      dispatch({
-        type: 'join-room',
-        roomMembers: data.roomMembers,
-        userData,
-      });
-      saveSessionInfo(userData);
+      dispatch({ type: 'join-room', artist: joinRoomData.artist, room: joinRoomData.room });
+      saveSessionInfo(user);
       history.push('/lobby');
     },
-    [dispatch, history, selectedAvatarIndex],
+    [dispatch, history],
   );
 
   useEffect(() => {
     socket.on('room_taken', handleTakenRoomname);
     socket.on('room_does_not_exist', handleNonexistentRoom);
     socket.on('username_taken', handleTakenUsername);
-    socket.on('room_created', handleRoomCreated);
     socket.on('room_joined', handleRoomJoined);
 
     return () => {
       socket.off('room_taken', handleTakenRoomname);
       socket.off('room_does_not_exist', handleNonexistentRoom);
       socket.off('username_taken', handleTakenUsername);
-      socket.off('room_created', handleRoomCreated);
       socket.off('room_joined', handleRoomJoined);
     };
-  }, [
-    handleTakenRoomname,
-    handleNonexistentRoom,
-    handleTakenUsername,
-    handleRoomCreated,
-    handleRoomJoined,
-  ]);
+  }, [handleTakenRoomname, handleNonexistentRoom, handleTakenUsername, handleRoomJoined]);
 
   const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoomname.length === 0;
 

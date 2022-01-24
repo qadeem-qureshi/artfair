@@ -3,8 +3,7 @@ import {
   Box, BoxProps, makeStyles, Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { Activity } from '@artfair/common';
-import { useRoomContext } from './RoomContextProvider';
+import { ActivityInformation } from '../util/activity';
 
 const useStyles = makeStyles({
   root: {
@@ -28,37 +27,25 @@ const useStyles = makeStyles({
 });
 
 export interface ActivityCarouselItemProps extends BoxProps {
-  name: string;
-  description: string;
-  activity: Activity;
-  imageSource: string;
+  activityInformation: ActivityInformation;
 }
 
 const ActivityCarouselItem: React.FC<ActivityCarouselItemProps> = ({
   className,
-  name,
-  description,
-  activity,
-  imageSource,
+  activityInformation,
   ...rest
 }) => {
   const classes = useStyles();
-  const { state } = useRoomContext();
-
-  // Only render if this activity is selected
-  if (state.activity !== activity) {
-    return null;
-  }
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <img src={imageSource} alt="Sample Activity" className={classes.image} />
+      <img src={activityInformation.imageSource} alt={activityInformation.name} className={classes.image} />
       <Box className={classes.info}>
         <Typography variant="h3" color="textPrimary" className={classes.name}>
-          {name}
+          {activityInformation.name}
         </Typography>
         <Typography variant="body1" color="textSecondary">
-          {description}
+          {activityInformation.description}
         </Typography>
       </Box>
     </Box>

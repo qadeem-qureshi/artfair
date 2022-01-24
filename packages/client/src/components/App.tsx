@@ -1,14 +1,15 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import { Switch, Route, useHistory } from 'react-router-dom';
 import clsx from 'clsx';
-import { MemberData } from '@artfair/common';
+import { Artist } from '@artfair/common';
 import Home from './Home';
 import Game from './Game';
 import Lobby from './Lobby';
 import socket from '../services/socket';
-import { useRoomContext } from './RoomContextProvider';
+import { useAppContext } from './AppContextProvider';
 import BackgroundImage from '../assets/snowflakes.jpg';
+import ConfirmationDialog from './ConfirmationDialog';
 
 const useStyles = makeStyles({
   root: {
@@ -27,15 +28,21 @@ export type AppProps = BoxProps;
 
 const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state, dispatch } = useRoomContext();
   const history = useHistory();
+  const { state, dispatch } = useAppContext();
+  const [hostAlertIsOpen, setHostAlertIsOpen] = useState(false);
+
+  const closeHostAlert = () => {
+    setHostAlertIsOpen(false);
+  };
+
+  const openHostAlert = () => {
+    setHostAlertIsOpen(true);
+  };
 
   const handleUserJoin = useCallback(
-    (memberData: MemberData) => {
-      dispatch({
-        type: 'user-join',
-        memberData,
-      });
+    (artist: Artist) => {
+      dispatch({ type: 'user-join', artist });
     },
     [dispatch],
   );
@@ -47,22 +54,32 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
     [dispatch],
   );
 
+  const handleHostPromotion = useCallback(
+    (hostname: string) => {
+      dispatch({ type: 'set-host', hostname });
+      openHostAlert();
+    },
+    [dispatch],
+  );
+
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
+    socket.on('promote_host', handleHostPromotion);
 
     return () => {
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
+      socket.off('promote_host', handleHostPromotion);
     };
-  }, [handleUserJoin, handleUserLeave]);
+  }, [handleHostPromotion, handleUserJoin, handleUserLeave]);
 
   useEffect(() => {
     // Redirect users who are not in a room
-    if (!state.userData.roomname) {
+    if (!state.room.name) {
       history.push('/home');
     }
-  }, [history, state.userData.roomname]);
+  }, [history, state.room.name]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
@@ -77,6 +94,15 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
           <Game />
         </Route>
       </Switch>
+      <ConfirmationDialog
+        open={hostAlertIsOpen}
+        onCancel={closeHostAlert}
+        onConfirm={closeHostAlert}
+        onClose={closeHostAlert}
+        title="You have been promoted to room host!"
+        message="As host, you have the ability to control activities, kick out malicious artists, or transfer your power to another artist."
+        confirmText="Ok"
+      />
     </Box>
   );
 };

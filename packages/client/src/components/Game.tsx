@@ -15,7 +15,7 @@ import Toolbar from './Toolbar';
 import GameTabs, { TabItem } from './GameTabs';
 import Chat from './Chat';
 import Rules from './Rules';
-import Artists from './Artists';
+import VerticalArtistList from './VerticalArtistList';
 import CanvasContextProvider from './CanvasContextProvider';
 
 const CANVAS_SIZE = 'min(50vw, 78vh)';
@@ -24,7 +24,7 @@ const CANVAS_RESOLUTION = 1024;
 
 const TAB_ITEMS: TabItem[] = [
   { label: 'Chat', icon: ChatRounded, content: Chat },
-  { label: 'Artists', icon: GroupRounded, content: Artists },
+  { label: 'Artists', icon: GroupRounded, content: VerticalArtistList },
   { label: 'Rules', icon: InfoRounded, content: Rules },
 ];
 

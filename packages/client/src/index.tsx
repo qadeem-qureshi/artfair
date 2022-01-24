@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { BrowserRouter } from 'react-router-dom';
 import playful from './themes/playful';
-import RoomContextProvider from './components/RoomContextProvider';
+import RoomContextProvider from './components/AppContextProvider';
 import App from './components/App';
 
 const rootElement = document.getElementById('root');

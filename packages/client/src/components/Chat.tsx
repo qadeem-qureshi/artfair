@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { ChatMessage, MemberData } from '@artfair/common';
+import { Artist, ChatMessage } from '@artfair/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
-import { useRoomContext } from './RoomContextProvider';
+import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -28,7 +28,7 @@ export type ChatProps = BoxProps;
 const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const { state } = useRoomContext();
+  const { state } = useAppContext();
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
@@ -36,8 +36,8 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   }, []);
 
   const handleUserJoin = useCallback(
-    (memberData: MemberData) => {
-      addMessage({ sender: '', content: `${memberData.name} joined the room` });
+    (artist: Artist) => {
+      addMessage({ sender: '', content: `${artist.name} joined the room` });
     },
     [addMessage],
   );
@@ -50,7 +50,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   );
 
   const handleSend = (content: string) => {
-    const message: ChatMessage = { sender: state.userData.name, content };
+    const message: ChatMessage = { sender: state.artist.name, content };
     socket.emit('chat_message', message);
     addMessage(message);
   };
