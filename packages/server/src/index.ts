@@ -103,7 +103,7 @@ const addUserLeaveListener = (socket: Socket) => {
     const index = roomData.members.findIndex(
       (member) => member.name === userData.name,
     );
-    roomData.members.splice(index);
+    roomData.members.splice(index, 1);
     if (roomData.members.length === 0) {
       rooms.delete(userData.roomname);
     }
