@@ -9,6 +9,7 @@ import {
   RoomData,
   RoomRequestData,
 } from '@artfair/common';
+require('dotenv').config({ path: `${__dirname}/../../../.env` });
 
 const app = express();
 const server = createServer(app);
@@ -17,7 +18,7 @@ const io = new Server(server, {
     origin: '*',
   },
 });
-const port = process.env.port || 3000;
+const port = process.env.REACT_APP_PORT;
 const root = path.join(__dirname, '../../client/dist');
 
 const users = new Map<string, UserData>();
