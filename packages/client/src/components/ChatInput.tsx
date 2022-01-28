@@ -15,9 +15,6 @@ const useStyles = makeStyles({
     flexGrow: 1,
     marginRight: '1rem',
   },
-  button: {
-
-  },
 });
 
 export interface ChatInputProps extends BoxProps {
@@ -29,7 +26,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, className, ...rest }) => 
 
   const [input, setInput] = useState('');
 
-  const handleSend = () => {
+  const send = () => {
     onSend(input.trim());
     setInput('');
   };
@@ -39,7 +36,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, className, ...rest }) => 
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (input.trim() && event.key === 'Enter') { handleSend(); }
+    if (input.trim() && event.key === 'Enter') { send(); }
   };
 
   return (
@@ -56,8 +53,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, className, ...rest }) => 
         spellCheck={false}
       />
       <Button
-        className={classes.button}
-        onClick={handleSend}
+        onClick={send}
         disabled={input.trim().length === 0}
         variant="contained"
         color="primary"

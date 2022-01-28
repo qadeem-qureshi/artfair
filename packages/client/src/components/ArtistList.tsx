@@ -7,21 +7,30 @@ import ArtistProfile from './ArtistProfile';
 const useStyles = makeStyles({
   root: {
     display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+  },
+  artist: {
     flexDirection: 'row',
-    gap: '1rem',
+    justifyContent: 'flex-start',
   },
 });
 
 export type ArtistListProps = BoxProps;
 
-const ArtistList: React.FC<ArtistListProps> = ({ className, ...rest }) => {
+const ArtistList: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { state } = useRoomContext();
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       {state.roomMembers.map((member) => (
-        <ArtistProfile name={member.name} avatarIndex={member.avatarIndex} key={member.name} />
+        <ArtistProfile
+          className={classes.artist}
+          name={member.name}
+          avatarIndex={member.avatarIndex}
+          key={member.name}
+        />
       ))}
     </Box>
   );

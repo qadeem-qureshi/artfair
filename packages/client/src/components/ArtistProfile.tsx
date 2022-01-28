@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '0.5rem',
+    gap: '1rem',
   },
   name: {
     textAlign: 'center',
@@ -37,8 +37,8 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Avatar src={AVATARS[avatarIndex]} variant="square" />
-      <Typography variant="subtitle1" className={classes.name}>
+      <Avatar src={AVATARS[avatarIndex].src} variant="square" />
+      <Typography noWrap variant="subtitle1" className={classes.name}>
         {name}
       </Typography>
     </Box>
