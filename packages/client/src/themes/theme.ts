@@ -32,6 +32,20 @@ const THEME = responsiveFontSizes(
           transform: 'translateZ(0)',
         },
       },
+      MuiMenu: {
+        paper: {
+          boxShadow: '0 0 0 0.2rem #eeeeee',
+          // Hack to fix overflow not hiding with border radius on certain browsers
+          transform: 'translateZ(0)',
+        },
+      },
+      MuiPopover: {
+        paper: {
+          boxShadow: '0 0 0 0.2rem #eeeeee',
+          // Hack to fix overflow not hiding with border radius on certain browsers
+          transform: 'translateZ(0)',
+        },
+      },
       MuiButton: {
         containedPrimary: {
           boxShadow: '0 0.3rem #1565c0',

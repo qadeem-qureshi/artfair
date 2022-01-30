@@ -108,6 +108,19 @@ const addUserLeaveListener = (socket: Socket) => {
   });
 };
 
+const addPromoteHostListener = (socket: Socket) => {
+  socket.on('promote_host', (hostname: string) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    if (room.members.some((member) => member.name === hostname)) {
+      room.hostname = hostname;
+      socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+    }
+  });
+};
+
 const addChatMessageListener = (socket: Socket) => {
   socket.on('chat_message', (message: ChatMessage) => {
     const user = userMap.get(socket.id);
@@ -152,6 +165,7 @@ io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
   addUserLeaveListener(socket);
+  addPromoteHostListener(socket);
   addChatMessageListener(socket);
   addBeginStrokeListener(socket);
   addContinueStrokeListener(socket);

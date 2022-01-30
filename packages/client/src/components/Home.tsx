@@ -67,7 +67,7 @@ const useStyles = makeStyles({
 
 const useVerticalOverrideStyles = makeStyles({
   main: {
-    padding: '3rem',
+    padding: '2.5rem',
     gridTemplateColumns: `${HALF_CONTENT_SIZE}`,
   },
   avatarSelector: {
