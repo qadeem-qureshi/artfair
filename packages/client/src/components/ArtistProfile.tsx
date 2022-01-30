@@ -44,7 +44,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
   className, name, avatarIndex, ...rest
 }) => {
   const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+  const { state } = useAppContext();
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
 
@@ -57,7 +57,6 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
   };
 
   const promoteArtist = () => {
-    dispatch({ type: 'set-host', hostname: name });
     socket.emit('promote_host', name);
   };
 

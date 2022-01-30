@@ -116,7 +116,8 @@ const addPromoteHostListener = (socket: Socket) => {
     if (!room) return;
     if (room.members.some((member) => member.name === hostname)) {
       room.hostname = hostname;
-      socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+      // Send to everyone in the room, including previous host
+      io.in(user.roomname).emit('promote_host', room.hostname);
     }
   });
 };
