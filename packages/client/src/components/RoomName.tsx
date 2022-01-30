@@ -16,7 +16,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: '1rem',
+    gap: '1.5rem',
   },
   name: {
     fontWeight: 'bold',
@@ -30,7 +30,7 @@ const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
   const { state } = useRoomContext();
   const [copied, setCopied] = useState(false);
 
-  const handleRoomCopy = () => {
+  const copyRoom = () => {
     navigator.clipboard.writeText(state.userData.roomname);
     setCopied(true);
   };
@@ -38,7 +38,7 @@ const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <Typography noWrap variant="h2" className={classes.name}>{state.userData.roomname}</Typography>
-      <IconButton size="medium" onClick={handleRoomCopy}>
+      <IconButton size="medium" onClick={copyRoom}>
         {copied ? <CheckRounded /> : <FileCopyRounded />}
       </IconButton>
     </Box>

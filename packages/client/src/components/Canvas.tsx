@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import {
+  Color,
   Point,
   StrokeBeginData,
   StrokeContinueData,
@@ -32,6 +33,7 @@ const useStyles = makeStyles({
     userSelect: 'none',
     touchAction: 'none',
     cursor: 'none',
+    overflow: 'hidden',
   },
   canvas: {
     position: 'absolute',
@@ -47,7 +49,7 @@ const useStyles = makeStyles({
 });
 
 interface StrokeBuffer {
-  color: string;
+  color: Color;
   thickness: number;
   points: Point[];
   tangent?: Vector;

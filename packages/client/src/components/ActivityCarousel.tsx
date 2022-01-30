@@ -7,7 +7,7 @@ import { Activity } from '@artfair/common';
 import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
 import { modulo } from '../util/math';
-import SampleActivityImage from '../assets/activity.png';
+import SampleActivityImage from '../assets/activity.jpg';
 import ActivityCarouselItem from './ActivityCarouselItem';
 import { useRoomContext } from './RoomContextProvider';
 
@@ -34,7 +34,7 @@ const useStyles = makeStyles({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    padding: '0 1rem 0 1rem',
+    padding: '0 1.5rem 0 1.5rem',
     overflowY: 'auto',
     minHeight: 0,
   },

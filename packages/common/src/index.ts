@@ -39,9 +39,11 @@ export interface RoomData {
   members: MemberData[];
 }
 
+export type Color = string;
+
 export interface StrokeBeginData {
   strokeId: string;
-  strokeColor: string;
+  strokeColor: Color;
   strokeThickness: number;
   point: Point;
 }

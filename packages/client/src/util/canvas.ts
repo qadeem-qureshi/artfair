@@ -1,4 +1,4 @@
-import { Point } from '@artfair/common';
+import { Color, Point } from '@artfair/common';
 import { CurveSegment } from './interpolation';
 
 export const getCanvasPoint = (
@@ -24,7 +24,7 @@ export const clear = (context: CanvasRenderingContext2D): void => {
   context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 };
 
-export const fill = (context: CanvasRenderingContext2D, color: string): void => {
+export const fill = (context: CanvasRenderingContext2D, color: Color): void => {
   context.save();
   context.fillStyle = color;
   context.fillRect(0, 0, context.canvas.width, context.canvas.height);
@@ -34,7 +34,7 @@ export const fill = (context: CanvasRenderingContext2D, color: string): void => 
 export const drawCurveSegments = (
   context: CanvasRenderingContext2D,
   segments: CurveSegment[],
-  color: string,
+  color: Color,
   thickness: number,
 ): void => {
   context.save();
@@ -74,7 +74,7 @@ export const drawCurveSegments = (
 export const drawControls = (
   context: CanvasRenderingContext2D,
   segments: CurveSegment[],
-  color: string,
+  color: Color,
   thickness: number,
 ): void => {
   context.save();
@@ -103,7 +103,7 @@ export const drawControls = (
 export const drawPoints = (
   context: CanvasRenderingContext2D,
   segments: CurveSegment[],
-  color: string,
+  color: Color,
   thickness: number,
 ): void => {
   context.save();
@@ -137,7 +137,7 @@ export const drawPoints = (
 export const drawCursor = (
   context: CanvasRenderingContext2D,
   point: Point,
-  color: string,
+  color: Color,
   thickness: number,
 ): void => {
   context.save();

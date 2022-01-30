@@ -1,20 +1,20 @@
+import { Color } from '@artfair/common';
 import React, { createContext, useContext, useReducer } from 'react';
-import { DEFAULT_COLOR } from './ColorPicker';
-import { DEFAULT_THICKNESS } from './ThicknessSlider';
+import { DEFAULT_STROKE_COLOR, DEFAULT_STROKE_THICKNESS } from '../util/stroke';
 
 interface CanvasData {
-  strokeColor: string;
+  strokeColor: Color;
   strokeThickness: number;
   canvasElement?: HTMLCanvasElement,
 }
 
 const DEFAULT_CANVAS_DATA: CanvasData = {
-  strokeColor: DEFAULT_COLOR,
-  strokeThickness: DEFAULT_THICKNESS,
+  strokeColor: DEFAULT_STROKE_COLOR,
+  strokeThickness: DEFAULT_STROKE_THICKNESS,
 };
 
 type CanvasAction =
-  | { type: 'set-stroke-color'; color: string }
+  | { type: 'set-stroke-color'; color: Color }
   | { type: 'set-stroke-thickness'; thickness: number }
   | { type: 'set-canvas-element'; canvasElement: HTMLCanvasElement };
 

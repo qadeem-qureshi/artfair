@@ -11,32 +11,32 @@ const ClearButton: React.FC<ClearButtonProps> = (props) => {
   const { state } = useCanvasContext();
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
-  const handleClose = () => {
+  const closeDialog = () => {
     setDialogIsOpen(false);
   };
 
-  const handleOpen = () => {
+  const openDialog = () => {
     setDialogIsOpen(true);
   };
 
-  const handleClear = () => {
+  const clear = () => {
     if (!state.canvasElement) return;
     const clearEvent = new Event('clear');
     state.canvasElement.dispatchEvent(clearEvent);
     socket.emit('clear_canvas');
-    handleClose();
+    closeDialog();
   };
 
   return (
     <>
-      <IconButton onClick={handleOpen} color="primary" {...props}>
+      <IconButton onClick={openDialog} color="primary" {...props}>
         <DeleteRounded />
       </IconButton>
       <ConfirmationDialog
         open={dialogIsOpen}
-        onCancel={handleClose}
-        onConfirm={handleClear}
-        onClose={handleClose}
+        onCancel={closeDialog}
+        onConfirm={clear}
+        onClose={closeDialog}
         title="Are you sure you want to clear the canvas?"
         message="All your progress will be lost!"
         cancelText="Cancel"
