@@ -7,24 +7,28 @@ import { useAppContext } from './AppContextProvider';
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    flexDirection: 'row',
-    gap: '1rem',
+    flexDirection: 'column',
+    gap: '1.5rem',
   },
 });
 
-export type HorizontalArtistListProps = BoxProps;
+export type ArtistListProps = BoxProps;
 
-const HorizontalArtistList: React.FC<HorizontalArtistListProps> = ({ className, ...rest }) => {
+const ArtistList: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { state } = useAppContext();
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      {state.room.members.map((artist) => (
-        <ArtistProfile name={artist.name} avatarIndex={artist.avatarIndex} key={artist.name} />
+      {state.room.members.map((member) => (
+        <ArtistProfile
+          name={member.name}
+          avatarIndex={member.avatarIndex}
+          key={member.name}
+        />
       ))}
     </Box>
   );
 };
 
-export default HorizontalArtistList;
+export default ArtistList;

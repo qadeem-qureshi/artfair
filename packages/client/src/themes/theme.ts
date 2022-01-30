@@ -1,7 +1,7 @@
 import { createTheme, responsiveFontSizes } from '@material-ui/core';
 import { Shadows } from '@material-ui/core/styles/shadows';
 
-const playful = responsiveFontSizes(
+const THEME = responsiveFontSizes(
   createTheme({
     palette: {
       primary: {
@@ -56,4 +56,4 @@ const playful = responsiveFontSizes(
   }),
 );
 
-export default playful;
+export default THEME;

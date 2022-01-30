@@ -1,5 +1,5 @@
 import { Activity } from '@artfair/common';
-import SampleActivityImage from '../assets/activity.png';
+import SampleActivityImage from '../assets/activity.jpg';
 
 export const ACTIVITIES: Activity[] = ['art-collab', 'con-artist', 'canvas-swap', 'art-dealer', 'art-critic'];
 

@@ -24,7 +24,7 @@ const useStyles = makeStyles({
   },
   content: {
     flex: 1,
-    padding: '0 1rem 0 1rem',
+    padding: '0 1.5rem 0 1.5rem',
     overflowY: 'auto',
     minHeight: 0,
   },

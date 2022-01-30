@@ -3,16 +3,13 @@ import {
   Box, BoxProps, makeStyles, Paper,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { PALETTES } from '../util/palette';
+import { Color } from '@artfair/common';
+import { PALETTE } from '../util/palette';
 import { useCanvasContext } from './CanvasContextProvider';
 
-const NUM_ROWS = 2;
-const PREVIEW_SIZE = 'min(5.5vw, 6vh)';
-const COLOR_ITEM_SIZE = `calc(${PREVIEW_SIZE} / ${NUM_ROWS})`;
-
-const PALETTE = PALETTES.WINTER;
-
-export const DEFAULT_COLOR = PALETTE[0];
+const PREVIEW_SIZE = '3rem';
+const PALETTE_SQUARE_SIZE = `calc(${PREVIEW_SIZE} / 2)`;
+const SQUARES_PER_ROW = Math.ceil(PALETTE.length / 2);
 
 const useStyles = makeStyles({
   root: {
@@ -26,10 +23,12 @@ const useStyles = makeStyles({
   },
   palette: {
     display: 'grid',
-    gridTemplateColumns: `repeat(${Math.ceil(PALETTE.length / NUM_ROWS)}, ${COLOR_ITEM_SIZE})`,
-    gridTemplateRows: `repeat(${NUM_ROWS}, ${COLOR_ITEM_SIZE})`,
-    justifyItems: 'stretch',
+    gridTemplateColumns: `repeat(${SQUARES_PER_ROW}, 1fr)`,
     overflow: 'hidden',
+  },
+  square: {
+    width: PALETTE_SQUARE_SIZE,
+    height: PALETTE_SQUARE_SIZE,
   },
 });
 
@@ -39,14 +38,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const { state, dispatch } = useCanvasContext();
 
-  const colorSelector = (color: string) => () => dispatch({ type: 'set-stroke-color', color });
+  const colorSelector = (color: Color) => () => dispatch({ type: 'set-stroke-color', color });
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <Paper className={classes.preview} style={{ backgroundColor: state.strokeColor }} />
       <Paper className={classes.palette}>
         {PALETTE.map((color) => (
-          <Box key={color} bgcolor={color} onClick={colorSelector(color)} />
+          <Box className={classes.square} key={color} bgcolor={color} onClick={colorSelector(color)} />
         ))}
       </Paper>
     </Box>

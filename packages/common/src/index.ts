@@ -38,9 +38,11 @@ export interface JoinRoomData {
   room: Room;
 }
 
+export type Color = string;
+
 export interface StrokeBeginData {
   strokeId: string;
-  strokeColor: string;
+  strokeColor: Color;
   strokeThickness: number;
   point: Point;
 }
