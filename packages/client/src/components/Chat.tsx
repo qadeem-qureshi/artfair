@@ -49,6 +49,13 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     [addMessage],
   );
 
+  const handlePromoteHost = useCallback(
+    (name: string) => {
+      addMessage({ sender: '', content: `${name} was promoted to host` });
+    },
+    [addMessage],
+  );
+
   const handleSend = (content: string) => {
     const message: ChatMessage = { sender: state.artist.name, content };
     socket.emit('chat_message', message);
@@ -59,13 +66,15 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     socket.on('chat_message', addMessage);
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
+    socket.on('promote_host', handlePromoteHost);
 
     return () => {
       socket.off('chat_message', addMessage);
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
+      socket.off('promote_host', handlePromoteHost);
     };
-  }, [addMessage, handleUserJoin, handleUserLeave]);
+  }, [addMessage, handlePromoteHost, handleUserJoin, handleUserLeave]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>

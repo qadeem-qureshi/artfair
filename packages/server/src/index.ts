@@ -114,6 +114,8 @@ const addPromoteHostListener = (socket: Socket) => {
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
+    // No need to promote the host twice
+    if (room.hostname === hostname) return;
     if (room.members.some((member) => member.name === hostname)) {
       room.hostname = hostname;
       // Send to everyone in the room, including previous host
