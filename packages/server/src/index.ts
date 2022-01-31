@@ -94,6 +94,7 @@ const addUserLeaveListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     const index = room.members.findIndex((member) => member.name === user.name);
+    if (index === -1) return;
     room.members.splice(index, 1);
     if (room.members.length === 0) {
       // Delete room if it is empty
@@ -121,6 +122,22 @@ const addPromoteHostListener = (socket: Socket) => {
       // Send to everyone in the room, including previous host
       io.in(user.roomname).emit('promote_host', room.hostname);
     }
+  });
+};
+
+const addKickListener = (socket: Socket) => {
+  socket.on('kick', (username: string) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    // Never kick the host
+    if (room.hostname === username) return;
+    const index = room.members.findIndex((member) => member.name === username);
+    if (index === -1) return;
+    room.members.splice(index, 1);
+    // Send to everyone in the room, including host
+    io.in(user.roomname).emit('kick', username);
   });
 };
 
@@ -169,6 +186,7 @@ io.on('connection', (socket) => {
   addJoinRoomAttemptListener(socket);
   addUserLeaveListener(socket);
   addPromoteHostListener(socket);
+  addKickListener(socket);
   addChatMessageListener(socket);
   addBeginStrokeListener(socket);
   addContinueStrokeListener(socket);

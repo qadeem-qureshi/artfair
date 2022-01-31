@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Box, BoxProps, makeStyles, Paper, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { Route } from 'react-router-dom';
+import { Route, useHistory } from 'react-router-dom';
 import { Artist } from '@artfair/common';
 import socket from '../services/socket';
 import GameTabs from './GameTabs';
@@ -12,8 +12,9 @@ import Toolbar from './Toolbar';
 import Canvas from './Canvas';
 import Lobby from './Lobby';
 import CanvasContextProvider from './CanvasContextProvider';
-import ConfirmationDialog from './ConfirmationDialog';
 import { useAppContext } from './AppContextProvider';
+import HostPromotionAlert from './HostPromotionAlert';
+import KickAlert from './KickAlert';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -61,17 +62,9 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const portraitOverrideClasses = usePortraitOverrideStyles();
   const { state, dispatch } = useAppContext();
+  const history = useHistory();
   const isPortrait = useMediaQuery('(max-aspect-ratio: 1/1)');
   const isCompact = useMediaQuery('(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)');
-  const [hostAlertIsOpen, setHostAlertIsOpen] = useState(false);
-
-  const closeHostAlert = () => {
-    setHostAlertIsOpen(false);
-  };
-
-  const openHostAlert = () => {
-    setHostAlertIsOpen(true);
-  };
 
   const handleUserJoin = useCallback(
     (artist: Artist) => {
@@ -87,27 +80,21 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
     [dispatch],
   );
 
-  const handleHostPromotion = useCallback(
-    (hostname: string) => {
-      dispatch({ type: 'set-host', hostname });
-      if (state.artist.name === hostname) {
-        openHostAlert();
-      }
-    },
-    [dispatch, state.artist],
-  );
-
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
-    socket.on('promote_host', handleHostPromotion);
-
     return () => {
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
-      socket.off('promote_host', handleHostPromotion);
     };
-  }, [handleHostPromotion, handleUserJoin, handleUserLeave]);
+  }, [handleUserJoin, handleUserLeave]);
+
+  useEffect(() => {
+    // Redirect users who are not in a room
+    if (!state.room.name) {
+      history.push('/home');
+    }
+  }, [history, state.room.name]);
 
   return (
     <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
@@ -122,15 +109,8 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         </CanvasContextProvider>
       </Route>
       <GameTabs className={clsx(classes.sidebar, isPortrait && portraitOverrideClasses.sidebar)} component={Paper} />
-      <ConfirmationDialog
-        open={hostAlertIsOpen}
-        onCancel={closeHostAlert}
-        onConfirm={closeHostAlert}
-        onClose={closeHostAlert}
-        title="You have been promoted to room host!"
-        message="As host, you have the ability to control activities, kick out malicious artists, or transfer your power to another artist."
-        confirmText="Ok"
-      />
+      <HostPromotionAlert />
+      <KickAlert />
     </Box>
   );
 };

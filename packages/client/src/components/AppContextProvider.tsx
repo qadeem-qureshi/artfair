@@ -21,7 +21,8 @@ type AppAction =
   | { type: 'user-join'; artist: Artist }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-host'; hostname: string };
+  | { type: 'set-host'; hostname: string }
+  | { type: 'exit-room' };
 
 const AppReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
@@ -62,6 +63,8 @@ const AppReducer = (state: AppState, action: AppAction): AppState => {
           hostname: action.hostname,
         },
       };
+    case 'exit-room':
+      return DEFAULT_APP_STATE;
     default:
       throw new Error('Invalid action.');
   }

@@ -1,13 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import {
-  Avatar, Badge, Box, BoxProps, IconButton, makeStyles, Menu, MenuItem, Typography,
+  Avatar, Badge, Box, BoxProps, makeStyles, Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import MoreVertRounded from '@material-ui/icons/MoreVertRounded';
 import StarsRounded from '@material-ui/icons/StarsRounded';
-import socket from '../services/socket';
 import { AVATARS } from '../util/avatar';
 import { useAppContext } from './AppContextProvider';
+import ArtistActionMenuButton from './ArtistActionMenuButton';
 
 const useStyles = makeStyles({
   root: {
@@ -27,12 +26,6 @@ const useStyles = makeStyles({
     width: '2.5rem',
     height: '2.5rem',
   },
-  menuIcon: {
-    fontSize: '1.5rem',
-  },
-  menuItem: {
-    gap: '1rem',
-  },
 });
 
 export interface ArtistProfileProps extends BoxProps {
@@ -45,25 +38,6 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
 }) => {
   const classes = useStyles();
   const { state } = useAppContext();
-  const iconButtonRef = useRef<HTMLButtonElement>(null);
-  const [menuIsOpen, setMenuIsOpen] = useState(false);
-
-  const openMenu = () => {
-    setMenuIsOpen(true);
-  };
-
-  const closeMenu = () => {
-    setMenuIsOpen(false);
-  };
-
-  const promoteArtist = () => {
-    socket.emit('promote_host', name);
-  };
-
-  const handlePromoteButtonClick = () => {
-    promoteArtist();
-    closeMenu();
-  };
 
   const clientIsHost = state.artist.name === state.room.hostname;
   const isHostProfile = name === state.room.hostname;
@@ -85,30 +59,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
         {name}
       </Typography>
       {clientIsHost && (
-        <>
-          <IconButton className={classes.menuButton} ref={iconButtonRef} onClick={openMenu} disabled={isHostProfile}>
-            <MoreVertRounded className={classes.menuIcon} />
-          </IconButton>
-          <Menu
-            open={menuIsOpen}
-            anchorEl={iconButtonRef.current}
-            getContentAnchorEl={null}
-            onClose={closeMenu}
-            anchorOrigin={{
-              vertical: 'center',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'center',
-              horizontal: 'left',
-            }}
-          >
-            <MenuItem className={classes.menuItem} onClick={handlePromoteButtonClick}>
-              <StarsRounded color="primary" />
-              <Typography>Promote</Typography>
-            </MenuItem>
-          </Menu>
-        </>
+        <ArtistActionMenuButton className={classes.menuButton} artistName={name} disabled={isHostProfile} />
       )}
     </Box>
   );

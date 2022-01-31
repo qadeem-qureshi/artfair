@@ -56,6 +56,13 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     [addMessage],
   );
 
+  const handleKick = useCallback(
+    (name: string) => {
+      addMessage({ sender: '', content: `${name} was kicked from the room` });
+    },
+    [addMessage],
+  );
+
   const handleSend = (content: string) => {
     const message: ChatMessage = { sender: state.artist.name, content };
     socket.emit('chat_message', message);
@@ -67,14 +74,16 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
     socket.on('promote_host', handlePromoteHost);
+    socket.on('kick', handleKick);
 
     return () => {
       socket.off('chat_message', addMessage);
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
       socket.off('promote_host', handlePromoteHost);
+      socket.off('kick', handleKick);
     };
-  }, [addMessage, handlePromoteHost, handleUserJoin, handleUserLeave]);
+  }, [addMessage, handleKick, handlePromoteHost, handleUserJoin, handleUserLeave]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
