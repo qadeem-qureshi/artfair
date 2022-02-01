@@ -29,7 +29,7 @@ export interface ConfirmationDialogProps extends DialogProps {
   title: string;
   message: string;
   confirmText: string;
-  cancelText: string;
+  cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -52,7 +52,7 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions className={classes.actions}>
-        <Button onClick={onCancel}>{cancelText}</Button>
+        {cancelText && <Button onClick={onCancel}>{cancelText}</Button>}
         <Button variant="contained" color="primary" onClick={onConfirm}>
           {confirmText}
         </Button>

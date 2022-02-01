@@ -1,12 +1,17 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Box, BoxProps, Button, makeStyles, Typography,
+  Box,
+  BoxProps,
+  Button,
+  makeStyles,
+  Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
+import { Activity } from '@artfair/common';
 import socket from '../services/socket';
-import { useRoomContext } from './RoomContextProvider';
 import ActivityCarousel from './ActivityCarousel';
+import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -31,16 +36,28 @@ export type LobbyProps = BoxProps;
 const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const history = useHistory();
-  const { state } = useRoomContext();
+  const { state, dispatch } = useAppContext();
+  const [currentActivity, setCurrentActivity] = useState<Activity>(
+    state.room.activity,
+  );
+
+  const handleActivityChange = useCallback((activity: Activity) => {
+    setCurrentActivity(activity);
+  }, []);
 
   const handlePlay = () => {
-    socket.emit('start_game');
+    dispatch({ type: 'set-activity', activity: currentActivity });
+    socket.emit('start_game', currentActivity);
     history.push('/room/game');
   };
 
-  const startGame = useCallback(() => {
-    history.push('/room/game');
-  }, [history]);
+  const startGame = useCallback(
+    (activity: Activity) => {
+      dispatch({ type: 'set-activity', activity });
+      history.push('/room/game');
+    },
+    [dispatch, history],
+  );
 
   useEffect(() => {
     socket.on('start_game', startGame);
@@ -49,15 +66,29 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
     };
   }, [startGame]);
 
+  const isHost = state.room.hostname === state.artist.name;
+
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <ActivityCarousel className={classes.carousel} />
-      {state.isHost ? (
-        <Button fullWidth color="primary" variant="contained" onClick={handlePlay}>
+      <ActivityCarousel
+        className={classes.carousel}
+        onActivityChange={handleActivityChange}
+      />
+      {isHost ? (
+        <Button
+          fullWidth
+          color="primary"
+          variant="contained"
+          onClick={handlePlay}
+        >
           Start Activity
         </Button>
       ) : (
-        <Typography className={classes.waitingText} variant="subtitle1" color="textSecondary">
+        <Typography
+          className={classes.waitingText}
+          variant="subtitle1"
+          color="textSecondary"
+        >
           Waiting for the host to start an activity.
         </Typography>
       )}

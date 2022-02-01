@@ -3,16 +3,18 @@ import {
   Box, BoxProps, makeStyles, Paper, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { Route } from 'react-router-dom';
-import { MemberData } from '@artfair/common';
+import { Route, useHistory } from 'react-router-dom';
+import { Artist } from '@artfair/common';
 import socket from '../services/socket';
-import { useRoomContext } from './RoomContextProvider';
 import GameTabs from './GameTabs';
 import RoomName from './RoomName';
 import Toolbar from './Toolbar';
 import Canvas from './Canvas';
 import Lobby from './Lobby';
 import CanvasContextProvider from './CanvasContextProvider';
+import { useAppContext } from './AppContextProvider';
+import HostPromotionAlert from './HostPromotionAlert';
+import KickAlert from './KickAlert';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -59,16 +61,14 @@ export type RoomProps = BoxProps;
 const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const portraitOverrideClasses = usePortraitOverrideStyles();
-  const { dispatch } = useRoomContext();
+  const { state, dispatch } = useAppContext();
+  const history = useHistory();
   const isPortrait = useMediaQuery('(max-aspect-ratio: 1/1)');
   const isCompact = useMediaQuery('(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)');
 
   const handleUserJoin = useCallback(
-    (memberData: MemberData) => {
-      dispatch({
-        type: 'user-join',
-        memberData,
-      });
+    (artist: Artist) => {
+      dispatch({ type: 'user-join', artist });
     },
     [dispatch],
   );
@@ -83,12 +83,18 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
-
     return () => {
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
     };
   }, [handleUserJoin, handleUserLeave]);
+
+  useEffect(() => {
+    // Redirect users who are not in a room
+    if (!state.room.name) {
+      history.push('/home');
+    }
+  }, [history, state.room.name]);
 
   return (
     <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
@@ -103,6 +109,8 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         </CanvasContextProvider>
       </Route>
       <GameTabs className={clsx(classes.sidebar, isPortrait && portraitOverrideClasses.sidebar)} component={Paper} />
+      <HostPromotionAlert />
+      <KickAlert />
     </Box>
   );
 };

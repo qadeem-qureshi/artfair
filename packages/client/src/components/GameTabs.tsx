@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Box, BoxProps, makeStyles } from '@material-ui/core';
+import {
+  Box, BoxProps, ButtonBase, makeStyles,
+} from '@material-ui/core';
 import ChatRounded from '@material-ui/icons/ChatRounded';
 import GroupRounded from '@material-ui/icons/GroupRounded';
 import InfoRounded from '@material-ui/icons/InfoRounded';
@@ -77,13 +79,13 @@ const GameTabs: React.FC<GameTabsProps> = ({ className, ...rest }) => {
     <Box className={clsx(classes.root, className)} {...rest}>
       <Box className={classes.tabs}>
         {TAB_ITEMS.map((item, index) => (
-          <Box
+          <ButtonBase
             className={clsx(classes.tab, index === tabIndex && classes.active)}
             key={item.label}
             onClick={changeTab(index)}
           >
             <item.icon color="action" />
-          </Box>
+          </ButtonBase>
         ))}
       </Box>
       {TAB_ITEMS.map((item, index) => (

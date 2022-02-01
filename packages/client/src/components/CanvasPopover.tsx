@@ -6,6 +6,7 @@ import { useCanvasContext } from './CanvasContextProvider';
 const useStyles = makeStyles({
   paper: {
     background: 'none',
+    boxShadow: 'none',
   },
 });
 

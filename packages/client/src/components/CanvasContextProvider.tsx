@@ -2,13 +2,13 @@ import { Color } from '@artfair/common';
 import React, { createContext, useContext, useReducer } from 'react';
 import { DEFAULT_STROKE_COLOR, DEFAULT_STROKE_THICKNESS } from '../util/stroke';
 
-interface CanvasData {
+interface CanvasState {
   strokeColor: Color;
   strokeThickness: number;
   canvasElement?: HTMLCanvasElement,
 }
 
-const DEFAULT_CANVAS_DATA: CanvasData = {
+const DEFAULT_CANVAS_STATE: CanvasState = {
   strokeColor: DEFAULT_STROKE_COLOR,
   strokeThickness: DEFAULT_STROKE_THICKNESS,
 };
@@ -18,7 +18,7 @@ type CanvasAction =
   | { type: 'set-stroke-thickness'; thickness: number }
   | { type: 'set-canvas-element'; canvasElement: HTMLCanvasElement };
 
-const CanvasReducer = (state: CanvasData, action: CanvasAction): CanvasData => {
+const CanvasReducer = (state: CanvasState, action: CanvasAction): CanvasState => {
   switch (action.type) {
     case 'set-stroke-color':
       return {
@@ -41,7 +41,7 @@ const CanvasReducer = (state: CanvasData, action: CanvasAction): CanvasData => {
 };
 
 interface CanvasContextData {
-  state: CanvasData;
+  state: CanvasState;
   dispatch: React.Dispatch<CanvasAction>;
 }
 
@@ -54,7 +54,7 @@ export const useCanvasContext = (): CanvasContextData => {
 };
 
 const CanvasContextProvider: React.FC = ({ children }) => {
-  const [state, dispatch] = useReducer(CanvasReducer, DEFAULT_CANVAS_DATA);
+  const [state, dispatch] = useReducer(CanvasReducer, DEFAULT_CANVAS_STATE);
   return <CanvasContext.Provider value={{ state, dispatch }}>{children}</CanvasContext.Provider>;
 };
 

@@ -3,18 +3,18 @@ import {
   Box, BoxProps, Button, makeStyles, Paper, TextField, Typography, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { RoomCreationData, RoomJoinData, UserData } from '@artfair/common';
+import { JoinRoomData, User } from '@artfair/common';
 import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
-import { useRoomContext } from './RoomContextProvider';
 import AvatarSelector from './AvatarSelector';
 import Logo from '../assets/logo.svg';
 import ContentDivider from './ContentDivider';
+import { useAppContext } from './AppContextProvider';
 
-const saveSessionInfo = (userData: UserData) => sessionStorage.setItem('userData', JSON.stringify(userData));
+const saveSessionInfo = (user: User) => sessionStorage.setItem('user', JSON.stringify(user));
 const getSessionInfo = () => {
-  const serializedData = sessionStorage.getItem('userData');
-  return serializedData ? (JSON.parse(serializedData) as UserData) : null;
+  const serializedData = sessionStorage.getItem('user');
+  return serializedData ? (JSON.parse(serializedData) as User) : null;
 };
 
 const LOGO_SIZE = 'clamp(6rem, 10rem, 10vh)';
@@ -67,7 +67,7 @@ const useStyles = makeStyles({
 
 const useVerticalOverrideStyles = makeStyles({
   main: {
-    padding: '3rem',
+    padding: '2.5rem',
     gridTemplateColumns: `${HALF_CONTENT_SIZE}`,
   },
   avatarSelector: {
@@ -99,16 +99,16 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
   const history = useHistory();
-  const { dispatch } = useRoomContext();
+  const { dispatch } = useAppContext();
   const isVertical = useMediaQuery('(max-width: 60rem)');
   const isCompact = useMediaQuery('(max-height: 50rem)');
 
   useEffect(() => {
-    const sessionUserData: UserData | null = getSessionInfo();
-    if (!sessionUserData) return;
-    setSelectedAvatarIndex(sessionUserData.avatarIndex);
-    setRequestedUsername(sessionUserData.name);
-    setRequestedRoomname(sessionUserData.roomname);
+    const user: User | null = getSessionInfo();
+    if (!user) return;
+    setSelectedAvatarIndex(user.avatarIndex);
+    setRequestedUsername(user.name);
+    setRequestedRoomname(user.roomname);
   }, []);
 
   const handleAvatarIndexChange = (index: number) => {
@@ -117,30 +117,30 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
 
   const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedUsernameError('');
-    setRequestedUsername(event.target.value.trimStart());
+    setRequestedUsername(event.target.value.trimLeft());
   };
 
   const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedRoomnameError('');
-    setRequestedRoomname(event.target.value.trimStart());
+    setRequestedRoomname(event.target.value.trimLeft());
   };
 
   const handleCreateRoomAttempt = () => {
-    const userData: UserData = {
+    const user: User = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('create_room_attempt', userData);
+    socket.emit('create_room_attempt', user);
   };
 
   const handleJoinRoomAttempt = () => {
-    const userData: UserData = {
+    const user: User = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('join_room_attempt', userData);
+    socket.emit('join_room_attempt', user);
   };
 
   const handleTakenRoomname = useCallback(() => {
@@ -155,56 +155,33 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     setRequestedUsernameError('This username is taken.');
   }, []);
 
-  const handleRoomCreated = useCallback(
-    (data: RoomCreationData) => {
-      const userData: UserData = {
-        name: data.username,
-        roomname: data.roomname,
-        avatarIndex: selectedAvatarIndex,
-      };
-      dispatch({
-        type: 'create-room',
-        userData,
-      });
-      saveSessionInfo(userData);
-      history.push('/room/lobby');
-    },
-    [dispatch, history, selectedAvatarIndex],
-  );
-
   const handleRoomJoined = useCallback(
-    (data: RoomJoinData) => {
-      const userData: UserData = {
-        name: data.username,
-        roomname: data.roomname,
-        avatarIndex: selectedAvatarIndex,
+    (joinRoomData: JoinRoomData) => {
+      const user: User = {
+        name: joinRoomData.artist.name,
+        roomname: joinRoomData.room.name,
+        avatarIndex: joinRoomData.artist.avatarIndex,
       };
-      dispatch({
-        type: 'join-room',
-        roomMembers: data.roomMembers,
-        userData,
-      });
-      saveSessionInfo(userData);
+      dispatch({ type: 'join-room', artist: joinRoomData.artist, room: joinRoomData.room });
+      saveSessionInfo(user);
       history.push('/room/lobby');
     },
-    [dispatch, history, selectedAvatarIndex],
+    [dispatch, history],
   );
 
   useEffect(() => {
     socket.on('room_taken', handleTakenRoomname);
     socket.on('room_does_not_exist', handleNonexistentRoom);
     socket.on('username_taken', handleTakenUsername);
-    socket.on('room_created', handleRoomCreated);
     socket.on('room_joined', handleRoomJoined);
 
     return () => {
       socket.off('room_taken', handleTakenRoomname);
       socket.off('room_does_not_exist', handleNonexistentRoom);
       socket.off('username_taken', handleTakenUsername);
-      socket.off('room_created', handleRoomCreated);
       socket.off('room_joined', handleRoomJoined);
     };
-  }, [handleTakenRoomname, handleNonexistentRoom, handleTakenUsername, handleRoomCreated, handleRoomJoined]);
+  }, [handleTakenRoomname, handleNonexistentRoom, handleTakenUsername, handleRoomJoined]);
 
   const textFieldsAreEmpty = requestedUsername.length === 0 || requestedRoomname.length === 0;
 

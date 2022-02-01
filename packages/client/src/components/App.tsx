@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
-import { Switch, Route, useHistory } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import clsx from 'clsx';
 import Home from './Home';
 import Room from './Room';
-import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -18,16 +17,6 @@ export type AppProps = BoxProps;
 
 const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state } = useRoomContext();
-  const history = useHistory();
-
-  useEffect(() => {
-    // Redirect users who are not in a room
-    if (!state.userData.roomname) {
-      history.push('/home');
-    }
-  }, [history, state.userData.roomname]);
-
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <Switch>
@@ -36,6 +25,9 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
         </Route>
         <Route path="/room">
           <Room />
+        </Route>
+        <Route path="/">
+          <Redirect to="/home" />
         </Route>
       </Switch>
     </Box>
