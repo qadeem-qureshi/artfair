@@ -1,4 +1,4 @@
-export type Activity = 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer' | 'art-critic';
+export type Activity = 'free-draw' | 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer';
 
 export interface ChatMessage {
   sender: string;

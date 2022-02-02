@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Box, BoxProps, makeStyles, Typography,
+  Box, BoxProps, makeStyles, Typography, Chip,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { ActivityInformation } from '../util/activity';
@@ -9,20 +9,21 @@ const useStyles = makeStyles({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    gap: '1rem',
   },
   image: {
     width: '100%',
     height: 'auto',
   },
-  info: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignSelf: 'stretch',
-  },
   name: {
-    padding: '0.5rem 0 0.5rem 0',
     fontWeight: 'bold',
+  },
+  chipContainer: {
+    marginTop: '0.5rem',
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: '1rem',
   },
 });
 
@@ -40,13 +41,16 @@ const ActivityCarouselItem: React.FC<ActivityCarouselItemProps> = ({
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <img src={activityInformation.imageSource} alt={activityInformation.name} className={classes.image} />
-      <Box className={classes.info}>
-        <Typography variant="h3" color="textPrimary" className={classes.name}>
-          {activityInformation.name}
-        </Typography>
-        <Typography variant="body1" color="textSecondary">
-          {activityInformation.description}
-        </Typography>
+      <Typography variant="h3" color="textPrimary" className={classes.name}>
+        {activityInformation.name}
+      </Typography>
+      <Typography variant="body1" color="textSecondary">
+        {activityInformation.description}
+      </Typography>
+      <Box className={classes.chipContainer}>
+        <Chip label={`${activityInformation.minArtistCount}+ Artists`} />
+        <Chip label={activityInformation.modeType} />
+        <Chip label={activityInformation.conceptCovered} />
       </Box>
     </Box>
   );

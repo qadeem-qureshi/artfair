@@ -44,7 +44,7 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
         name: user.roomname,
         members: [artist],
         hostname: user.name,
-        activity: 'art-collab',
+        activity: 'free-draw',
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);

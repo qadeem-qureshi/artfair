@@ -12,7 +12,7 @@ const DEFAULT_APP_STATE: AppState = {
     name: '',
     members: [],
     hostname: '',
-    activity: 'art-collab',
+    activity: 'free-draw',
   },
 };
 
