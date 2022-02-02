@@ -25,7 +25,6 @@ const useStyles = makeStyles({
     flexWrap: 'wrap',
     gap: '1rem',
   },
-
 });
 
 export interface ActivityCarouselItemProps extends BoxProps {
