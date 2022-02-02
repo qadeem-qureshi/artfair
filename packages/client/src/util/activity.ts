@@ -1,13 +1,13 @@
 import { Activity } from '@artfair/common';
 import SampleActivityImage from '../assets/activity.jpg';
 
-export const ACTIVITIES: Activity[] = ['free-draw', 'art-collab', 'con-artist', 'canvas-swap', 'art-dealer', 'art-critic'];
+export const ACTIVITIES: Activity[] = ['free-draw', 'art-collab', 'con-artist', 'canvas-swap', 'art-dealer'];
 
 export interface ActivityInformation {
   name: string;
   description: string;
   imageSource: string;
-  playerAmount: string;
+  minArtistCount: number;
   modeType: string;
   conceptCovered: string;
 }
@@ -16,16 +16,18 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
   'free-draw': {
     imageSource: SampleActivityImage,
     name: 'Free Draw',
-    description: 'Artists can share a canvas to draw whatever they desire.',
-    playerAmount: '1+ Players',
+    description:
+      'Artists share a canvas and may draw whatever they desire. This is an opportunity for artists to showcase their talent and creativity.',
+    minArtistCount: 1,
     modeType: 'Relaxing',
     conceptCovered: 'Creativity',
   },
   'art-collab': {
     imageSource: SampleActivityImage,
     name: 'Art Collab',
-    description: 'Artists are given a prompt and must collaborate to complete the prompt on a shared canvas',
-    playerAmount: '2+ Players',
+    description:
+      "Artists are prompted with a scene to draw and must collaborate to complete it. Artists must work together and delegate tasks to efficiently create their masterpiece without stepping on each other's toes.",
+    minArtistCount: 2,
     modeType: 'Relaxing',
     conceptCovered: 'Collaboration',
   },
@@ -34,15 +36,16 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     name: 'Con Artist',
     description:
       'All but one artist are given a prompt to draw. Artists take turns to draw a single, connected stroke. After three rounds, the artists must attempt to vote out the con artist.',
-    playerAmount: '4+ Players',
+    minArtistCount: 4,
     modeType: 'Competitive',
     conceptCovered: 'Problem-solving',
   },
   'canvas-swap': {
     imageSource: SampleActivityImage,
     name: 'Canvas Swap',
-    description: 'Artists each start off with an individual canvas. Then, the canvases rotate between the artists.',
-    playerAmount: '2+ Players',
+    description:
+      "Artists each start off with an individual canvas to draw whatever they like. After some time, the canvases rotate so that each artist may continue the other's work.",
+    minArtistCount: 2,
     modeType: 'Relaxing',
     conceptCovered: 'Teamwork',
   },
@@ -51,16 +54,8 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     name: 'Art Dealer',
     description:
       "Each artist is given a problem and must draw their solution to that problem. After some time, each artist is presented with the work of another and must give a 'sales pitch' of the solution to the other artists.",
-    playerAmount: '3+ Players',
-    modeType: 'Humourous',
-    conceptCovered: 'Critical Thinking',
-  },
-  'art-critic': {
-    imageSource: SampleActivityImage,
-    name: 'Art Critic',
-    description: 'One artist is given a prompt to draw and the others compete to guess the prompt.',
-    playerAmount: '3+ Players',
-    modeType: 'Competitive',
+    minArtistCount: 3,
+    modeType: 'Humorous',
     conceptCovered: 'Critical Thinking',
   },
 };

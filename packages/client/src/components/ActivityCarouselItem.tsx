@@ -49,7 +49,7 @@ const ActivityCarouselItem: React.FC<ActivityCarouselItemProps> = ({
         {activityInformation.description}
       </Typography>
       <Box className={classes.chipContainer}>
-        <Chip label={activityInformation.playerAmount} />
+        <Chip label={`${activityInformation.minArtistCount}+ Artists`} />
         <Chip label={activityInformation.modeType} />
         <Chip label={activityInformation.conceptCovered} />
       </Box>
