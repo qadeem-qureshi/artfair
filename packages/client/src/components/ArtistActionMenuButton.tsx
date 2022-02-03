@@ -43,10 +43,10 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistN
   };
 
   const kickArtist = () => {
-    socket.emit('kick', artistName);
+    socket.emit('kick_artist', artistName);
   };
 
-  const handleKickButtonClick = () => {
+  const handleKickArtistButtonClick = () => {
     kickArtist();
     closeMenu();
   };
@@ -74,7 +74,7 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistN
           <StarsRounded color="primary" />
           <Typography>Promote</Typography>
         </MenuItem>
-        <MenuItem className={classes.menuItem} onClick={handleKickButtonClick}>
+        <MenuItem className={classes.menuItem} onClick={handleKickArtistButtonClick}>
           <ExitToAppRounded color="error" />
           <Typography>Kick</Typography>
         </MenuItem>

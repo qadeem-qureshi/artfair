@@ -3,12 +3,11 @@ import {
   Box, BoxProps, Button, makeStyles, Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { useHistory } from 'react-router-dom';
 import { Activity } from '@artfair/common';
 import { DEFAULT_ACTIVITY } from '../util/activity';
 import socket from '../services/socket';
 import ActivityCarousel from './ActivityCarousel';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -32,35 +31,31 @@ export type LobbyProps = BoxProps;
 
 const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const history = useHistory();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
   const [currentActivity, setCurrentActivity] = useState<Activity>(DEFAULT_ACTIVITY);
-
 
   const handleActivityChange = useCallback((activity: Activity) => {
     setCurrentActivity(activity);
   }, []);
 
   const handlePlay = () => {
-    dispatch({ type: 'set-activity', activity: currentActivity });
-    socket.emit('start_game', currentActivity);
-    history.push('/room/game');
+    dispatch({ type: 'start-activity', activity: currentActivity });
+    socket.emit('start_activity', currentActivity);
   };
 
-  const startGame = useCallback(
+  const startActivity = useCallback(
     (activity: Activity) => {
-      dispatch({ type: 'set-activity', activity });
-      history.push('/room/game');
+      dispatch({ type: 'start-activity', activity });
     },
-    [dispatch, history],
+    [dispatch],
   );
 
   useEffect(() => {
-    socket.on('start_game', startGame);
+    socket.on('start_activity', startActivity);
     return () => {
-      socket.off('start_game', startGame);
+      socket.off('start_activity', startActivity);
     };
-  }, [startGame]);
+  }, [startActivity]);
 
   const isHost = state.room.hostname === state.artist.name;
   const isActivityInProgress = Boolean(state.room.activity);

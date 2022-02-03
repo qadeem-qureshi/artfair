@@ -5,7 +5,7 @@ import {
 import clsx from 'clsx';
 import StarsRounded from '@material-ui/icons/StarsRounded';
 import { AVATARS } from '../util/avatar';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import ArtistActionMenuButton from './ArtistActionMenuButton';
 
 const useStyles = makeStyles({
@@ -37,7 +37,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
   className, name, avatarIndex, ...rest
 }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   const clientIsHost = state.artist.name === state.room.hostname;
   const isHostProfile = name === state.room.hostname;

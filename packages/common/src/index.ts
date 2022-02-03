@@ -18,6 +18,7 @@ export interface Vector {
 export interface Artist {
   name: string;
   avatarIndex: number;
+  isPartOfActivity: boolean;
 }
 
 export interface User {

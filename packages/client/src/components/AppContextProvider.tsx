@@ -1,78 +1,27 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity, Artist, Room } from '@artfair/common';
+import { JoinRoomData } from '@artfair/common';
 
 interface AppState {
-  artist: Artist;
-  room: Room;
+  joinRoomData: JoinRoomData | null;
 }
 
-const DEFAULT_APP_STATE: AppState = {
-  artist: { name: '', avatarIndex: 0 },
-  room: {
-    name: '',
-    members: [],
-    hostname: '',
-    activity: null,
-  },
-};
+type AppAction = { type: 'join-room'; data: JoinRoomData } | { type: 'exit-room' };
 
-type AppAction =
-  | { type: 'join-room'; artist: Artist; room: Room }
-  | { type: 'user-join'; artist: Artist }
-  | { type: 'user-leave'; username: string }
-  | { type: 'set-activity'; activity: Activity }
-  | { type: 'set-host'; hostname: string }
-  | { type: 'exit-room' }
-  | { type: 'exit-activity' };
+const DEFAULT_APP_STATE: AppState = {
+  joinRoomData: null,
+};
 
 const AppReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
     case 'join-room':
       return {
-        artist: action.artist,
-        room: action.room,
-      };
-    case 'user-join':
-      return {
         ...state,
-        room: {
-          ...state.room,
-          members: [...state.room.members, action.artist],
-        },
-      };
-    case 'user-leave':
-      return {
-        ...state,
-        room: {
-          ...state.room,
-          members: state.room.members.filter((member) => member.name !== action.username),
-        },
-      };
-    case 'set-activity':
-      return {
-        ...state,
-        room: {
-          ...state.room,
-          activity: action.activity,
-        },
-      };
-    case 'set-host':
-      return {
-        ...state,
-        room: {
-          ...state.room,
-          hostname: action.hostname,
-        },
+        joinRoomData: action.data,
       };
     case 'exit-room':
-      return DEFAULT_APP_STATE;
-    case 'exit-activity':
       return {
         ...state,
-        room: {
-          ...state.room,
-          activity: null,
-        },
+        joinRoomData: null,
       };
     default:
       throw new Error('Invalid action.');

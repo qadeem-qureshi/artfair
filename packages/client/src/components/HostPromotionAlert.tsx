@@ -1,6 +1,6 @@
 import { DialogProps } from '@material-ui/core';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import ConfirmationDialog from './ConfirmationDialog';
 import socket from '../services/socket';
 
@@ -8,7 +8,7 @@ export type HostPromotionAlertProps = Omit<DialogProps, 'open'>;
 
 const HostPromotionAlert: React.FC<HostPromotionAlertProps> = (props) => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
 
   const closeAlert = () => {
     setAlertIsOpen(false);
