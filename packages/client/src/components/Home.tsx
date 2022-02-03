@@ -4,7 +4,7 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { JoinRoomData, User } from '@artfair/common';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
 import AvatarSelector from './AvatarSelector';
 import Logo from '../assets/logo.svg';
