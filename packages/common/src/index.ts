@@ -1,5 +1,4 @@
 export type Activity = 'free-draw' | 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer';
-export type GameState = 'in-game' | 'no-game';
 
 export interface ChatMessage {
   sender: string;
@@ -31,8 +30,7 @@ export interface Room {
   name: string;
   members: Artist[];
   hostname: string;
-  activity: Activity;
-  gamestate: GameState;
+  activity: Activity | null;
 }
 
 export interface JoinRoomData {

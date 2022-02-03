@@ -6,10 +6,9 @@ import clsx from 'clsx';
 import { Activity } from '@artfair/common';
 import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
-import { ACTIVITIES, ACTIVITY_INFORMATION_RECORD } from '../util/activity';
+import { ACTIVITIES, ACTIVITY_INFORMATION_RECORD, DEFAULT_ACTIVITY } from '../util/activity';
 import { modulo } from '../util/math';
 import ActivityCarouselItem from './ActivityCarouselItem';
-import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -36,8 +35,7 @@ export interface ActivityCarouselProps extends BoxProps {
 
 const ActivityCarousel: React.FC<ActivityCarouselProps> = ({ className, onActivityChange, ...rest }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
-  const [index, setIndex] = useState(() => ACTIVITIES.indexOf(state.room.activity));
+  const [index, setIndex] = useState(() => ACTIVITIES.indexOf(DEFAULT_ACTIVITY));
 
   const selectNextActivity = () => {
     setIndex((previousIndex) => modulo(previousIndex + 1, ACTIVITIES.length));

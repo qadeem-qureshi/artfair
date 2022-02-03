@@ -15,7 +15,7 @@ import CanvasContextProvider from './CanvasContextProvider';
 import { useAppContext } from './AppContextProvider';
 import HostPromotionAlert from './HostPromotionAlert';
 import KickAlert from './KickAlert';
-import NavigationController from './NavigationController';
+import ActivityController from './ActivityController';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -81,26 +81,36 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
     [dispatch],
   );
 
+  const handleEndGame = useCallback(() => {
+    dispatch({ type: 'exit-activity' });
+  }, [dispatch]);
+
   useEffect(() => {
     socket.on('user_join', handleUserJoin);
     socket.on('user_leave', handleUserLeave);
+    socket.on('end_game', handleEndGame);
     return () => {
       socket.off('user_join', handleUserJoin);
       socket.off('user_leave', handleUserLeave);
+      socket.off('end_game', handleEndGame);
     };
-  }, [handleUserJoin, handleUserLeave]);
+  }, [handleEndGame, handleUserJoin, handleUserLeave]);
 
+  // Redirect users who are not in a room
   useEffect(() => {
-    // Redirect users who are not in a room
     if (!state.room.name) {
       history.push('/home');
     }
   }, [history, state.room.name]);
 
-  useEffect(() => () => {
-    socket.emit('user_leave', state.artist.name);
-    dispatch({ type: 'exit-room' });
-  }, [dispatch, state.artist.name]);
+  // Exit the room when component unmounts
+  useEffect(
+    () => () => {
+      socket.emit('user_leave');
+      dispatch({ type: 'exit-room' });
+    },
+    [dispatch],
+  );
 
   return (
     <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
@@ -109,7 +119,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         <Lobby className={clsx(classes.main, classes.lobby)} component={Paper} />
       </Route>
       <Route path="/room/game">
-        <NavigationController />
+        <ActivityController />
         <CanvasContextProvider>
           <Toolbar className={classes.header} compact={isPortrait || isCompact} />
           <Canvas className={classes.main} component={Paper} resolution={CANVAS_RESOLUTION} />

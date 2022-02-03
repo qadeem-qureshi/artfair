@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import {
-  Activity, Artist, GameState, Room,
-} from '@artfair/common';
+import { Activity, Artist, Room } from '@artfair/common';
 
 interface AppState {
   artist: Artist;
@@ -14,19 +12,18 @@ const DEFAULT_APP_STATE: AppState = {
     name: '',
     members: [],
     hostname: '',
-    activity: 'free-draw',
-    gamestate: 'no-game',
+    activity: null,
   },
 };
 
 type AppAction =
-  | { type: 'join-room'; artist: Artist, room: Room }
+  | { type: 'join-room'; artist: Artist; room: Room }
   | { type: 'user-join'; artist: Artist }
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
   | { type: 'set-host'; hostname: string }
   | { type: 'exit-room' }
-  | { type: 'set-gamestate'; gamestate: GameState };
+  | { type: 'exit-activity' };
 
 const AppReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
@@ -69,12 +66,12 @@ const AppReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'exit-room':
       return DEFAULT_APP_STATE;
-    case 'set-gamestate':
+    case 'exit-activity':
       return {
         ...state,
         room: {
           ...state.room,
-          gamestate: action.gamestate,
+          activity: null,
         },
       };
     default:

@@ -1,14 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Box,
-  BoxProps,
-  Button,
-  makeStyles,
-  Typography,
+  Box, BoxProps, Button, makeStyles, Typography,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { useHistory } from 'react-router-dom';
 import { Activity } from '@artfair/common';
+import { DEFAULT_ACTIVITY } from '../util/activity';
 import socket from '../services/socket';
 import ActivityCarousel from './ActivityCarousel';
 import { useAppContext } from './AppContextProvider';
@@ -37,9 +34,7 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const history = useHistory();
   const { state, dispatch } = useAppContext();
-  const [currentActivity, setCurrentActivity] = useState<Activity>(
-    state.room.activity,
-  );
+  const [currentActivity, setCurrentActivity] = useState<Activity>(DEFAULT_ACTIVITY);
 
   const handleActivityChange = useCallback((activity: Activity) => {
     setCurrentActivity(activity);
@@ -47,7 +42,6 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
 
   const handlePlay = () => {
     dispatch({ type: 'set-activity', activity: currentActivity });
-    dispatch({ type: 'set-gamestate', gamestate: 'in-game' });
     socket.emit('start_game', currentActivity);
     history.push('/room/game');
   };
@@ -55,7 +49,6 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const startGame = useCallback(
     (activity: Activity) => {
       dispatch({ type: 'set-activity', activity });
-      dispatch({ type: 'set-gamestate', gamestate: 'in-game' });
       history.push('/room/game');
     },
     [dispatch, history],
@@ -68,44 +61,21 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
     };
   }, [startGame]);
 
-  useEffect(() => {
-    // Redirect users who are not in a room
-    if (state.room.gamestate === 'in-game') {
-      if (state.room.hostname === state.artist.name) {
-        socket.emit('end_game');
-      }
-    }
-  }, [history, state.artist.name, state.room.gamestate, state.room.hostname]);
-
   const isHost = state.room.hostname === state.artist.name;
-  const inSession = state.room.gamestate === 'in-game';
+  const isActivityInProgress = Boolean(state.room.activity);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <ActivityCarousel
-        className={classes.carousel}
-        onActivityChange={handleActivityChange}
-      />
+      <ActivityCarousel className={classes.carousel} onActivityChange={handleActivityChange} />
       {isHost ? (
-        <Button
-          fullWidth
-          color="primary"
-          variant="contained"
-          onClick={handlePlay}
-        >
+        <Button fullWidth color="primary" variant="contained" onClick={handlePlay}>
           Start Activity
         </Button>
       ) : (
-        <Typography
-          className={classes.waitingText}
-          variant="subtitle1"
-          color="textSecondary"
-        >
-          {inSession ? (
-            <>Waiting for the activity to finish.</>
-          ) : (
-            <>Waiting for the host to start an activity.</>
-          )}
+        <Typography className={classes.waitingText} variant="subtitle1" color="textSecondary">
+          {isActivityInProgress
+            ? 'Waiting for the host to end an activity.'
+            : 'Waiting for the host to start an activity.'}
         </Typography>
       )}
     </Box>

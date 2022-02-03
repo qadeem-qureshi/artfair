@@ -44,8 +44,7 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
         name: user.roomname,
         members: [artist],
         hostname: user.name,
-        activity: 'free-draw',
-        gamestate: 'no-game',
+        activity: null,
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
@@ -98,30 +97,32 @@ const addEndGameListener = (socket: Socket) => {
   });
 };
 
-const addUserLeaveListener = (socket: Socket) => {
-  socket.on('disconnect', () => {
-    const user = userMap.get(socket.id);
-    if (!user) return;
-    const room = roomMap.get(user.roomname);
-    if (!room) return;
-    const index = room.members.findIndex((member) => member.name === user.name);
-    if (index === -1) {
-      userMap.delete(socket.id);
-      return;
-    }
-    socket.broadcast.to(user.roomname).emit('user_leave', user.name);
-    room.members.splice(index, 1);
-    if (room.members.length === 0) {
-      // Delete room if it is empty
-      roomMap.delete(user.roomname);
-    } else if (room.hostname === user.name) {
-      // Promote a new host if the host left
-      const newHostArtist = room.members[0];
-      room.hostname = newHostArtist.name;
-      socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
-    }
+const getUserLeaveHandler = (socket: Socket) => () => {
+  const user = userMap.get(socket.id);
+  if (!user) return;
+  const room = roomMap.get(user.roomname);
+  if (!room) return;
+  const index = room.members.findIndex((member) => member.name === user.name);
+  if (index === -1) {
     userMap.delete(socket.id);
-  });
+    return;
+  }
+  socket.broadcast.to(user.roomname).emit('user_leave', user.name);
+  room.members.splice(index, 1);
+  if (room.members.length === 0) {
+    // Delete room if it is empty
+    roomMap.delete(user.roomname);
+  } else if (room.hostname === user.name) {
+    // Promote a new host if the host left
+    const newHostArtist = room.members[0];
+    room.hostname = newHostArtist.name;
+    socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+  }
+  userMap.delete(socket.id);
+};
+
+const addDisconnectListener = (socket: Socket) => {
+  socket.on('disconnect', getUserLeaveHandler(socket));
 };
 
 const addPromoteHostListener = (socket: Socket) => {
@@ -141,28 +142,7 @@ const addPromoteHostListener = (socket: Socket) => {
 };
 
 const addLeaveListener = (socket: Socket) => {
-  socket.on('user_leave', (username: string) => {
-    const user = userMap.get(socket.id);
-    if (!user) return;
-    const room = roomMap.get(user.roomname);
-    if (!room) return;
-    const index = room.members.findIndex((member) => member.name === username);
-    if (index === -1) {
-      userMap.delete(socket.id);
-      return;
-    }
-    socket.broadcast.to(user.roomname).emit('user_leave', username);
-    room.members.splice(index, 1);
-    if (room.members.length === 0) {
-      // Delete room if it is empty
-      roomMap.delete(user.roomname);
-    } else if (room.hostname === username) {
-      // Promote a new host if the host left
-      const newHostArtist = room.members[0];
-      room.hostname = newHostArtist.name;
-      socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
-    }
-  });
+  socket.on('user_leave', getUserLeaveHandler(socket));
 };
 
 const addKickListener = (socket: Socket) => {
@@ -178,7 +158,6 @@ const addKickListener = (socket: Socket) => {
     room.members.splice(index, 1);
     // Send to everyone in the room, including host
     io.in(user.roomname).emit('kick', username);
-    user.roomname = '';
   });
 };
 
@@ -225,7 +204,7 @@ const addClearCanvasListener = (socket: Socket) => {
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
-  addUserLeaveListener(socket);
+  addDisconnectListener(socket);
   addPromoteHostListener(socket);
   addKickListener(socket);
   addLeaveListener(socket);
