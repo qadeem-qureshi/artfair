@@ -15,6 +15,7 @@ import CanvasContextProvider from './CanvasContextProvider';
 import { useAppContext } from './AppContextProvider';
 import HostPromotionAlert from './HostPromotionAlert';
 import KickAlert from './KickAlert';
+import NavigationController from './NavigationController';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -96,6 +97,11 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
     }
   }, [history, state.room.name]);
 
+  useEffect(() => () => {
+    socket.emit('user_leave', state.artist.name);
+    dispatch({ type: 'exit-room' });
+  }, [dispatch, state.artist.name]);
+
   return (
     <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
       <Route path="/room/lobby">
@@ -103,6 +109,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         <Lobby className={clsx(classes.main, classes.lobby)} component={Paper} />
       </Route>
       <Route path="/room/game">
+        <NavigationController />
         <CanvasContextProvider>
           <Toolbar className={classes.header} compact={isPortrait || isCompact} />
           <Canvas className={classes.main} component={Paper} resolution={CANVAS_RESOLUTION} />

@@ -47,6 +47,7 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
 
   const handlePlay = () => {
     dispatch({ type: 'set-activity', activity: currentActivity });
+    dispatch({ type: 'set-gamestate', gamestate: 'in-game' });
     socket.emit('start_game', currentActivity);
     history.push('/room/game');
   };
@@ -54,6 +55,7 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const startGame = useCallback(
     (activity: Activity) => {
       dispatch({ type: 'set-activity', activity });
+      dispatch({ type: 'set-gamestate', gamestate: 'in-game' });
       history.push('/room/game');
     },
     [dispatch, history],
@@ -66,7 +68,17 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
     };
   }, [startGame]);
 
+  useEffect(() => {
+    // Redirect users who are not in a room
+    if (state.room.gamestate === 'in-game') {
+      if (state.room.hostname === state.artist.name) {
+        socket.emit('end_game');
+      }
+    }
+  }, [history, state.artist.name, state.room.gamestate, state.room.hostname]);
+
   const isHost = state.room.hostname === state.artist.name;
+  const inSession = state.room.gamestate === 'in-game';
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
@@ -89,7 +101,11 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
           variant="subtitle1"
           color="textSecondary"
         >
-          Waiting for the host to start an activity.
+          {inSession ? (
+            <>Waiting for the activity to finish.</>
+          ) : (
+            <>Waiting for the host to start an activity.</>
+          )}
         </Typography>
       )}
     </Box>

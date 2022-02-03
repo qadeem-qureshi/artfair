@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity, Artist, Room } from '@artfair/common';
+import {
+  Activity, Artist, GameState, Room,
+} from '@artfair/common';
 
 interface AppState {
   artist: Artist;
@@ -13,6 +15,7 @@ const DEFAULT_APP_STATE: AppState = {
     members: [],
     hostname: '',
     activity: 'free-draw',
+    gamestate: 'no-game',
   },
 };
 
@@ -22,7 +25,8 @@ type AppAction =
   | { type: 'user-leave'; username: string }
   | { type: 'set-activity'; activity: Activity }
   | { type: 'set-host'; hostname: string }
-  | { type: 'exit-room' };
+  | { type: 'exit-room' }
+  | { type: 'set-gamestate'; gamestate: GameState };
 
 const AppReducer = (state: AppState, action: AppAction): AppState => {
   switch (action.type) {
@@ -65,6 +69,14 @@ const AppReducer = (state: AppState, action: AppAction): AppState => {
       };
     case 'exit-room':
       return DEFAULT_APP_STATE;
+    case 'set-gamestate':
+      return {
+        ...state,
+        room: {
+          ...state.room,
+          gamestate: action.gamestate,
+        },
+      };
     default:
       throw new Error('Invalid action.');
   }
