@@ -66,7 +66,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const history = useHistory();
   const isPortrait = useMediaQuery('(max-aspect-ratio: 1/1)');
   const isCompact = useMediaQuery('(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)');
-
+ 
   const handleUserJoin = useCallback(
     (artist: Artist) => {
       dispatch({ type: 'user-join', artist });
@@ -83,6 +83,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
 
   const handleEndGame = useCallback(() => {
     dispatch({ type: 'exit-activity' });
+    history.push('/room/lobby');
   }, [dispatch]);
 
   useEffect(() => {
@@ -102,7 +103,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
       history.push('/home');
     }
   }, [history, state.room.name]);
-
+  
   // Exit the room when component unmounts
   useEffect(
     () => () => {

@@ -4,7 +4,7 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { JoinRoomData, User } from '@artfair/common';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import socket from '../services/socket';
 import AvatarSelector from './AvatarSelector';
 import Logo from '../assets/logo.svg';
@@ -168,7 +168,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     },
     [dispatch, history],
   );
-
+  
   useEffect(() => {
     socket.on('room_taken', handleTakenRoomname);
     socket.on('room_does_not_exist', handleNonexistentRoom);

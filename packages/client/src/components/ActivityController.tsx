@@ -1,26 +1,33 @@
-import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useCallback, useEffect } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import socket from '../services/socket';
 import { useAppContext } from './AppContextProvider';
 
 const ActivityController: React.FC = () => {
   const { state, dispatch } = useAppContext();
   const history = useHistory();
+  const location = useLocation();
 
-  // Redirect when there is no activity in progress
+  const handleActivityNaviagtion = useCallback(
+    (path: string) => {
+      if(path === "/room/game" && !state.room.activity)
+      {
+        history.push('/room/lobby');
+      }
+    },
+    [dispatch],
+  );
+  
   useEffect(() => {
-    if (!state.room.activity) {
-      history.push('/room/lobby');
-    }
-  }, [history, state.room.activity]);
-
-  // End activity if host leaves
+    handleActivityNaviagtion(location.pathname)
+  }, [location]);
+  
   useEffect(
     () => () => {
       if (state.room.hostname === state.artist.name) {
-        dispatch({ type: 'exit-activity' });
         socket.emit('end_game');
       }
+      dispatch({ type: 'exit-activity' });
     },
     [dispatch, state.artist.name, state.room.hostname],
   );
