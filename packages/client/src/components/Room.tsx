@@ -84,7 +84,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const handleEndGame = useCallback(() => {
     dispatch({ type: 'exit-activity' });
     history.push('/room/lobby');
-  }, [dispatch]);
+  }, [dispatch, history]);
 
   useEffect(() => {
     socket.on('user_join', handleUserJoin);

@@ -15,7 +15,7 @@ const ActivityController: React.FC = () => {
         history.push('/room/lobby');
       }
     },
-    [dispatch],
+    [dispatch, state.room.activity],
   );
   
   useEffect(() => {
