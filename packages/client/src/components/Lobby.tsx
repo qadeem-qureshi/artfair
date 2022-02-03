@@ -36,7 +36,6 @@ const Lobby: React.FC<LobbyProps> = ({ className, ...rest }) => {
   const { state, dispatch } = useAppContext();
   const [currentActivity, setCurrentActivity] = useState<Activity>(DEFAULT_ACTIVITY);
 
-
   const handleActivityChange = useCallback((activity: Activity) => {
     setCurrentActivity(activity);
   }, []);

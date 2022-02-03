@@ -10,18 +10,17 @@ const ActivityController: React.FC = () => {
 
   const handleActivityNaviagtion = useCallback(
     (path: string) => {
-      if(path === "/room/game" && !state.room.activity)
-      {
+      if (path === '/room/game' && !state.room.activity) {
         history.push('/room/lobby');
       }
     },
-    [dispatch, state.room.activity],
+    [history, state.room.activity],
   );
-  
+
   useEffect(() => {
-    handleActivityNaviagtion(location.pathname)
-  }, [location]);
-  
+    handleActivityNaviagtion(location.pathname);
+  }, [handleActivityNaviagtion, location]);
+
   useEffect(
     () => () => {
       if (state.room.hostname === state.artist.name) {

@@ -168,7 +168,7 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
     },
     [dispatch, history],
   );
-  
+
   useEffect(() => {
     socket.on('room_taken', handleTakenRoomname);
     socket.on('room_does_not_exist', handleNonexistentRoom);
