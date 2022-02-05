@@ -41,6 +41,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         room: {
           ...state.room,
           activity: action.activity,
+          members: state.room.members.map((member) => ({ ...member, isPartOfActivity: true })),
         },
       };
     case 'set-host':
@@ -61,6 +62,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         room: {
           ...state.room,
           activity: null,
+          members: state.room.members.map((member) => ({ ...member, isPartOfActivity: false })),
         },
       };
     default:

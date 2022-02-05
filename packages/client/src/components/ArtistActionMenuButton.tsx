@@ -5,7 +5,9 @@ import {
 import MoreVertRounded from '@material-ui/icons/MoreVertRounded';
 import StarsRounded from '@material-ui/icons/StarsRounded';
 import ExitToAppRounded from '@material-ui/icons/ExitToAppRounded';
+import { Artist } from '@artfair/common';
 import socket from '../services/socket';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   menuIcon: {
@@ -17,13 +19,15 @@ const useStyles = makeStyles({
 });
 
 export interface ArtistActionMenuButtonProps extends IconButtonProps {
-  artistName: string;
+  artist: Artist;
 }
 
-const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistName, ...rest }) => {
+const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artist, ...rest }) => {
   const classes = useStyles();
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
+  const { state } = useRoomContext();
+  const artistCanBePromoted = !state.room.activity || artist.isPartOfActivity;
 
   const openMenu = () => {
     setMenuIsOpen(true);
@@ -34,7 +38,7 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistN
   };
 
   const promoteArtist = () => {
-    socket.emit('promote_host', artistName);
+    socket.emit('promote_host', artist.name);
   };
 
   const handlePromoteButtonClick = () => {
@@ -43,7 +47,7 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistN
   };
 
   const kickArtist = () => {
-    socket.emit('kick_artist', artistName);
+    socket.emit('kick_artist', artist.name);
   };
 
   const handleKickArtistButtonClick = () => {
@@ -70,10 +74,12 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artistN
           horizontal: 'left',
         }}
       >
-        <MenuItem className={classes.menuItem} onClick={handlePromoteButtonClick}>
-          <StarsRounded color="primary" />
-          <Typography>Promote</Typography>
-        </MenuItem>
+        {artistCanBePromoted && (
+          <MenuItem className={classes.menuItem} onClick={handlePromoteButtonClick}>
+            <StarsRounded color="primary" />
+            <Typography>Promote</Typography>
+          </MenuItem>
+        )}
         <MenuItem className={classes.menuItem} onClick={handleKickArtistButtonClick}>
           <ExitToAppRounded color="error" />
           <Typography>Kick</Typography>

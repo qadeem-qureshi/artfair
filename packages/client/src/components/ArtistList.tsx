@@ -21,11 +21,7 @@ const ArtistList: React.FC<BoxProps> = ({ className, ...rest }) => {
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       {state.room.members.map((member) => (
-        <ArtistProfile
-          name={member.name}
-          avatarIndex={member.avatarIndex}
-          key={member.name}
-        />
+        <ArtistProfile artist={member} key={member.name} />
       ))}
     </Box>
   );

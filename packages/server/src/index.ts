@@ -87,6 +87,7 @@ const addStartActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     room.activity = activity;
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: true }));
     socket.broadcast.to(user.roomname).emit('start_activity', activity);
   });
 };
@@ -98,6 +99,8 @@ const addEndActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     if (user.name !== room.hostname) return;
+    room.activity = null;
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: false }));
     socket.broadcast.to(user.roomname).emit('end_activity');
   });
 };
