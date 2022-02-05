@@ -122,8 +122,16 @@ const getArtistLeaveHandler = (socket: Socket) => () => {
     roomMap.delete(user.roomname);
   } else if (room.hostname === user.name) {
     // Promote a new host if the host left
-    const newHostArtist = room.members[0];
-    room.hostname = newHostArtist.name;
+    const artistInActivity = room.members.find((member) => member.isPartOfActivity);
+    if (artistInActivity) {
+      // If another artist is still in the activity, promote them
+      room.hostname = artistInActivity.name;
+    } else {
+      // Otherwise, end the activity and promote someone else
+      room.activity = null;
+      socket.broadcast.to(user.roomname).emit('end_activity');
+      room.hostname = room.members[0].name;
+    }
     socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
   }
   userMap.delete(socket.id);
