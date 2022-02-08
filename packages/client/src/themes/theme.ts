@@ -55,6 +55,9 @@ const THEME = responsiveFontSizes(
           '&:focus': {
             boxShadow: '0 0.2rem #1565c0',
           },
+          '&:disabled': {
+            boxShadow: 'none',
+          },
         },
         containedSecondary: {
           boxShadow: '0 0.3rem #2e7d32',
@@ -63,6 +66,9 @@ const THEME = responsiveFontSizes(
           },
           '&:focus': {
             boxShadow: '0 0.2rem #2e7d32',
+          },
+          '&:disabled': {
+            boxShadow: 'none',
           },
         },
       },
