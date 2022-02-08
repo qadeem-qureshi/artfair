@@ -1,14 +1,16 @@
 import { DialogProps } from '@material-ui/core';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import ConfirmationDialog from './ConfirmationDialog';
 import socket from '../services/socket';
+import { useAppContext } from './AppContextProvider';
 
 export type KickAlertProps = Omit<DialogProps, 'open'>;
 
 const KickAlert: React.FC<KickAlertProps> = (props) => {
   const [alertIsOpen, setAlertIsOpen] = useState(false);
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch } = useRoomContext();
+  const { dispatch: appDispatch } = useAppContext();
 
   const closeAlert = () => {
     setAlertIsOpen(false);
@@ -20,26 +22,26 @@ const KickAlert: React.FC<KickAlertProps> = (props) => {
 
   const handleClose = () => {
     closeAlert();
-    dispatch({ type: 'exit-room' });
+    appDispatch({ type: 'exit-room' });
   };
 
-  const handleKick = useCallback(
+  const handleKickArtist = useCallback(
     (username: string) => {
       if (state.artist.name === username) {
         openAlert();
       } else {
-        dispatch({ type: 'user-leave', username });
+        dispatch({ type: 'artist-leave', username });
       }
     },
     [dispatch, state.artist.name],
   );
 
   useEffect(() => {
-    socket.on('kick', handleKick);
+    socket.on('kick_artist', handleKickArtist);
     return () => {
-      socket.off('kick', handleKick);
+      socket.off('kick_artist', handleKickArtist);
     };
-  }, [handleKick]);
+  }, [handleKickArtist]);
 
   return (
     <ConfirmationDialog

@@ -24,7 +24,7 @@ const userMap = new Map<string, User>();
 const roomMap = new Map<string, Room>();
 
 app.use('/', express.static(root));
-app.use('*', express.static(root));
+app.get('*', (req, res) => res.redirect('/'));
 
 const usernameIsTaken = (username: string, roomname: string) => {
   const room = roomMap.get(roomname);
@@ -39,12 +39,13 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
       const artist: Artist = {
         name: user.name,
         avatarIndex: user.avatarIndex,
+        isPartOfActivity: false,
       };
       const room: Room = {
         name: user.roomname,
         members: [artist],
         hostname: user.name,
-        activity: 'free-draw',
+        activity: null,
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
@@ -64,49 +65,80 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
     } else {
       const room = roomMap.get(user.roomname);
       if (!room) return;
-      const artist: Artist = { name: user.name, avatarIndex: user.avatarIndex };
+      const artist: Artist = {
+        name: user.name,
+        avatarIndex: user.avatarIndex,
+        isPartOfActivity: false,
+      };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
       room.members.push(artist);
       socket.join(user.roomname);
       socket.emit('room_joined', joinRoomData);
-      socket.broadcast.to(user.roomname).emit('user_join', artist);
+      socket.broadcast.to(user.roomname).emit('artist_join', artist);
     }
   });
 };
 
-const addStartGameListener = (socket: Socket) => {
-  socket.on('start_game', (activity: Activity) => {
+const addStartActivityListener = (socket: Socket) => {
+  socket.on('start_activity', (activity: Activity) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
     room.activity = activity;
-    socket.broadcast.to(user.roomname).emit('start_game', activity);
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: true }));
+    socket.broadcast.to(user.roomname).emit('start_activity', activity);
   });
 };
 
-const addUserLeaveListener = (socket: Socket) => {
-  socket.on('disconnect', () => {
+const addEndActivityListener = (socket: Socket) => {
+  socket.on('end_activity', () => {
     const user = userMap.get(socket.id);
     if (!user) return;
-    socket.broadcast.to(user.roomname).emit('user_leave', user.name);
     const room = roomMap.get(user.roomname);
     if (!room) return;
-    const index = room.members.findIndex((member) => member.name === user.name);
-    if (index === -1) return;
-    room.members.splice(index, 1);
-    if (room.members.length === 0) {
-      // Delete room if it is empty
-      roomMap.delete(user.roomname);
-    } else if (room.hostname === user.name) {
-      // Promote a new host if the host left
-      const newHostArtist = room.members[0];
-      room.hostname = newHostArtist.name;
-      socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
-    }
-    userMap.delete(socket.id);
+    if (user.name !== room.hostname) return;
+    room.activity = null;
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: false }));
+    socket.broadcast.to(user.roomname).emit('end_activity');
   });
+};
+
+const getArtistLeaveHandler = (socket: Socket) => () => {
+  const user = userMap.get(socket.id);
+  if (!user) return;
+  const room = roomMap.get(user.roomname);
+  if (!room) return;
+  const index = room.members.findIndex((member) => member.name === user.name);
+  if (index === -1) {
+    userMap.delete(socket.id);
+    return;
+  }
+  socket.broadcast.to(user.roomname).emit('artist_leave', user.name);
+  room.members.splice(index, 1);
+  if (room.members.length === 0) {
+    // Delete room if it is empty
+    roomMap.delete(user.roomname);
+  } else if (room.hostname === user.name) {
+    // Promote a new host if the host left
+    const artistInActivity = room.members.find((member) => member.isPartOfActivity);
+    if (artistInActivity) {
+      // If another artist is still in the activity, promote them
+      room.hostname = artistInActivity.name;
+    } else {
+      // Otherwise, end the activity and promote someone else
+      room.activity = null;
+      socket.broadcast.to(user.roomname).emit('end_activity');
+      room.hostname = room.members[0].name;
+    }
+    socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+  }
+  userMap.delete(socket.id);
+};
+
+const addDisconnectListener = (socket: Socket) => {
+  socket.on('disconnect', getArtistLeaveHandler(socket));
 };
 
 const addPromoteHostListener = (socket: Socket) => {
@@ -125,8 +157,12 @@ const addPromoteHostListener = (socket: Socket) => {
   });
 };
 
+const addLeaveListener = (socket: Socket) => {
+  socket.on('artist_leave', getArtistLeaveHandler(socket));
+};
+
 const addKickListener = (socket: Socket) => {
-  socket.on('kick', (username: string) => {
+  socket.on('kick_artist', (username: string) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     const room = roomMap.get(user.roomname);
@@ -137,7 +173,7 @@ const addKickListener = (socket: Socket) => {
     if (index === -1) return;
     room.members.splice(index, 1);
     // Send to everyone in the room, including host
-    io.in(user.roomname).emit('kick', username);
+    io.in(user.roomname).emit('kick_artist', username);
   });
 };
 
@@ -184,14 +220,16 @@ const addClearCanvasListener = (socket: Socket) => {
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
-  addUserLeaveListener(socket);
+  addDisconnectListener(socket);
   addPromoteHostListener(socket);
   addKickListener(socket);
+  addLeaveListener(socket);
   addChatMessageListener(socket);
   addBeginStrokeListener(socket);
   addContinueStrokeListener(socket);
   addEndStrokeListener(socket);
-  addStartGameListener(socket);
+  addStartActivityListener(socket);
+  addEndActivityListener(socket);
   addClearCanvasListener(socket);
 });
 

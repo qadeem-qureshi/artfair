@@ -5,7 +5,7 @@ import { Artist, ChatMessage } from '@artfair/common';
 import socket from '../services/socket';
 import ChatInput from './ChatInput';
 import ChatLine from './ChatLine';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -28,21 +28,21 @@ export type ChatProps = BoxProps;
 const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   const addMessage = useCallback((message: ChatMessage) => {
     // Messages are added to front because elements are rendered in reverse
     setMessages((previous) => [message, ...previous]);
   }, []);
 
-  const handleUserJoin = useCallback(
+  const handleArtistJoin = useCallback(
     (artist: Artist) => {
       addMessage({ sender: '', content: `${artist.name} joined the room` });
     },
     [addMessage],
   );
 
-  const handleUserLeave = useCallback(
+  const handleArtistLeave = useCallback(
     (name: string) => {
       addMessage({ sender: '', content: `${name} left the room` });
     },
@@ -56,7 +56,7 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
     [addMessage],
   );
 
-  const handleKick = useCallback(
+  const handleKickArtist = useCallback(
     (name: string) => {
       addMessage({ sender: '', content: `${name} was kicked from the room` });
     },
@@ -71,19 +71,19 @@ const Chat: React.FC<BoxProps> = ({ className, ...rest }) => {
 
   useEffect(() => {
     socket.on('chat_message', addMessage);
-    socket.on('user_join', handleUserJoin);
-    socket.on('user_leave', handleUserLeave);
+    socket.on('artist_join', handleArtistJoin);
+    socket.on('artist_leave', handleArtistLeave);
     socket.on('promote_host', handlePromoteHost);
-    socket.on('kick', handleKick);
+    socket.on('kick_artist', handleKickArtist);
 
     return () => {
       socket.off('chat_message', addMessage);
-      socket.off('user_join', handleUserJoin);
-      socket.off('user_leave', handleUserLeave);
+      socket.off('artist_join', handleArtistJoin);
+      socket.off('artist_leave', handleArtistLeave);
       socket.off('promote_host', handlePromoteHost);
-      socket.off('kick', handleKick);
+      socket.off('kick_artist', handleKickArtist);
     };
-  }, [addMessage, handleKick, handlePromoteHost, handleUserJoin, handleUserLeave]);
+  }, [addMessage, handleKickArtist, handlePromoteHost, handleArtistJoin, handleArtistLeave]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>

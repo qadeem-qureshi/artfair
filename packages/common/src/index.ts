@@ -18,6 +18,7 @@ export interface Vector {
 export interface Artist {
   name: string;
   avatarIndex: number;
+  isPartOfActivity: boolean;
 }
 
 export interface User {
@@ -30,7 +31,7 @@ export interface Room {
   name: string;
   members: Artist[];
   hostname: string;
-  activity: Activity;
+  activity: Activity | null;
 }
 
 export interface JoinRoomData {

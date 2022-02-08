@@ -3,18 +3,17 @@ import {
   Box, BoxProps, makeStyles, Paper, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { Route, useHistory } from 'react-router-dom';
 import { Artist } from '@artfair/common';
 import socket from '../services/socket';
-import GameTabs from './GameTabs';
 import RoomName from './RoomName';
 import Toolbar from './Toolbar';
 import Canvas from './Canvas';
 import Lobby from './Lobby';
 import CanvasContextProvider from './CanvasContextProvider';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import HostPromotionAlert from './HostPromotionAlert';
 import KickAlert from './KickAlert';
+import RoomTabs from './RoomTabs';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -61,54 +60,53 @@ export type RoomProps = BoxProps;
 const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const portraitOverrideClasses = usePortraitOverrideStyles();
-  const { state, dispatch } = useAppContext();
-  const history = useHistory();
   const isPortrait = useMediaQuery('(max-aspect-ratio: 1/1)');
   const isCompact = useMediaQuery('(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)');
+  const { state, dispatch } = useRoomContext();
 
-  const handleUserJoin = useCallback(
+  const handleArtistJoin = useCallback(
     (artist: Artist) => {
-      dispatch({ type: 'user-join', artist });
+      dispatch({ type: 'artist-join', artist });
     },
     [dispatch],
   );
 
-  const handleUserLeave = useCallback(
+  const handleArtistLeave = useCallback(
     (username: string) => {
-      dispatch({ type: 'user-leave', username });
+      dispatch({ type: 'artist-leave', username });
     },
     [dispatch],
   );
 
-  useEffect(() => {
-    socket.on('user_join', handleUserJoin);
-    socket.on('user_leave', handleUserLeave);
-    return () => {
-      socket.off('user_join', handleUserJoin);
-      socket.off('user_leave', handleUserLeave);
-    };
-  }, [handleUserJoin, handleUserLeave]);
+  const handleEndActivity = useCallback(() => {
+    dispatch({ type: 'exit-activity' });
+  }, [dispatch]);
 
   useEffect(() => {
-    // Redirect users who are not in a room
-    if (!state.room.name) {
-      history.push('/home');
-    }
-  }, [history, state.room.name]);
+    socket.on('artist_join', handleArtistJoin);
+    socket.on('artist_leave', handleArtistLeave);
+    socket.on('end_activity', handleEndActivity);
+    return () => {
+      socket.off('artist_join', handleArtistJoin);
+      socket.off('artist_leave', handleArtistLeave);
+      socket.off('end_activity', handleEndActivity);
+    };
+  }, [handleEndActivity, handleArtistJoin, handleArtistLeave]);
 
   return (
     <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
-      <Route path="/room/lobby">
-        <RoomName className={classes.header} />
-        <Lobby className={clsx(classes.main, classes.lobby)} component={Paper} />
-      </Route>
-      <Route path="/room/game">
+      {state.artist.isPartOfActivity ? (
         <CanvasContextProvider>
           <Toolbar className={classes.header} compact={isPortrait || isCompact} />
           <Canvas className={classes.main} component={Paper} resolution={CANVAS_RESOLUTION} />
         </CanvasContextProvider>
-      </Route>
-      <GameTabs className={clsx(classes.sidebar, isPortrait && portraitOverrideClasses.sidebar)} component={Paper} />
+      ) : (
+        <>
+          <RoomName className={classes.header} />
+          <Lobby className={clsx(classes.main, classes.lobby)} component={Paper} />
+        </>
+      )}
+      <RoomTabs className={clsx(classes.sidebar, isPortrait && portraitOverrideClasses.sidebar)} component={Paper} />
       <HostPromotionAlert />
       <KickAlert />
     </Box>

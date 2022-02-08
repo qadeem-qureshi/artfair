@@ -1,9 +1,10 @@
 import React from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
-import { Switch, Route, Redirect } from 'react-router-dom';
 import clsx from 'clsx';
 import Home from './Home';
 import Room from './Room';
+import RoomContextProvider from './RoomContextProvider';
+import { useAppContext } from './AppContextProvider';
 
 const useStyles = makeStyles({
   root: {
@@ -17,19 +18,17 @@ export type AppProps = BoxProps;
 
 const App: React.FC<AppProps> = ({ className, ...rest }) => {
   const classes = useStyles();
+  const { state } = useAppContext();
+
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Switch>
-        <Route path="/home">
-          <Home />
-        </Route>
-        <Route path="/room">
+      {state.joinRoomData ? (
+        <RoomContextProvider defaultRoomState={state.joinRoomData}>
           <Room />
-        </Route>
-        <Route path="/">
-          <Redirect to="/home" />
-        </Route>
-      </Switch>
+        </RoomContextProvider>
+      ) : (
+        <Home />
+      )}
     </Box>
   );
 };

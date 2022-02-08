@@ -4,7 +4,6 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { JoinRoomData, User } from '@artfair/common';
-import { useHistory } from 'react-router-dom';
 import socket from '../services/socket';
 import AvatarSelector from './AvatarSelector';
 import Logo from '../assets/logo.svg';
@@ -98,10 +97,9 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const [requestedRoomname, setRequestedRoomname] = useState('');
   const [requestedUsernameError, setRequestedUsernameError] = useState('');
   const [requestedRoomnameError, setRequestedRoomnameError] = useState('');
-  const history = useHistory();
-  const { dispatch } = useAppContext();
   const isVertical = useMediaQuery('(max-width: 60rem)');
   const isCompact = useMediaQuery('(max-height: 50rem)');
+  const { dispatch } = useAppContext();
 
   useEffect(() => {
     const user: User | null = getSessionInfo();
@@ -162,11 +160,10 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
         roomname: joinRoomData.room.name,
         avatarIndex: joinRoomData.artist.avatarIndex,
       };
-      dispatch({ type: 'join-room', artist: joinRoomData.artist, room: joinRoomData.room });
       saveSessionInfo(user);
-      history.push('/room/lobby');
+      dispatch({ type: 'join-room', data: joinRoomData });
     },
-    [dispatch, history],
+    [dispatch],
   );
 
   useEffect(() => {

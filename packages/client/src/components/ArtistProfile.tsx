@@ -4,8 +4,9 @@ import {
 } from '@material-ui/core';
 import clsx from 'clsx';
 import StarsRounded from '@material-ui/icons/StarsRounded';
+import { Artist } from '@artfair/common';
 import { AVATARS } from '../util/avatar';
-import { useAppContext } from './AppContextProvider';
+import { useRoomContext } from './RoomContextProvider';
 import ArtistActionMenuButton from './ArtistActionMenuButton';
 
 const useStyles = makeStyles({
@@ -29,18 +30,15 @@ const useStyles = makeStyles({
 });
 
 export interface ArtistProfileProps extends BoxProps {
-  name: string;
-  avatarIndex: number;
+  artist: Artist;
 }
 
-const ArtistProfile: React.FC<ArtistProfileProps> = ({
-  className, name, avatarIndex, ...rest
-}) => {
+const ArtistProfile: React.FC<ArtistProfileProps> = ({ className, artist, ...rest }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   const clientIsHost = state.artist.name === state.room.hostname;
-  const isHostProfile = name === state.room.hostname;
+  const isHostProfile = artist.name === state.room.hostname;
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
@@ -53,13 +51,13 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({
         overlap="rectangular"
         badgeContent={<StarsRounded className={classes.badgeIcon} color="primary" />}
       >
-        <Avatar src={AVATARS[avatarIndex].src} variant="square" />
+        <Avatar src={AVATARS[artist.avatarIndex].src} variant="square" />
       </Badge>
       <Typography noWrap variant="subtitle1" className={classes.name}>
-        {name}
+        {artist.name}
       </Typography>
       {clientIsHost && (
-        <ArtistActionMenuButton className={classes.menuButton} artistName={name} disabled={isHostProfile} />
+        <ArtistActionMenuButton className={classes.menuButton} artist={artist} disabled={isHostProfile} />
       )}
     </Box>
   );

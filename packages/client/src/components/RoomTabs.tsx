@@ -65,9 +65,9 @@ const TAB_ITEMS: TabItem[] = [
   { label: 'Rules', icon: InfoRounded, content: Rules },
 ];
 
-export type GameTabsProps = BoxProps;
+export type RoomTabsProps = BoxProps;
 
-const GameTabs: React.FC<GameTabsProps> = ({ className, ...rest }) => {
+const RoomTabs: React.FC<RoomTabsProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -97,4 +97,4 @@ const GameTabs: React.FC<GameTabsProps> = ({ className, ...rest }) => {
   );
 };
 
-export default GameTabs;
+export default RoomTabs;
