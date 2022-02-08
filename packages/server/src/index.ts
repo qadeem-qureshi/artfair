@@ -14,10 +14,12 @@ import {
   Activity,
 } from '@artfair/common';
 
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
-const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
 const userMap = new Map<string, User>();
@@ -233,4 +235,4 @@ io.on('connection', (socket) => {
   addClearCanvasListener(socket);
 });
 
-server.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+server.listen(PORT, HOSTNAME, undefined, () => console.log(`App listening at http://${HOSTNAME}:${PORT}`));
