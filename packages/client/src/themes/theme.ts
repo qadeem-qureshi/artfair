@@ -1,7 +1,7 @@
 import { createTheme, responsiveFontSizes } from '@material-ui/core';
 import { Shadows } from '@material-ui/core/styles/shadows';
 
-const playful = responsiveFontSizes(
+const THEME = responsiveFontSizes(
   createTheme({
     palette: {
       primary: {
@@ -32,6 +32,20 @@ const playful = responsiveFontSizes(
           transform: 'translateZ(0)',
         },
       },
+      MuiMenu: {
+        paper: {
+          boxShadow: '0 0 0 0.2rem #eeeeee',
+          // Hack to fix overflow not hiding with border radius on certain browsers
+          transform: 'translateZ(0)',
+        },
+      },
+      MuiPopover: {
+        paper: {
+          boxShadow: '0 0 0 0.2rem #eeeeee',
+          // Hack to fix overflow not hiding with border radius on certain browsers
+          transform: 'translateZ(0)',
+        },
+      },
       MuiButton: {
         containedPrimary: {
           boxShadow: '0 0.3rem #1565c0',
@@ -40,6 +54,9 @@ const playful = responsiveFontSizes(
           },
           '&:focus': {
             boxShadow: '0 0.2rem #1565c0',
+          },
+          '&:disabled': {
+            boxShadow: 'none',
           },
         },
         containedSecondary: {
@@ -50,10 +67,13 @@ const playful = responsiveFontSizes(
           '&:focus': {
             boxShadow: '0 0.2rem #2e7d32',
           },
+          '&:disabled': {
+            boxShadow: 'none',
+          },
         },
       },
     },
   }),
 );
 
-export default playful;
+export default THEME;

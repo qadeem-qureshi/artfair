@@ -1,30 +1,6 @@
-export const PALETTES = {
-  WINTER: [
-    '#1e272e',
-    '#28543c',
-    '#b33939',
-    '#fa4c4c',
-    '#997b4e',
-    '#98b9f8',
-    '#cda173',
-    '#ffa781',
-    '#fac824',
-    '#cdd873',
-    '#caefef',
-    '#f5f6fa',
-  ],
-  SPRING: [
-    '#b33939',
-    '#f53b57',
-    '#ffa801',
-    '#ffdd59',
-    '#05c46b',
-    '#0be881',
-    '#0984e3',
-    '#74b9ff',
-    '#6c5ce7',
-    '#a29bfe',
-    '#1e272e',
-    '#f5f6fa',
-  ],
-};
+import { Color } from '@artfair/common';
+
+export const PALETTE: Color[] = [
+  '#1e272e', '#28543c', '#05c46b', '#0be881', '#B06C49', '#fa4c4c', '#9b59b6', '#f368e0',
+  '#caefef', '#f5f6fa', '#FFC312', '#ffdd59', '#cda173', '#ffa781', '#778beb', '#98b9f8',
+];

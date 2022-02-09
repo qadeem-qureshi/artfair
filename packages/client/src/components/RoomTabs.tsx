@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
-import { Box, BoxProps, makeStyles } from '@material-ui/core';
+import {
+  Box, BoxProps, ButtonBase, makeStyles,
+} from '@material-ui/core';
+import ChatRounded from '@material-ui/icons/ChatRounded';
+import GroupRounded from '@material-ui/icons/GroupRounded';
+import InfoRounded from '@material-ui/icons/InfoRounded';
 import clsx from 'clsx';
+import Chat from './Chat';
+import ArtistList from './ArtistList';
+import Rules from './Rules';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
+    overflow: 'hidden',
   },
   tabs: {
     display: 'flex',
@@ -36,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
   content: {
     flex: 1,
-    padding: '1rem',
+    padding: '1.5rem',
     overflowY: 'auto',
   },
   hidden: {
@@ -44,42 +53,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export interface TabItem {
+interface TabItem {
   label: string;
   icon: React.ElementType;
   content: React.ElementType;
 }
 
-export interface GameTabsProps extends BoxProps {
-  items: TabItem[];
-}
+const TAB_ITEMS: TabItem[] = [
+  { label: 'Artists', icon: GroupRounded, content: ArtistList },
+  { label: 'Chat', icon: ChatRounded, content: Chat },
+  { label: 'Rules', icon: InfoRounded, content: Rules },
+];
 
-const GameTabs: React.FC<GameTabsProps> = ({ className, items, ...rest }) => {
+export type RoomTabsProps = BoxProps;
+
+const RoomTabs: React.FC<RoomTabsProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const [tabIndex, setTabIndex] = useState(0);
 
-  const handleTabChange = (index: number) => () => {
+  const changeTab = (index: number) => () => {
     setTabIndex(index);
   };
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
       <Box className={classes.tabs}>
-        {items.map((item, index) => (
-          <Box
+        {TAB_ITEMS.map((item, index) => (
+          <ButtonBase
             className={clsx(classes.tab, index === tabIndex && classes.active)}
             key={item.label}
-            onClick={handleTabChange(index)}
+            onClick={changeTab(index)}
           >
             <item.icon color="action" />
-          </Box>
+          </ButtonBase>
         ))}
       </Box>
-      {items.map((item, index) => (
-        <Box
-          className={clsx(classes.contentWrapper, index !== tabIndex && classes.hidden)}
-          key={item.label}
-        >
+      {TAB_ITEMS.map((item, index) => (
+        <Box className={clsx(classes.contentWrapper, index !== tabIndex && classes.hidden)} key={item.label}>
           <item.content className={classes.content} />
         </Box>
       ))}
@@ -87,4 +97,4 @@ const GameTabs: React.FC<GameTabsProps> = ({ className, items, ...rest }) => {
   );
 };
 
-export default GameTabs;
+export default RoomTabs;

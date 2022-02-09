@@ -1,18 +1,17 @@
 import { IconButton, IconButtonProps } from '@material-ui/core';
 import SaveAltRounded from '@material-ui/icons/SaveAltRounded';
 import React, { useRef } from 'react';
-import { useAppContext } from './AppContextProvider';
+import { useCanvasContext } from './CanvasContextProvider';
 
 export type ExportButtonProps = IconButtonProps;
 
 const ExportButton: React.FC<ExportButtonProps> = (props) => {
-  const { state } = useAppContext();
+  const { state } = useCanvasContext();
   const anchorRef = useRef<HTMLAnchorElement>(null);
 
   const handleClick = () => {
-    if (!state.context) return;
-    if (!anchorRef.current) return;
-    anchorRef.current.setAttribute('href', state.context.canvas.toDataURL('image/png'));
+    if (!anchorRef.current || !state.canvasElement) return;
+    anchorRef.current.setAttribute('href', state.canvasElement.toDataURL('image/png'));
     anchorRef.current.click();
   };
 

@@ -1,3 +1,5 @@
+export type Activity = 'free-draw' | 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer';
+
 export interface ChatMessage {
   sender: string;
   content: string;
@@ -8,37 +10,50 @@ export interface Point {
   y: number;
 }
 
-export interface UserData {
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+export interface Artist {
+  name: string;
+  avatarIndex: number;
+  isPartOfActivity: boolean;
+}
+
+export interface User {
   name: string;
   roomname: string;
   avatarIndex: number;
 }
 
-export interface MemberData {
+export interface Room {
   name: string;
-  avatarIndex: number;
+  members: Artist[];
+  hostname: string;
+  activity: Activity | null;
 }
 
-export interface RoomCreationData {
-  username: string;
-  roomname: string;
+export interface JoinRoomData {
+  artist: Artist;
+  room: Room;
 }
 
-export interface RoomJoinData {
-  username: string;
-  roomname: string;
-  roomMembers: MemberData[];
+export type Color = string;
+
+export interface StrokeBeginData {
+  strokeId: string;
+  strokeColor: Color;
+  strokeThickness: number;
+  point: Point;
 }
 
-export interface RoomData {
-  members: MemberData[];
+export interface StrokeContinueData {
+  strokeId: string;
+  point: Point;
 }
 
-export interface StrokeSegment {
-  start: Point;
-  end: Point;
-  color: string;
-  thickness: number;
+export interface StrokeEndData {
+  strokeId: string;
+  point: Point;
 }
-
-export type Activity = 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer' | 'art-critic';

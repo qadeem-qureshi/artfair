@@ -4,12 +4,14 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import {
   ChatMessage,
-  StrokeSegment,
-  UserData,
-  RoomCreationData,
-  RoomData,
-  MemberData,
-  RoomJoinData,
+  StrokeBeginData,
+  StrokeContinueData,
+  StrokeEndData,
+  User,
+  Room,
+  Artist,
+  JoinRoomData,
+  Activity,
 } from '@artfair/common';
 
 const app = express();
@@ -18,119 +20,234 @@ const io = new Server(server, { cors: { origin: '*' } });
 const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
-const users = new Map<string, UserData>();
-const rooms = new Map<string, RoomData>();
+const userMap = new Map<string, User>();
+const roomMap = new Map<string, Room>();
 
 app.use('/', express.static(root));
-app.use('*', express.static(root));
+app.get('*', (req, res) => res.redirect('/'));
 
 const usernameIsTaken = (username: string, roomname: string) => {
-  const roomData = rooms.get(roomname);
-  return roomData && roomData.members.some((member) => member.name === username);
+  const room = roomMap.get(roomname);
+  return room && room.members.some((member) => member.name === username);
 };
 
 const addCreateRoomAttemptListener = (socket: Socket) => {
-  socket.on('create_room_attempt', (userData: UserData) => {
-    if (rooms.has(userData.roomname)) {
+  socket.on('create_room_attempt', (user: User) => {
+    if (roomMap.has(user.roomname)) {
       socket.emit('room_taken');
+      console.info(`User [${user.name}] attempted to create existing room [${user.roomname}].`);
     } else {
-      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
-      const roomData: RoomData = { members: [memberData] };
-      const roomCreationData: RoomCreationData = {
-        username: userData.name,
-        roomname: userData.roomname,
+      const artist: Artist = {
+        name: user.name,
+        avatarIndex: user.avatarIndex,
+        isPartOfActivity: false,
       };
-      users.set(socket.id, userData);
-      rooms.set(userData.roomname, roomData);
-      socket.join(userData.roomname);
-      socket.emit('room_created', roomCreationData);
+      const room: Room = {
+        name: user.roomname,
+        members: [artist],
+        hostname: user.name,
+        activity: null,
+      };
+      const joinRoomData: JoinRoomData = { artist, room };
+      userMap.set(socket.id, user);
+      roomMap.set(user.roomname, room);
+      socket.join(user.roomname);
+      socket.emit('room_joined', joinRoomData);
+      console.info(`User [${user.name}] created room [${user.roomname}].`);
     }
   });
 };
 
 const addJoinRoomAttemptListener = (socket: Socket) => {
-  socket.on('join_room_attempt', (userData: UserData) => {
-    if (!rooms.has(userData.roomname)) {
+  socket.on('join_room_attempt', (user: User) => {
+    if (!roomMap.has(user.roomname)) {
       socket.emit('room_does_not_exist');
-    } else if (usernameIsTaken(userData.name, userData.roomname)) {
+      console.info(`User [${user.name}] attempted to join nonexistent room [${user.roomname}].`);
+    } else if (usernameIsTaken(user.name, user.roomname)) {
       socket.emit('username_taken');
+      console.info(`User [${user.name}] attempted to join room [${user.roomname}] with a taken username.`);
     } else {
-      const roomData = rooms.get(userData.roomname);
-      if (!roomData) return;
-      users.set(socket.id, userData);
-      const memberData: MemberData = { name: userData.name, avatarIndex: userData.avatarIndex };
-      roomData.members.push(memberData);
-      const roomJoinData: RoomJoinData = {
-        username: userData.name,
-        roomname: userData.roomname,
-        roomMembers: roomData.members,
+      const room = roomMap.get(user.roomname);
+      if (!room) return;
+      const artist: Artist = {
+        name: user.name,
+        avatarIndex: user.avatarIndex,
+        isPartOfActivity: false,
       };
-      socket.join(userData.roomname);
-      socket.emit('room_joined', roomJoinData);
-      socket.broadcast.to(userData.roomname).emit('user_join', memberData);
+      const joinRoomData: JoinRoomData = { artist, room };
+      userMap.set(socket.id, user);
+      room.members.push(artist);
+      socket.join(user.roomname);
+      socket.emit('room_joined', joinRoomData);
+      socket.broadcast.to(user.roomname).emit('artist_join', artist);
+      console.info(`User [${user.name}] joined room [${user.roomname}].`);
     }
   });
 };
 
-const addStartGameListener = (socket: Socket) => {
-  socket.on('start_game', () => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('start_game');
+const addStartActivityListener = (socket: Socket) => {
+  socket.on('start_activity', (activity: Activity) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    room.activity = activity;
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: true }));
+    socket.broadcast.to(user.roomname).emit('start_activity', activity);
+    console.info(`Host [${user.name}] of room [${user.roomname}] began activity [${activity}].`);
   });
 };
 
-const addUserLeaveListener = (socket: Socket) => {
-  socket.on('disconnect', () => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('user_leave', userData.name);
+const addEndActivityListener = (socket: Socket) => {
+  socket.on('end_activity', () => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    if (user.name !== room.hostname) return;
+    room.activity = null;
+    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: false }));
+    socket.broadcast.to(user.roomname).emit('end_activity');
+    console.info(`Host [${user.name}] of room [${user.roomname}] ended the current activity.`);
+  });
+};
 
-    const roomData = rooms.get(userData.roomname);
-    if (!roomData) return;
-
-    // Remove user from room and delete room if everybody has left
-    const index = roomData.members.findIndex((member) => member.name === userData.name);
-    roomData.members.splice(index);
-    if (roomData.members.length === 0) {
-      rooms.delete(userData.roomname);
+const getArtistLeaveHandler = (socket: Socket) => () => {
+  const user = userMap.get(socket.id);
+  if (!user) return;
+  const room = roomMap.get(user.roomname);
+  if (!room) return;
+  const index = room.members.findIndex((member) => member.name === user.name);
+  if (index === -1) {
+    userMap.delete(socket.id);
+    return;
+  }
+  socket.broadcast.to(user.roomname).emit('artist_leave', user.name);
+  console.info(`User [${user.name}] left room [${user.roomname}].`);
+  room.members.splice(index, 1);
+  if (room.members.length === 0) {
+    // Delete room if it is empty
+    roomMap.delete(user.roomname);
+    console.info(`Room [${user.roomname}] was deleted.`);
+  } else if (room.hostname === user.name) {
+    // Promote a new host if the host left
+    const artistInActivity = room.members.find((member) => member.isPartOfActivity);
+    if (artistInActivity) {
+      // If another artist is still in the activity, promote them
+      room.hostname = artistInActivity.name;
+    } else {
+      // Otherwise, end the activity and promote someone else
+      room.activity = null;
+      socket.broadcast.to(user.roomname).emit('end_activity');
+      console.info(`The activity in room [${user.roomname}] was ended automatically.`);
+      room.hostname = room.members[0].name;
     }
-    users.delete(socket.id);
+    socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+    console.info(`User [${room.hostname}] was automatically promoted to host of room [${user.roomname}].`);
+  }
+  userMap.delete(socket.id);
+};
+
+const addDisconnectListener = (socket: Socket) => {
+  socket.on('disconnect', getArtistLeaveHandler(socket));
+};
+
+const addPromoteHostListener = (socket: Socket) => {
+  socket.on('promote_host', (hostname: string) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    // No need to promote the host twice
+    if (room.hostname === hostname) return;
+    if (room.members.some((member) => member.name === hostname)) {
+      room.hostname = hostname;
+      // Send to everyone in the room, including previous host
+      io.in(user.roomname).emit('promote_host', room.hostname);
+      console.info(`Host [${user.name}] promoted user [${room.hostname}] in room [${user.roomname}].`);
+    }
+  });
+};
+
+const addLeaveListener = (socket: Socket) => {
+  socket.on('artist_leave', getArtistLeaveHandler(socket));
+};
+
+const addKickListener = (socket: Socket) => {
+  socket.on('kick_artist', (username: string) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    // Never kick the host
+    if (room.hostname === username) return;
+    const index = room.members.findIndex((member) => member.name === username);
+    if (index === -1) return;
+    room.members.splice(index, 1);
+    // Send to everyone in the room, including host
+    io.in(user.roomname).emit('kick_artist', username);
+    console.info(`User [${username}] was kicked from room [${user.roomname}].`);
   });
 };
 
 const addChatMessageListener = (socket: Socket) => {
   socket.on('chat_message', (message: ChatMessage) => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('chat_message', message);
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    socket.broadcast.to(user.roomname).emit('chat_message', message);
+    console.info(`User [${user.name}] sent a chat message in room [${user.roomname}].`);
   });
 };
 
-const addDrawSegmentListener = (socket: Socket) => {
-  socket.on('draw_segment', (segment: StrokeSegment) => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('draw_segment', segment);
+const addBeginStrokeListener = (socket: Socket) => {
+  socket.on('begin_stroke', (strokeBeginData: StrokeBeginData) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    socket.broadcast.to(user.roomname).emit('begin_stroke', strokeBeginData);
+    console.info(`User [${user.name}] began a stroke in room [${user.roomname}].`);
+  });
+};
+
+const addContinueStrokeListener = (socket: Socket) => {
+  socket.on('continue_stroke', (strokeContinueData: StrokeContinueData) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    socket.broadcast.to(user.roomname).emit('continue_stroke', strokeContinueData);
+  });
+};
+
+const addEndStrokeListener = (socket: Socket) => {
+  socket.on('end_stroke', (strokeEndData: StrokeEndData) => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    socket.broadcast.to(user.roomname).emit('end_stroke', strokeEndData);
+    console.info(`User [${user.name}] ended a stroke in room [${user.roomname}].`);
   });
 };
 
 const addClearCanvasListener = (socket: Socket) => {
   socket.on('clear_canvas', () => {
-    const userData = users.get(socket.id);
-    if (!userData) return;
-    socket.broadcast.to(userData.roomname).emit('clear_canvas');
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    socket.broadcast.to(user.roomname).emit('clear_canvas');
+    console.info(`User [${user.name}] cleared the canvas in room [${user.roomname}].`);
   });
 };
 
 io.on('connection', (socket) => {
   addCreateRoomAttemptListener(socket);
   addJoinRoomAttemptListener(socket);
-  addUserLeaveListener(socket);
+  addDisconnectListener(socket);
+  addPromoteHostListener(socket);
+  addKickListener(socket);
+  addLeaveListener(socket);
   addChatMessageListener(socket);
-  addDrawSegmentListener(socket);
-  addStartGameListener(socket);
+  addBeginStrokeListener(socket);
+  addContinueStrokeListener(socket);
+  addEndStrokeListener(socket);
+  addStartActivityListener(socket);
+  addEndActivityListener(socket);
   addClearCanvasListener(socket);
 });
 
-server.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+server.listen(port, () => console.info(`App listening at http://localhost:${port}.`));

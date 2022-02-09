@@ -1,27 +1,27 @@
 import React from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
-import { useAppContext } from './AppContextProvider';
 import ArtistProfile from './ArtistProfile';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    flexDirection: 'row',
-    gap: '1rem',
+    flexDirection: 'column',
+    gap: '1.5rem',
   },
 });
 
 export type ArtistListProps = BoxProps;
 
-const ArtistList: React.FC<ArtistListProps> = ({ className, ...rest }) => {
+const ArtistList: React.FC<BoxProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const { state } = useAppContext();
+  const { state } = useRoomContext();
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      {state.roomMembers.map((member) => (
-        <ArtistProfile name={member.name} avatarIndex={member.avatarIndex} key={member.name} />
+      {state.room.members.map((member) => (
+        <ArtistProfile artist={member} key={member.name} />
       ))}
     </Box>
   );

@@ -1,40 +1,38 @@
-import React from 'react';
-import { makeStyles, Slider, SliderProps } from '@material-ui/core';
-import clsx from 'clsx';
-import { useAppContext } from './AppContextProvider';
-
-const useStyles = makeStyles({
-  root: {},
-});
-
-const MIN_THICKNESS = 3;
-const MAX_THICKNESS = 100;
+import React, { useState } from 'react';
+import { Slider, SliderProps } from '@material-ui/core';
+import { useCanvasContext } from './CanvasContextProvider';
+import { MAX_STROKE_THICKNESS, MIN_STROKE_THICKNESS } from '../util/stroke';
 
 export type ThicknessSliderProps = SliderProps;
 
-const ThicknessSlider: React.FC<ThicknessSliderProps> = ({
-  className,
-  ...rest
-}) => {
-  const classes = useStyles();
-  const { state, dispatch } = useAppContext();
+const ThicknessSlider: React.FC<ThicknessSliderProps> = (props) => {
+  const { state, dispatch } = useCanvasContext();
+  const [value, setValue] = useState(state.strokeThickness);
+
+  const handleSliderChangeCommitted = (
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    event: React.ChangeEvent<{}>,
+    newValue: number | number[],
+  ) => {
+    dispatch({ type: 'set-stroke-thickness', thickness: newValue as number });
+  };
 
   const handleSliderChange = (
     // eslint-disable-next-line @typescript-eslint/ban-types
     event: React.ChangeEvent<{}>,
-    value: number | number[],
+    newValue: number | number[],
   ) => {
-    dispatch({ type: 'set-thickness', thickness: value as number });
+    setValue(newValue as number);
   };
 
   return (
     <Slider
-      className={clsx(classes.root, className)}
-      min={MIN_THICKNESS}
-      max={MAX_THICKNESS}
-      value={state.thickness}
+      value={value}
+      min={MIN_STROKE_THICKNESS}
+      max={MAX_STROKE_THICKNESS}
       onChange={handleSliderChange}
-      {...rest}
+      onChangeCommitted={handleSliderChangeCommitted}
+      {...props}
     />
   );
 };
