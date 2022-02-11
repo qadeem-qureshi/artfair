@@ -25,6 +25,7 @@ const useStyles = makeStyles({
   avatarContainer: {
     padding: '0 1rem',
     flex: 1,
+    minWidth: '100%',
   },
   avatar: {
     width: '100%',
