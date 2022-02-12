@@ -13,7 +13,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: '1.5rem',
   },
   carousel: {
@@ -25,13 +25,13 @@ const useStyles = makeStyles({
   avatarContainer: {
     padding: '0 1rem',
     flex: 1,
-    minWidth: '100%',
   },
   avatar: {
     width: '100%',
   },
   name: {
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

@@ -47,6 +47,7 @@ const useStyles = makeStyles({
   },
   avatarSelector: {
     gridArea: '2 / 1 / 3 / 2',
+    justifySelf: 'stretch',
   },
   divider: {
     gridArea: '1 / 2 / 3 / 3',
