@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { Activity, Artist, Room } from '@artfair/common';
+import {
+  ACTIVITIES, Activity, Artist, Room,
+} from '@artfair/common';
+import { modulo } from '../util/math';
 
 interface RoomState {
   artist: Artist;
@@ -11,7 +14,10 @@ type RoomAction =
   | { type: 'artist-leave'; username: string }
   | { type: 'start-activity'; activity: Activity }
   | { type: 'set-host'; hostname: string }
-  | { type: 'exit-activity' };
+  | { type: 'start-discussion' }
+  | { type: 'end-activity' }
+  | { type: 'next-activity' }
+  | { type: 'previous-activity' };
 
 const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
   switch (action.type) {
@@ -36,12 +42,29 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         artist: {
           ...state.artist,
-          isPartOfActivity: true,
+          stage: 'activity',
         },
         room: {
           ...state.room,
           activity: action.activity,
-          members: state.room.members.map((member) => ({ ...member, isPartOfActivity: true })),
+          members: state.room.members.map((member) => ({ ...member, stage: 'activity' })),
+          stage: 'activity',
+        },
+      };
+    case 'start-discussion':
+      return {
+        ...state,
+        artist: {
+          ...state.artist,
+          stage: 'discussion',
+        },
+        room: {
+          ...state.room,
+          members: state.room.members.map((member) => ({
+            ...member,
+            stage: member.stage === state.room.stage ? 'discussion' : member.stage,
+          })),
+          stage: 'discussion',
         },
       };
     case 'set-host':
@@ -52,17 +75,33 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
           hostname: action.hostname,
         },
       };
-    case 'exit-activity':
+    case 'end-activity':
       return {
         ...state,
         artist: {
           ...state.artist,
-          isPartOfActivity: false,
+          stage: 'lobby',
         },
         room: {
           ...state.room,
-          activity: null,
-          members: state.room.members.map((member) => ({ ...member, isPartOfActivity: false })),
+          members: state.room.members.map((member) => ({ ...member, stage: 'lobby' })),
+          stage: 'lobby',
+        },
+      };
+    case 'next-activity':
+      return {
+        ...state,
+        room: {
+          ...state.room,
+          activity: ACTIVITIES[modulo(ACTIVITIES.indexOf(state.room.activity) + 1, ACTIVITIES.length)],
+        },
+      };
+    case 'previous-activity':
+      return {
+        ...state,
+        room: {
+          ...state.room,
+          activity: ACTIVITIES[modulo(ACTIVITIES.indexOf(state.room.activity) - 1, ACTIVITIES.length)],
         },
       };
     default:

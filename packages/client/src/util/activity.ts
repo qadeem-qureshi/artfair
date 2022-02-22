@@ -1,10 +1,6 @@
 import { Activity } from '@artfair/common';
 import SampleActivityImage from '../assets/activity.jpg';
 
-export const ACTIVITIES: Activity[] = ['free-draw', 'art-collab', 'con-artist', 'canvas-swap', 'art-dealer'];
-
-export const DEFAULT_ACTIVITY: Activity = 'free-draw';
-
 export interface ActivityInformation {
   name: string;
   description: string;

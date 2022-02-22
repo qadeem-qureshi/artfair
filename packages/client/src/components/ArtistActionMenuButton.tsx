@@ -27,7 +27,7 @@ const ArtistActionMenuButton: React.FC<ArtistActionMenuButtonProps> = ({ artist,
   const iconButtonRef = useRef<HTMLButtonElement>(null);
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const { state } = useRoomContext();
-  const artistCanBePromoted = !state.room.activity || artist.isPartOfActivity;
+  const artistCanBePromoted = state.room.stage === artist.stage;
 
   const openMenu = () => {
     setMenuIsOpen(true);
