@@ -273,4 +273,4 @@ io.on('connection', (socket) => {
   addClearCanvasListener(socket);
 });
 
-server.listen(port, () => console.info(`App listening at http://localhost:${port}.`));
+server.listen(port, () => console.info(`App listening at http://localhost:${port}`));
