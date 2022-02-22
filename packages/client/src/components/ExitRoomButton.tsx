@@ -25,7 +25,7 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = (props) => {
 
   return (
     <>
-      <Button color="primary" variant="contained" onClick={openDialog} {...props}>
+      <Button color="secondary" variant="contained" onClick={openDialog} {...props}>
         Exit Room
       </Button>
       <ConfirmationDialog
