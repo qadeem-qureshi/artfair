@@ -19,9 +19,6 @@ const useStyles = makeStyles({
   name: {
     fontWeight: 'bold',
   },
-  description: {
-    paddingLeft: '0.5rem',
-  },
   chipContainer: {
     marginTop: '0.5rem',
     display: 'flex',
@@ -46,7 +43,7 @@ const ActivityInformationPanel: React.FC<ActivityInformationPanelProps> = ({ cla
       <Typography variant="h3" color="textPrimary" className={classes.name}>
         {name}
       </Typography>
-      <Typography className={classes.description} variant="body1" color="textSecondary">
+      <Typography variant="body1" color="textSecondary">
         {description}
       </Typography>
       <Box className={classes.chipContainer}>

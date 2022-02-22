@@ -8,7 +8,6 @@ import socket from '../services/socket';
 import RoomName from './RoomName';
 import Toolbar from './Toolbar';
 import Canvas from './Canvas';
-import Lobby from './Lobby';
 import CanvasContextProvider from './CanvasContextProvider';
 import { useRoomContext } from './RoomContextProvider';
 import HostPromotionAlert from './HostPromotionAlert';
@@ -19,6 +18,7 @@ import ExitRoomButton from './ExitRoomButton';
 import StartActivityButton from './StartActivityButton';
 import StartDiscussionButton from './StartDiscussionButton';
 import EndActivityButton from './EndActivityButton';
+import ActivityCarousel from './ActivityCarousel';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -45,7 +45,7 @@ const useStyles = makeStyles({
   sidebar: {
     gridArea: '2 / 2 / 3 / 3',
   },
-  lobby: {
+  activityCarousel: {
     padding: '1.5rem',
   },
   discussion: {
@@ -131,7 +131,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         return (
           <>
             <RoomName className={classes.header} />
-            <Lobby className={clsx(classes.main, classes.lobby)} component={Paper} />
+            <ActivityCarousel className={clsx(classes.main, classes.activityCarousel)} component={Paper} />
           </>
         );
       case 'activity':
@@ -157,7 +157,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
     classes.discussion,
     classes.discussionText,
     classes.header,
-    classes.lobby,
+    classes.activityCarousel,
     classes.main,
     isCompact,
     isPortrait,
