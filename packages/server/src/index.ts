@@ -12,6 +12,8 @@ import {
   Artist,
   JoinRoomData,
   Activity,
+  DEFAULT_ACTIVITY,
+  DEFAULT_STAGE,
 } from '@artfair/common';
 
 const HOSTNAME = process.env.HOSTNAME || 'localhost';
@@ -37,23 +39,26 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
   socket.on('create_room_attempt', (user: User) => {
     if (roomMap.has(user.roomname)) {
       socket.emit('room_taken');
+      console.info(`User [${user.name}] attempted to create existing room [${user.roomname}].`);
     } else {
       const artist: Artist = {
         name: user.name,
         avatarIndex: user.avatarIndex,
-        isPartOfActivity: false,
+        stage: DEFAULT_STAGE,
       };
       const room: Room = {
         name: user.roomname,
         members: [artist],
         hostname: user.name,
-        activity: null,
+        activity: DEFAULT_ACTIVITY,
+        stage: DEFAULT_STAGE,
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
       roomMap.set(user.roomname, room);
       socket.join(user.roomname);
       socket.emit('room_joined', joinRoomData);
+      console.info(`User [${user.name}] created room [${user.roomname}].`);
     }
   });
 };
@@ -62,15 +67,17 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
   socket.on('join_room_attempt', (user: User) => {
     if (!roomMap.has(user.roomname)) {
       socket.emit('room_does_not_exist');
+      console.info(`User [${user.name}] attempted to join nonexistent room [${user.roomname}].`);
     } else if (usernameIsTaken(user.name, user.roomname)) {
       socket.emit('username_taken');
+      console.info(`User [${user.name}] attempted to join room [${user.roomname}] with a taken username.`);
     } else {
       const room = roomMap.get(user.roomname);
       if (!room) return;
       const artist: Artist = {
         name: user.name,
         avatarIndex: user.avatarIndex,
-        isPartOfActivity: false,
+        stage: 'lobby',
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
@@ -78,6 +85,7 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
       socket.join(user.roomname);
       socket.emit('room_joined', joinRoomData);
       socket.broadcast.to(user.roomname).emit('artist_join', artist);
+      console.info(`User [${user.name}] joined room [${user.roomname}].`);
     }
   });
 };
@@ -89,8 +97,10 @@ const addStartActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     room.activity = activity;
-    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: true }));
+    room.members = room.members.map((member) => ({ ...member, stage: 'activity' }));
+    room.stage = 'activity';
     socket.broadcast.to(user.roomname).emit('start_activity', activity);
+    console.info(`Host [${user.name}] of room [${user.roomname}] began activity [${activity}].`);
   });
 };
 
@@ -101,9 +111,27 @@ const addEndActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     if (user.name !== room.hostname) return;
-    room.activity = null;
-    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: false }));
+    room.activity = DEFAULT_ACTIVITY;
+    room.members = room.members.map((member) => ({ ...member, stage: DEFAULT_STAGE }));
+    room.stage = DEFAULT_STAGE;
     socket.broadcast.to(user.roomname).emit('end_activity');
+    console.info(`Host [${user.name}] of room [${user.roomname}] ended the current activity.`);
+  });
+};
+
+const addStartDiscussionListener = (socket: Socket) => {
+  socket.on('start_discussion', () => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    room.members = room.members.map((member) => ({
+      ...member,
+      stage: member.stage === room.stage ? 'discussion' : member.stage,
+    }));
+    room.stage = 'discussion';
+    socket.broadcast.to(user.roomname).emit('start_discussion');
+    console.info(`Host [${user.name}] of room [${user.roomname}] began discussion.`);
   });
 };
 
@@ -118,23 +146,28 @@ const getArtistLeaveHandler = (socket: Socket) => () => {
     return;
   }
   socket.broadcast.to(user.roomname).emit('artist_leave', user.name);
+  console.info(`User [${user.name}] left room [${user.roomname}].`);
   room.members.splice(index, 1);
   if (room.members.length === 0) {
     // Delete room if it is empty
     roomMap.delete(user.roomname);
+    console.info(`Room [${user.roomname}] was deleted.`);
   } else if (room.hostname === user.name) {
     // Promote a new host if the host left
-    const artistInActivity = room.members.find((member) => member.isPartOfActivity);
-    if (artistInActivity) {
-      // If another artist is still in the activity, promote them
-      room.hostname = artistInActivity.name;
+    const artistWithHost = room.members.find((member) => member.stage === room.stage);
+    if (artistWithHost) {
+      // If another artist is in the same stage as the host, promote them
+      room.hostname = artistWithHost.name;
     } else {
       // Otherwise, end the activity and promote someone else
-      room.activity = null;
+      room.activity = DEFAULT_ACTIVITY;
+      room.stage = DEFAULT_STAGE;
       socket.broadcast.to(user.roomname).emit('end_activity');
+      console.info(`The activity in room [${user.roomname}] was ended automatically.`);
       room.hostname = room.members[0].name;
     }
     socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
+    console.info(`User [${room.hostname}] was automatically promoted to host of room [${user.roomname}].`);
   }
   userMap.delete(socket.id);
 };
@@ -155,6 +188,7 @@ const addPromoteHostListener = (socket: Socket) => {
       room.hostname = hostname;
       // Send to everyone in the room, including previous host
       io.in(user.roomname).emit('promote_host', room.hostname);
+      console.info(`Host [${user.name}] promoted user [${room.hostname}] in room [${user.roomname}].`);
     }
   });
 };
@@ -176,6 +210,7 @@ const addKickListener = (socket: Socket) => {
     room.members.splice(index, 1);
     // Send to everyone in the room, including host
     io.in(user.roomname).emit('kick_artist', username);
+    console.info(`User [${username}] was kicked from room [${user.roomname}].`);
   });
 };
 
@@ -184,6 +219,7 @@ const addChatMessageListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('chat_message', message);
+    console.info(`User [${user.name}] sent a chat message in room [${user.roomname}].`);
   });
 };
 
@@ -192,6 +228,7 @@ const addBeginStrokeListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('begin_stroke', strokeBeginData);
+    console.info(`User [${user.name}] began a stroke in room [${user.roomname}].`);
   });
 };
 
@@ -208,6 +245,7 @@ const addEndStrokeListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('end_stroke', strokeEndData);
+    console.info(`User [${user.name}] ended a stroke in room [${user.roomname}].`);
   });
 };
 
@@ -216,6 +254,7 @@ const addClearCanvasListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('clear_canvas');
+    console.info(`User [${user.name}] cleared the canvas in room [${user.roomname}].`);
   });
 };
 
@@ -232,6 +271,7 @@ io.on('connection', (socket) => {
   addEndStrokeListener(socket);
   addStartActivityListener(socket);
   addEndActivityListener(socket);
+  addStartDiscussionListener(socket);
   addClearCanvasListener(socket);
 });
 

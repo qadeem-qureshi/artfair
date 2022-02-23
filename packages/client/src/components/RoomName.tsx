@@ -37,7 +37,7 @@ const RoomName: React.FC<RoomNameProps> = ({ className, ...rest }) => {
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Typography noWrap variant="h2" className={classes.name}>{state.room.name}</Typography>
+      <Typography noWrap variant="h3" className={classes.name}>{state.room.name}</Typography>
       <IconButton size="medium" onClick={copyRoom}>
         {copied ? <CheckRounded /> : <FileCopyRounded />}
       </IconButton>
