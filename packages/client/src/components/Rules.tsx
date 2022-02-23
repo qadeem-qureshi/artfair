@@ -26,8 +26,8 @@ const useStyles = makeStyles({
     flexDirection: 'row',
     gap: '0.75rem',
   },
-  bullet: {
-    fontWeight: 'bold',
+  number: {
+    fontWeight: 'normal',
   },
 });
 
@@ -59,8 +59,8 @@ const Rules: React.FC<BoxProps> = ({ className, ...rest }) => {
             {instructions.map((instruction, index) => (
               // eslint-disable-next-line react/no-array-index-key
               <Box key={index} className={classes.instruction}>
-                <Typography className={classes.bullet} color="textPrimary">
-                  •
+                <Typography className={classes.number} color="textPrimary">
+                  {`${index + 1}.`}
                 </Typography>
                 <Typography color="textSecondary">{instruction}</Typography>
               </Box>
