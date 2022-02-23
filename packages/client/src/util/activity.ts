@@ -8,6 +8,7 @@ export interface ActivityInformation {
   minArtistCount: number;
   modeType: string;
   conceptCovered: string;
+  instructions: string[];
 }
 
 export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> = {
@@ -19,6 +20,7 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 1,
     modeType: 'Relaxing',
     conceptCovered: 'Creativity',
+    instructions: ['There are no rules!', 'Enjoy drawing on the shared canvas with other artists or draw solo.'],
   },
   'art-collab': {
     imageSource: SampleActivityImage,
@@ -28,6 +30,12 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 2,
     modeType: 'Relaxing',
     conceptCovered: 'Collaboration',
+    instructions: [
+      'The host will choose a scene for the artists to draw.',
+      'All artists should pick a portion of the scene to draw (use the chat function to delegate or claim the parts to draw!).',
+      'Everyone then works together to complete the scene and add any finishing touches.',
+      'Finally, all artists can download the completed masterpiece to their own device.',
+    ],
   },
   'con-artist': {
     imageSource: SampleActivityImage,
@@ -37,6 +45,13 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 4,
     modeType: 'Competitive',
     conceptCovered: 'Problem-solving',
+    instructions: [
+      "Every artist except for the 'Con Artist' is told the prompt.",
+      'Each round consists of everyone taking a turn to draw a single, connected stroke.',
+      "Once three rounds have been completed, everyone votes for who they think the 'Con Artist' is.",
+      "If the artists are able to vote out the 'Con Artist', they win!",
+      "However, if the 'Con Artist' successfully fools everyone, the 'Con Artist' is the winner.",
+    ],
   },
   'canvas-swap': {
     imageSource: SampleActivityImage,
@@ -46,6 +61,10 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 2,
     modeType: 'Relaxing',
     conceptCovered: 'Teamwork',
+    instructions: [
+      'Every artist begins with their own individual canvas.',
+      "After 2 minutes, the canvases rotate and each artist is then meant to continue the other artists' work.",
+    ],
   },
   'art-dealer': {
     imageSource: SampleActivityImage,
@@ -55,5 +74,11 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 3,
     modeType: 'Humorous',
     conceptCovered: 'Critical Thinking',
+    instructions: [
+      'Every artist begins by drawing a solution to a problem.',
+      'After 5 minutes, every artist is then presented with the work of another artist.',
+      "Without knowing what the problem each artist was trying to solve, each artist must make a 'sales pitch' to the other artists.",
+      'In the end, the artist and art dealer with the most amount of votes wins!',
+    ],
   },
 };
