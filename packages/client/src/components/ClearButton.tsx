@@ -1,6 +1,6 @@
+import React, { useState } from 'react';
 import { IconButton, IconButtonProps } from '@material-ui/core';
 import DeleteRounded from '@material-ui/icons/DeleteRounded';
-import React, { useState } from 'react';
 import socket from '../services/socket';
 import { useCanvasContext } from './CanvasContextProvider';
 import ConfirmationDialog from './ConfirmationDialog';
