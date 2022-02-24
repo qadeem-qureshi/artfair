@@ -22,6 +22,7 @@ const useStyles = makeStyles({
   },
   actions: {
     padding: '0',
+    gap: '1rem',
   },
 });
 

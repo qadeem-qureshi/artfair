@@ -1,5 +1,13 @@
 export type Activity = 'free-draw' | 'art-collab' | 'con-artist' | 'canvas-swap' | 'art-dealer';
 
+export const ACTIVITIES: Activity[] = ['free-draw', 'art-collab', 'con-artist', 'canvas-swap', 'art-dealer'];
+
+export const DEFAULT_ACTIVITY: Activity = 'free-draw';
+
+export type Stage = 'lobby' | 'activity' | 'discussion';
+
+export const DEFAULT_STAGE: Stage = 'lobby';
+
 export interface ChatMessage {
   sender: string;
   content: string;
@@ -18,7 +26,7 @@ export interface Vector {
 export interface Artist {
   name: string;
   avatarIndex: number;
-  isPartOfActivity: boolean;
+  stage: Stage;
 }
 
 export interface User {
@@ -31,7 +39,8 @@ export interface Room {
   name: string;
   members: Artist[];
   hostname: string;
-  activity: Activity | null;
+  activity: Activity;
+  stage: Stage;
 }
 
 export interface JoinRoomData {

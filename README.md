@@ -115,3 +115,13 @@ At a high level, this project is made up of three packages: `client`, `server`, 
 11. Add at least one programmer as a reviewer for your pull request. If any changes are requested by the reviewer(s), just commit those changes and the pull request will automatically include those changes.
 
 12. Once your pull request is approved by the reviewer(s), you may merge the pull request into `dev`.
+
+## Deployment
+
+1. Clone the repository.
+
+2. Run the deploy script on the appropriate hostname and port:
+
+   ```sh
+   ./deploy.sh <hostname> <port>
+   ```

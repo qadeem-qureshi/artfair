@@ -12,12 +12,16 @@ import {
   Artist,
   JoinRoomData,
   Activity,
+  DEFAULT_ACTIVITY,
+  DEFAULT_STAGE,
 } from '@artfair/common';
+
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
-const port = process.env.port || 3000;
 const root = path.join(__dirname, '../../client/dist');
 
 const userMap = new Map<string, User>();
@@ -40,13 +44,14 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
       const artist: Artist = {
         name: user.name,
         avatarIndex: user.avatarIndex,
-        isPartOfActivity: false,
+        stage: DEFAULT_STAGE,
       };
       const room: Room = {
         name: user.roomname,
         members: [artist],
         hostname: user.name,
-        activity: null,
+        activity: DEFAULT_ACTIVITY,
+        stage: DEFAULT_STAGE,
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
@@ -72,7 +77,7 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
       const artist: Artist = {
         name: user.name,
         avatarIndex: user.avatarIndex,
-        isPartOfActivity: false,
+        stage: 'lobby',
       };
       const joinRoomData: JoinRoomData = { artist, room };
       userMap.set(socket.id, user);
@@ -92,7 +97,8 @@ const addStartActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     room.activity = activity;
-    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: true }));
+    room.members = room.members.map((member) => ({ ...member, stage: 'activity' }));
+    room.stage = 'activity';
     socket.broadcast.to(user.roomname).emit('start_activity', activity);
     console.info(`Host [${user.name}] of room [${user.roomname}] began activity [${activity}].`);
   });
@@ -105,10 +111,27 @@ const addEndActivityListener = (socket: Socket) => {
     const room = roomMap.get(user.roomname);
     if (!room) return;
     if (user.name !== room.hostname) return;
-    room.activity = null;
-    room.members = room.members.map((member) => ({ ...member, isPartOfActivity: false }));
+    room.activity = DEFAULT_ACTIVITY;
+    room.members = room.members.map((member) => ({ ...member, stage: DEFAULT_STAGE }));
+    room.stage = DEFAULT_STAGE;
     socket.broadcast.to(user.roomname).emit('end_activity');
     console.info(`Host [${user.name}] of room [${user.roomname}] ended the current activity.`);
+  });
+};
+
+const addStartDiscussionListener = (socket: Socket) => {
+  socket.on('start_discussion', () => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    room.members = room.members.map((member) => ({
+      ...member,
+      stage: member.stage === room.stage ? 'discussion' : member.stage,
+    }));
+    room.stage = 'discussion';
+    socket.broadcast.to(user.roomname).emit('start_discussion');
+    console.info(`Host [${user.name}] of room [${user.roomname}] began discussion.`);
   });
 };
 
@@ -131,13 +154,14 @@ const getArtistLeaveHandler = (socket: Socket) => () => {
     console.info(`Room [${user.roomname}] was deleted.`);
   } else if (room.hostname === user.name) {
     // Promote a new host if the host left
-    const artistInActivity = room.members.find((member) => member.isPartOfActivity);
-    if (artistInActivity) {
-      // If another artist is still in the activity, promote them
-      room.hostname = artistInActivity.name;
+    const artistWithHost = room.members.find((member) => member.stage === room.stage);
+    if (artistWithHost) {
+      // If another artist is in the same stage as the host, promote them
+      room.hostname = artistWithHost.name;
     } else {
       // Otherwise, end the activity and promote someone else
-      room.activity = null;
+      room.activity = DEFAULT_ACTIVITY;
+      room.stage = DEFAULT_STAGE;
       socket.broadcast.to(user.roomname).emit('end_activity');
       console.info(`The activity in room [${user.roomname}] was ended automatically.`);
       room.hostname = room.members[0].name;
@@ -247,7 +271,8 @@ io.on('connection', (socket) => {
   addEndStrokeListener(socket);
   addStartActivityListener(socket);
   addEndActivityListener(socket);
+  addStartDiscussionListener(socket);
   addClearCanvasListener(socket);
 });
 
-server.listen(port, () => console.info(`App listening at http://localhost:${port}.`));
+server.listen(PORT, HOSTNAME, undefined, () => console.log(`App listening at http://${HOSTNAME}:${PORT}`));
