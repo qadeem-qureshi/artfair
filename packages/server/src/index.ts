@@ -16,7 +16,6 @@ import {
   DEFAULT_STAGE,
 } from '@artfair/common';
 
-const HOSTNAME = process.env.HOSTNAME ? '0.0.0.0' : 'localhost';
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 const app = express();
@@ -277,4 +276,4 @@ io.on('connection', (socket) => {
   addClearCanvasListener(socket);
 });
 
-server.listen(PORT, HOSTNAME, undefined, () => console.log(`App listening at http://${HOSTNAME}:${PORT}`));
+server.listen(PORT, () => console.log(`App listening at http://localhost:${PORT}`));
