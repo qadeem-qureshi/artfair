@@ -1,66 +1,78 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Box, BoxProps, IconButton, makeStyles,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { Activity } from '@artfair/common';
 import ArrowBackIosRounded from '@material-ui/icons/ArrowBackIosRounded';
 import ArrowForwardIosRounded from '@material-ui/icons/ArrowForwardIosRounded';
-import { ACTIVITIES, ACTIVITY_INFORMATION_RECORD, DEFAULT_ACTIVITY } from '../util/activity';
-import { modulo } from '../util/math';
-import ActivityCarouselItem from './ActivityCarouselItem';
+import FiberManualRecordRounded from '@material-ui/icons/FiberManualRecordRounded';
+import { ACTIVITIES } from '@artfair/common';
+import ActivityInformationPanel from './ActivityInformationPanel';
+import { useRoomContext } from './RoomContextProvider';
 
 const useStyles = makeStyles({
   root: {
     display: 'flex',
-    flexDirection: 'row',
-  },
-  arrowContainer: {
-    display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    gap: '1rem',
   },
   content: {
     flex: 1,
-    padding: '0 1.5rem 0 1.5rem',
     overflowY: 'auto',
     minHeight: 0,
+    padding: '1rem',
+  },
+  dots: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '1rem',
+  },
+  dot: {
+    fontSize: '0.5rem',
+  },
+  navigation: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '2rem',
   },
 });
 
-export interface ActivityCarouselProps extends BoxProps {
-  onActivityChange: (activity: Activity) => void;
-}
+export type ActivityCarouselProps = BoxProps;
 
-const ActivityCarousel: React.FC<ActivityCarouselProps> = ({ className, onActivityChange, ...rest }) => {
+const ActivityCarousel: React.FC<ActivityCarouselProps> = ({ className, ...rest }) => {
   const classes = useStyles();
-  const [index, setIndex] = useState(() => ACTIVITIES.indexOf(DEFAULT_ACTIVITY));
+  const { state, dispatch } = useRoomContext();
 
   const selectNextActivity = () => {
-    setIndex((previousIndex) => modulo(previousIndex + 1, ACTIVITIES.length));
+    dispatch({ type: 'next-activity' });
   };
 
   const selectPreviousActivity = () => {
-    setIndex((previousIndex) => modulo(previousIndex - 1, ACTIVITIES.length));
+    dispatch({ type: 'previous-activity' });
   };
-
-  useEffect(() => {
-    onActivityChange(ACTIVITIES[index]);
-  }, [index, onActivityChange]);
 
   return (
     <Box className={clsx(classes.root, className)} {...rest}>
-      <Box className={classes.arrowContainer}>
+      <ActivityInformationPanel className={classes.content} />
+      <Box className={classes.navigation}>
         <IconButton onClick={selectPreviousActivity}>
           <ArrowBackIosRounded />
         </IconButton>
-      </Box>
-      <ActivityCarouselItem
-        className={classes.content}
-        activityInformation={ACTIVITY_INFORMATION_RECORD[ACTIVITIES[index]]}
-      />
-      <Box className={classes.arrowContainer}>
+        <Box className={classes.dots}>
+          {ACTIVITIES.map((activity, index) => (
+            <FiberManualRecordRounded
+              key={activity}
+              className={classes.dot}
+              color={index === ACTIVITIES.indexOf(state.room.activity) ? 'primary' : 'disabled'}
+            />
+          ))}
+        </Box>
         <IconButton onClick={selectNextActivity}>
           <ArrowForwardIosRounded />
         </IconButton>

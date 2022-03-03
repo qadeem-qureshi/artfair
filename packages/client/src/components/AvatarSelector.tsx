@@ -13,7 +13,7 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: '1.5rem',
   },
   carousel: {
@@ -31,6 +31,7 @@ const useStyles = makeStyles({
   },
   name: {
     fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
