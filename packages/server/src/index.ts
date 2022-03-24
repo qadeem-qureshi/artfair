@@ -184,6 +184,8 @@ const addPromoteHostListener = (socket: Socket) => {
     if (!room) return;
     // No need to promote the host twice
     if (room.hostname === hostname) return;
+    // Make sure that only the actual host can promote :)
+    if (room.hostname !== user.name) return;
     if (room.members.some((member) => member.name === hostname)) {
       room.hostname = hostname;
       // Send to everyone in the room, including previous host
