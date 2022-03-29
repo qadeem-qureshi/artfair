@@ -15,6 +15,7 @@ import {
   DEFAULT_ACTIVITY,
   DEFAULT_STAGE,
 } from '@artfair/common';
+import { PROBLEMS, THINGS } from './prompt';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
@@ -38,7 +39,9 @@ const addCreateRoomAttemptListener = (socket: Socket) => {
   socket.on('create_room_attempt', (user: User) => {
     if (roomMap.has(user.roomname)) {
       socket.emit('room_taken');
-      console.info(`User [${user.name}] attempted to create existing room [${user.roomname}].`);
+      console.info(
+        `User [${user.name}] attempted to create existing room [${user.roomname}].`,
+      );
     } else {
       const artist: Artist = {
         name: user.name,
@@ -66,10 +69,14 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
   socket.on('join_room_attempt', (user: User) => {
     if (!roomMap.has(user.roomname)) {
       socket.emit('room_does_not_exist');
-      console.info(`User [${user.name}] attempted to join nonexistent room [${user.roomname}].`);
+      console.info(
+        `User [${user.name}] attempted to join nonexistent room [${user.roomname}].`,
+      );
     } else if (usernameIsTaken(user.name, user.roomname)) {
       socket.emit('username_taken');
-      console.info(`User [${user.name}] attempted to join room [${user.roomname}] with a taken username.`);
+      console.info(
+        `User [${user.name}] attempted to join room [${user.roomname}] with a taken username.`,
+      );
     } else {
       const room = roomMap.get(user.roomname);
       if (!room) return;
@@ -89,32 +96,35 @@ const addJoinRoomAttemptListener = (socket: Socket) => {
   });
 };
 
+const getRandomPrompt = (activity: Activity) => {
+  switch (activity) {
+    case 'art-collab':
+    case 'con-artist':
+      return THINGS[Math.floor(Math.random() * THINGS.length)];
+    case 'art-dealer':
+      return PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+    default:
+      return undefined;
+  }
+};
+
 const addStartActivityListener = (socket: Socket) => {
   socket.on('start_activity', (activity: Activity) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
-    room.activity = activity;
-    room.members = room.members.map((member) => ({ ...member, stage: 'activity' }));
-    room.stage = 'activity';
-    socket.broadcast.to(user.roomname).emit('start_activity', activity);
-    console.info(`Host [${user.name}] of room [${user.roomname}] began activity [${activity}].`);
-  });
-};
-
-const addEndActivityListener = (socket: Socket) => {
-  socket.on('end_activity', () => {
-    const user = userMap.get(socket.id);
-    if (!user) return;
-    const room = roomMap.get(user.roomname);
-    if (!room) return;
     if (user.name !== room.hostname) return;
-    room.activity = DEFAULT_ACTIVITY;
-    room.members = room.members.map((member) => ({ ...member, stage: DEFAULT_STAGE }));
-    room.stage = DEFAULT_STAGE;
-    socket.broadcast.to(user.roomname).emit('end_activity');
-    console.info(`Host [${user.name}] of room [${user.roomname}] ended the current activity.`);
+    room.activity = activity;
+    room.members = room.members.map((member) => ({
+      ...member,
+      stage: member.stage === room.stage ? 'activity' : member.stage,
+    }));
+    room.stage = 'activity';
+    io.to(user.roomname).emit('start_activity', activity, getRandomPrompt(activity));
+    console.info(
+      `Host [${user.name}] of room [${user.roomname}] began activity [${activity}].`,
+    );
   });
 };
 
@@ -124,13 +134,36 @@ const addStartDiscussionListener = (socket: Socket) => {
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
+    if (user.name !== room.hostname) return;
     room.members = room.members.map((member) => ({
       ...member,
       stage: member.stage === room.stage ? 'discussion' : member.stage,
     }));
     room.stage = 'discussion';
     socket.broadcast.to(user.roomname).emit('start_discussion');
-    console.info(`Host [${user.name}] of room [${user.roomname}] began discussion.`);
+    console.info(
+      `Host [${user.name}] of room [${user.roomname}] began discussion.`,
+    );
+  });
+};
+
+const addEndDiscussionListener = (socket: Socket) => {
+  socket.on('end_discussion', () => {
+    const user = userMap.get(socket.id);
+    if (!user) return;
+    const room = roomMap.get(user.roomname);
+    if (!room) return;
+    if (user.name !== room.hostname) return;
+    room.activity = DEFAULT_ACTIVITY;
+    room.members = room.members.map((member) => ({
+      ...member,
+      stage: member.stage === room.stage ? 'lobby' : member.stage,
+    }));
+    room.stage = 'lobby';
+    socket.broadcast.to(user.roomname).emit('end_discussion');
+    console.info(
+      `Host [${user.name}] of room [${user.roomname}] ended discussion.`,
+    );
   });
 };
 
@@ -153,7 +186,9 @@ const getArtistLeaveHandler = (socket: Socket) => () => {
     console.info(`Room [${user.roomname}] was deleted.`);
   } else if (room.hostname === user.name) {
     // Promote a new host if the host left
-    const artistWithHost = room.members.find((member) => member.stage === room.stage);
+    const artistWithHost = room.members.find(
+      (member) => member.stage === room.stage,
+    );
     if (artistWithHost) {
       // If another artist is in the same stage as the host, promote them
       room.hostname = artistWithHost.name;
@@ -162,11 +197,15 @@ const getArtistLeaveHandler = (socket: Socket) => () => {
       room.activity = DEFAULT_ACTIVITY;
       room.stage = DEFAULT_STAGE;
       socket.broadcast.to(user.roomname).emit('end_activity');
-      console.info(`The activity in room [${user.roomname}] was ended automatically.`);
+      console.info(
+        `The activity in room [${user.roomname}] was ended automatically.`,
+      );
       room.hostname = room.members[0].name;
     }
     socket.broadcast.to(user.roomname).emit('promote_host', room.hostname);
-    console.info(`User [${room.hostname}] was automatically promoted to host of room [${user.roomname}].`);
+    console.info(
+      `User [${room.hostname}] was automatically promoted to host of room [${user.roomname}].`,
+    );
   }
   userMap.delete(socket.id);
 };
@@ -183,11 +222,14 @@ const addPromoteHostListener = (socket: Socket) => {
     if (!room) return;
     // No need to promote the host twice
     if (room.hostname === hostname) return;
+    if (user.name !== room.hostname) return;
     if (room.members.some((member) => member.name === hostname)) {
       room.hostname = hostname;
       // Send to everyone in the room, including previous host
       io.in(user.roomname).emit('promote_host', room.hostname);
-      console.info(`Host [${user.name}] promoted user [${room.hostname}] in room [${user.roomname}].`);
+      console.info(
+        `Host [${user.name}] promoted user [${room.hostname}] in room [${user.roomname}].`,
+      );
     }
   });
 };
@@ -204,6 +246,7 @@ const addKickListener = (socket: Socket) => {
     if (!room) return;
     // Never kick the host
     if (room.hostname === username) return;
+    if (user.name !== room.hostname) return;
     const index = room.members.findIndex((member) => member.name === username);
     if (index === -1) return;
     room.members.splice(index, 1);
@@ -218,7 +261,9 @@ const addChatMessageListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('chat_message', message);
-    console.info(`User [${user.name}] sent a chat message in room [${user.roomname}].`);
+    console.info(
+      `User [${user.name}] sent a chat message in room [${user.roomname}].`,
+    );
   });
 };
 
@@ -227,7 +272,9 @@ const addBeginStrokeListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('begin_stroke', strokeBeginData);
-    console.info(`User [${user.name}] began a stroke in room [${user.roomname}].`);
+    console.info(
+      `User [${user.name}] began a stroke in room [${user.roomname}].`,
+    );
   });
 };
 
@@ -235,7 +282,9 @@ const addContinueStrokeListener = (socket: Socket) => {
   socket.on('continue_stroke', (strokeContinueData: StrokeContinueData) => {
     const user = userMap.get(socket.id);
     if (!user) return;
-    socket.broadcast.to(user.roomname).emit('continue_stroke', strokeContinueData);
+    socket.broadcast
+      .to(user.roomname)
+      .emit('continue_stroke', strokeContinueData);
   });
 };
 
@@ -244,7 +293,9 @@ const addEndStrokeListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('end_stroke', strokeEndData);
-    console.info(`User [${user.name}] ended a stroke in room [${user.roomname}].`);
+    console.info(
+      `User [${user.name}] ended a stroke in room [${user.roomname}].`,
+    );
   });
 };
 
@@ -253,7 +304,9 @@ const addClearCanvasListener = (socket: Socket) => {
     const user = userMap.get(socket.id);
     if (!user) return;
     socket.broadcast.to(user.roomname).emit('clear_canvas');
-    console.info(`User [${user.name}] cleared the canvas in room [${user.roomname}].`);
+    console.info(
+      `User [${user.name}] cleared the canvas in room [${user.roomname}].`,
+    );
   });
 };
 
@@ -269,8 +322,8 @@ io.on('connection', (socket) => {
   addContinueStrokeListener(socket);
   addEndStrokeListener(socket);
   addStartActivityListener(socket);
-  addEndActivityListener(socket);
   addStartDiscussionListener(socket);
+  addEndDiscussionListener(socket);
   addClearCanvasListener(socket);
 });
 

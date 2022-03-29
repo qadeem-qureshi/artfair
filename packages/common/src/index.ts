@@ -27,6 +27,7 @@ export interface Artist {
   name: string;
   avatarIndex: number;
   stage: Stage;
+  prompt?: string;
 }
 
 export interface User {
