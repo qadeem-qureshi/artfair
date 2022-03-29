@@ -95,6 +95,8 @@ const addStartActivityListener = (socket: Socket) => {
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
+    // Only the actual host can start activity
+    if (room.hostname !== user.name) return;
     room.activity = activity;
     room.members = room.members.map((member) => ({ ...member, stage: 'activity' }));
     room.stage = 'activity';
@@ -109,7 +111,8 @@ const addEndActivityListener = (socket: Socket) => {
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
-    if (user.name !== room.hostname) return;
+    // Only the actual host can end activity
+    if (room.hostname !== user.name) return;
     room.activity = DEFAULT_ACTIVITY;
     room.members = room.members.map((member) => ({ ...member, stage: DEFAULT_STAGE }));
     room.stage = DEFAULT_STAGE;
@@ -124,6 +127,8 @@ const addStartDiscussionListener = (socket: Socket) => {
     if (!user) return;
     const room = roomMap.get(user.roomname);
     if (!room) return;
+    // Only the actual host can start discussion
+    if (room.hostname !== user.name) return;
     room.members = room.members.map((member) => ({
       ...member,
       stage: member.stage === room.stage ? 'discussion' : member.stage,
@@ -183,6 +188,8 @@ const addPromoteHostListener = (socket: Socket) => {
     if (!room) return;
     // No need to promote the host twice
     if (room.hostname === hostname) return;
+    // Make sure that only the actual host can promote :)
+    if (room.hostname !== user.name) return;
     if (room.members.some((member) => member.name === hostname)) {
       room.hostname = hostname;
       // Send to everyone in the room, including previous host
@@ -204,6 +211,8 @@ const addKickListener = (socket: Socket) => {
     if (!room) return;
     // Never kick the host
     if (room.hostname === username) return;
+    // Only the actual host can kick
+    if (room.hostname !== user.name) return;
     const index = room.members.findIndex((member) => member.name === username);
     if (index === -1) return;
     room.members.splice(index, 1);
