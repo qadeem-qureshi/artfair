@@ -15,16 +15,21 @@ import { createPoint, pointDistance } from '../util/math';
 import socket from '../services/socket';
 import {
   clear,
+  drawControls,
   drawCursor,
   drawCurveSegments,
+  drawPoints,
   fill,
   getCanvasPoint,
 } from '../util/canvas';
 import { useCanvasContext } from './CanvasContextProvider';
 
+const DEBUG_CONTROL_COLOR = '#4287f5';
+const DEBUG_POINT_COLOR = '#42f56f';
+const SHOW_DEBUG_GRAPHICS = false;
 const MIN_SEGMENT_LENGTH = 2;
-const MAX_SEGMENT_LENGTH = 12;
-const SIMPLIFICATION_TOLERANCE = 2;
+const MAX_SEGMENT_LENGTH = SHOW_DEBUG_GRAPHICS ? 200 : 12;
+const SIMPLIFICATION_TOLERANCE = SHOW_DEBUG_GRAPHICS ? 30 : 2;
 const SEGMENTS_UNTIL_SPLIT = 3;
 const MAX_DYNAMIC_SEGMENTS_AFTER_SPLIT = 3;
 
@@ -161,6 +166,21 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
           buffer.thickness,
         );
 
+        if (SHOW_DEBUG_GRAPHICS) {
+          drawControls(
+            dynamicCanvasContextRef.current!,
+            dynamicSegments,
+            DEBUG_CONTROL_COLOR,
+            buffer.thickness,
+          );
+          drawPoints(
+            dynamicCanvasContextRef.current!,
+            dynamicSegments,
+            DEBUG_POINT_COLOR,
+            buffer.thickness,
+          );
+        }
+
         // Update the buffer
         buffer.points = dynamicPoints;
         buffer.tangent = splitTangent;
@@ -173,6 +193,21 @@ const Canvas: React.FC<CanvasProps> = ({ className, resolution, ...rest }) => {
           buffer.color,
           buffer.thickness,
         );
+
+        if (SHOW_DEBUG_GRAPHICS) {
+          drawControls(
+            dynamicCanvasContextRef.current!,
+            segments,
+            DEBUG_CONTROL_COLOR,
+            buffer.thickness,
+          );
+          drawPoints(
+            dynamicCanvasContextRef.current!,
+            segments,
+            DEBUG_POINT_COLOR,
+            buffer.thickness,
+          );
+        }
       }
     });
 

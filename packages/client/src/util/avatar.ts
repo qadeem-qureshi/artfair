@@ -1,7 +1,10 @@
-import Hamster from '../assets/hamster.svg';
-import Yeti from '../assets/yeti.svg';
-import Tree from '../assets/tree.svg';
-import Fish from '../assets/fish.svg';
+import Acorn from '../assets/acorn.svg';
+import Berry from '../assets/berry.svg';
+import Chipbag from '../assets/chipbag.svg';
+import Flor from '../assets/flor.svg';
+import JeanRalphio from '../assets/jean-ralphio.svg';
+import Rufus from '../assets/rufus.svg';
+import Sunnie from '../assets/sunnie.svg';
 
 export interface Avatar {
   name: string;
@@ -10,19 +13,31 @@ export interface Avatar {
 
 export const AVATARS: Avatar[] = [
   {
-    name: 'Gus',
-    src: Hamster,
+    name: 'Acorn',
+    src: Acorn,
   },
   {
-    name: 'Alfredo',
-    src: Yeti,
+    name: 'Berry',
+    src: Berry,
   },
   {
-    name: 'Tree',
-    src: Tree,
+    name: 'Chipbag',
+    src: Chipbag,
   },
   {
-    name: 'Fish',
-    src: Fish,
+    name: 'Flor',
+    src: Flor,
+  },
+  {
+    name: 'Jean Ralphio',
+    src: JeanRalphio,
+  },
+  {
+    name: 'Rufus',
+    src: Rufus,
+  },
+  {
+    name: 'Sunnie',
+    src: Sunnie,
   },
 ];
