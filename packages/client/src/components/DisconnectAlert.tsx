@@ -28,7 +28,7 @@ export type DisconnectProps = Omit<DialogProps, 'open'>;
 
 const DisconnectAlert: React.FC<DisconnectProps> = (props) => {
   const [isDisconnected, setIsDisconnected] = useState(false);
-  const { state, dispatch } = useAppContext();
+  const { dispatch } = useAppContext();
   const classes = useStyles();
 
   const handleDisconnect = useCallback(() => {
@@ -42,11 +42,7 @@ const DisconnectAlert: React.FC<DisconnectProps> = (props) => {
 
   useEffect(() => {
     socket.on('disconnect', handleDisconnect);
-    try {
-      if (state.artist.stage === 'activity') { socket.io.on('reconnect', handleDisconnect); }
-    } catch {
-      socket.io.on('reconnect', handleReconnect);
-    }
+    socket.io.on('reconnect', handleReconnect);
     return () => {
       socket.off('disconnect', handleDisconnect);
       socket.io.on('reconnect', handleReconnect);
