@@ -52,7 +52,7 @@ const DisconnectAlert: React.FC<DisconnectProps> = (props) => {
   return (
     <Dialog PaperProps={{ className: classes.paper, elevation: 1 }} open={isDisconnected} {...props}>
       <DialogTitle className={classes.title}>
-        Reconnecting to Server
+        Reconnecting to server...
       </DialogTitle>
       <DialogContent className={classes.content}>
         <CircularProgress />
