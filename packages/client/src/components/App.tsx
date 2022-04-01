@@ -5,6 +5,7 @@ import Home from './Home';
 import Room from './Room';
 import RoomContextProvider from './RoomContextProvider';
 import { useAppContext } from './AppContextProvider';
+import DisconnectAlert from './DisconnectAlert';
 
 const useStyles = makeStyles({
   root: {
@@ -29,6 +30,7 @@ const App: React.FC<AppProps> = ({ className, ...rest }) => {
       ) : (
         <Home />
       )}
+      <DisconnectAlert />
     </Box>
   );
 };
