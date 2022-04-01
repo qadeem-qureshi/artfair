@@ -17,7 +17,7 @@ type RoomAction =
   | { type: 'end-discussion' }
   | { type: 'set-host'; hostname: string }
   | { type: 'next-activity' }
-  | { type: 'previous-activity' }
+  | { type: 'previous-activity' };
 
 const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
   switch (action.type) {
@@ -34,9 +34,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         room: {
           ...state.room,
-          members: state.room.members.filter(
-            (member) => member.name !== action.username,
-          ),
+          members: state.room.members.filter((member) => member.name !== action.username),
         },
       };
     case 'start-activity':
@@ -44,11 +42,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         artist: {
           ...state.artist,
-          stage:
-            state.artist.name === state.room.hostname
-            || state.artist.stage === state.room.stage
-              ? 'activity'
-              : state.artist.stage,
+          stage: state.artist.stage === state.room.stage ? 'activity' : state.artist.stage,
           prompt: action.prompt,
         },
         room: {
@@ -56,8 +50,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
           activity: action.activity,
           members: state.room.members.map((member) => ({
             ...member,
-            stage:
-              member.stage === state.room.stage ? 'activity' : member.stage,
+            stage: member.stage === state.room.stage ? 'activity' : member.stage,
           })),
           stage: 'activity',
         },
@@ -67,18 +60,13 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         artist: {
           ...state.artist,
-          stage:
-            state.artist.name === state.room.hostname
-            || state.artist.stage === state.room.stage
-              ? 'discussion'
-              : state.artist.stage,
+          stage: state.artist.stage === state.room.stage ? 'discussion' : state.artist.stage,
         },
         room: {
           ...state.room,
           members: state.room.members.map((member) => ({
             ...member,
-            stage:
-              member.stage === state.room.stage ? 'discussion' : member.stage,
+            stage: member.stage === state.room.stage ? 'discussion' : member.stage,
           })),
           stage: 'discussion',
         },
@@ -88,11 +76,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         artist: {
           ...state.artist,
-          stage:
-            state.artist.name === state.room.hostname
-            || state.artist.stage === state.room.stage
-              ? 'lobby'
-              : state.artist.stage,
+          stage: state.artist.stage === state.room.stage ? 'lobby' : state.artist.stage,
         },
         room: {
           ...state.room,
@@ -116,13 +100,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         room: {
           ...state.room,
-          activity:
-            ACTIVITIES[
-              modulo(
-                ACTIVITIES.indexOf(state.room.activity) + 1,
-                ACTIVITIES.length,
-              )
-            ],
+          activity: ACTIVITIES[modulo(ACTIVITIES.indexOf(state.room.activity) + 1, ACTIVITIES.length)],
         },
       };
     case 'previous-activity':
@@ -130,13 +108,7 @@ const RoomReducer = (state: RoomState, action: RoomAction): RoomState => {
         ...state,
         room: {
           ...state.room,
-          activity:
-            ACTIVITIES[
-              modulo(
-                ACTIVITIES.indexOf(state.room.activity) - 1,
-                ACTIVITIES.length,
-              )
-            ],
+          activity: ACTIVITIES[modulo(ACTIVITIES.indexOf(state.room.activity) - 1, ACTIVITIES.length)],
         },
       };
     default:
@@ -163,16 +135,9 @@ export interface RoomContextProviderProps {
   defaultRoomState: RoomState;
 }
 
-const RoomContextProvider: React.FC<RoomContextProviderProps> = ({
-  defaultRoomState,
-  children,
-}) => {
+const RoomContextProvider: React.FC<RoomContextProviderProps> = ({ defaultRoomState, children }) => {
   const [state, dispatch] = useReducer(RoomReducer, defaultRoomState);
-  return (
-    <RoomContext.Provider value={{ state, dispatch }}>
-      {children}
-    </RoomContext.Provider>
-  );
+  return <RoomContext.Provider value={{ state, dispatch }}>{children}</RoomContext.Provider>;
 };
 
 export default RoomContextProvider;
