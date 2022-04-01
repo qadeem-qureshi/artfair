@@ -94,6 +94,6 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
       'In the end, the artist and art dealer with the most amount of votes wins!',
     ],
     introduction:
-      "You must draw a solution to the following problem. After 5 minutes, you will be assigned the work of another artist and must give a 'sales pitch' of the idea to the other artists.",
+      "You must draw a solution to the following problem. After 5 minutes, you will be assigned the work of another artist and must give a 'sales pitch' of the idea to the other artists. Be creative!",
   },
 };

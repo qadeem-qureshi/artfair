@@ -3,17 +3,17 @@ import {
   Box, BoxProps, Button, makeStyles, Paper, TextField, Typography, useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
-import { JoinRoomData, User } from '@artfair/common';
+import { JoinRoomData, LoginData } from '@artfair/common';
 import socket from '../services/socket';
 import AvatarSelector from './AvatarSelector';
 import Logo from '../assets/logo.svg';
 import ContentDivider from './ContentDivider';
 import { useAppContext } from './AppContextProvider';
 
-const saveSessionInfo = (user: User) => sessionStorage.setItem('user', JSON.stringify(user));
+const saveSessionInfo = (sessionInfo: LoginData) => sessionStorage.setItem('user', JSON.stringify(sessionInfo));
 const getSessionInfo = () => {
   const serializedData = sessionStorage.getItem('user');
-  return serializedData ? (JSON.parse(serializedData) as User) : null;
+  return serializedData ? (JSON.parse(serializedData) as LoginData) : null;
 };
 
 const LOGO_SIZE = 'clamp(6rem, 10rem, 10vh)';
@@ -103,11 +103,11 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
   const { dispatch } = useAppContext();
 
   useEffect(() => {
-    const user: User | null = getSessionInfo();
-    if (!user) return;
-    setSelectedAvatarIndex(user.avatarIndex);
-    setRequestedUsername(user.name);
-    setRequestedRoomname(user.roomname);
+    const sessionInfo: LoginData | null = getSessionInfo();
+    if (!sessionInfo) return;
+    setSelectedAvatarIndex(sessionInfo.avatarIndex);
+    setRequestedUsername(sessionInfo.name);
+    setRequestedRoomname(sessionInfo.roomname);
   }, []);
 
   const handleAvatarIndexChange = (index: number) => {
@@ -116,30 +116,30 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
 
   const handleUsernameInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedUsernameError('');
-    setRequestedUsername(event.target.value.trimLeft());
+    setRequestedUsername(event.target.value.trimStart());
   };
 
   const handleRoomInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRequestedRoomnameError('');
-    setRequestedRoomname(event.target.value.trimLeft());
+    setRequestedRoomname(event.target.value.trimStart());
   };
 
   const handleCreateRoomAttempt = () => {
-    const user: User = {
+    const loginData: LoginData = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('create_room_attempt', user);
+    socket.emit('create_room_attempt', loginData);
   };
 
   const handleJoinRoomAttempt = () => {
-    const user: User = {
+    const loginData: LoginData = {
       name: requestedUsername,
       roomname: requestedRoomname,
       avatarIndex: selectedAvatarIndex,
     };
-    socket.emit('join_room_attempt', user);
+    socket.emit('join_room_attempt', loginData);
   };
 
   const handleTakenRoomname = useCallback(() => {
@@ -156,12 +156,12 @@ const Home: React.FC<HomeProps> = ({ className, ...rest }) => {
 
   const handleRoomJoined = useCallback(
     (joinRoomData: JoinRoomData) => {
-      const user: User = {
+      const sessionInfo: LoginData = {
         name: joinRoomData.artist.name,
         roomname: joinRoomData.room.name,
         avatarIndex: joinRoomData.artist.avatarIndex,
       };
-      saveSessionInfo(user);
+      saveSessionInfo(sessionInfo);
       dispatch({ type: 'join-room', data: joinRoomData });
     },
     [dispatch],
