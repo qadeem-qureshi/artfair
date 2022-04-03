@@ -6,10 +6,9 @@ import { useRoomContext } from './RoomContextProvider';
 export type StartActivityButtonProps = ButtonProps;
 
 const StartActivityButton: React.FC<StartActivityButtonProps> = (props) => {
-  const { state, dispatch } = useRoomContext();
+  const { state } = useRoomContext();
 
   const startActivity = () => {
-    dispatch({ type: 'start-activity', activity: state.room.activity });
     socket.emit('start_activity', state.room.activity);
   };
 

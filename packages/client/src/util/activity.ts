@@ -9,9 +9,13 @@ export interface ActivityInformation {
   modeType: string;
   conceptCovered: string;
   instructions: string[];
+  introduction: string;
 }
 
-export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> = {
+export const ACTIVITY_INFORMATION_RECORD: Record<
+  Activity,
+  ActivityInformation
+> = {
   'free-draw': {
     imageSource: SampleActivityImage,
     name: 'Free Draw',
@@ -20,7 +24,12 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     minArtistCount: 1,
     modeType: 'Relaxing',
     conceptCovered: 'Creativity',
-    instructions: ['There are no rules!', 'Enjoy drawing on the shared canvas with other artists or draw solo.'],
+    instructions: [
+      'There are no rules!',
+      'Enjoy drawing on the shared canvas with other artists or draw solo.',
+    ],
+    introduction:
+      'Get ready to share a canvas with your fellow artists and draw whatever you like. There are no rules for this activity, so let your creativity shine!',
   },
   'art-collab': {
     imageSource: SampleActivityImage,
@@ -31,54 +40,60 @@ export const ACTIVITY_INFORMATION_RECORD: Record<Activity, ActivityInformation> 
     modeType: 'Relaxing',
     conceptCovered: 'Collaboration',
     instructions: [
-      'The host will choose a scene for the artists to draw.',
-      'All artists should pick a portion of the scene to draw (use the chat function to delegate or claim the parts to draw!).',
-      'Everyone then works together to complete the scene and add any finishing touches.',
-      'Finally, all artists can download the completed masterpiece to their own device.',
+      'Artists receive a prompt of something to draw.',
+      'Artists must work together to complete the drawing efficiently.',
     ],
+    introduction:
+      'You must work with your fellow artists to complete a drawing based on the following prompt. Everyone shares the same canvas, so plan carefully!',
   },
   'con-artist': {
     imageSource: SampleActivityImage,
     name: 'Con Artist',
     description:
-      'All but one artist are given a prompt to draw. Artists take turns to draw a single, connected stroke. After three rounds, the artists must attempt to vote out the con artist.',
+      'All but one artist are given a prompt to draw. Those who know the prompt must work together to add to the drawing while the con artist attempts to fit in. After some time, everyone attempts to vote out the con artist. If the majority agree on the correct identity of the con artist, they win. Otherwise, the con artist is the winner!',
     minArtistCount: 4,
     modeType: 'Competitive',
     conceptCovered: 'Problem-solving',
     instructions: [
-      "Every artist except for the 'Con Artist' is told the prompt.",
-      'Each round consists of everyone taking a turn to draw a single, connected stroke.',
-      "Once three rounds have been completed, everyone votes for who they think the 'Con Artist' is.",
-      "If the artists are able to vote out the 'Con Artist', they win!",
-      "However, if the 'Con Artist' successfully fools everyone, the 'Con Artist' is the winner.",
+      'Every artist except for the con artist is told the prompt.',
+      'Artists must work together to complete the drawing while being careful not to reveal the prompt.',
+      'After 5 minutes, if the majority of artists correctly vote on the identity of the con artist, they win!',
+      'If the identity of the con artist remains unkown, they win!',
     ],
+    introduction:
+      'One of your rank is chosen as a con artist who is not given a prompt. The con artist must avoid suspicion by contributing to the drawing like everyone else. After 5 minutes, artists will attempt to vote out the con artist.',
   },
   'canvas-swap': {
     imageSource: SampleActivityImage,
     name: 'Canvas Swap',
     description:
-      "Artists each start off with an individual canvas to draw whatever they like. After some time, the canvases rotate so that each artist may continue the other's work.",
+      "Artists each start off with an individual canvas to draw whatever they like. Every few minutes, the canvases rotate so that each artist may continue the other's work.",
     minArtistCount: 2,
     modeType: 'Relaxing',
     conceptCovered: 'Teamwork',
     instructions: [
       'Every artist begins with their own individual canvas.',
-      "After 2 minutes, the canvases rotate and each artist is then meant to continue the other artists' work.",
+      "Every 2 minutes, the canvases rotate and each artist is then meant to continue the other artists' work.",
+      'The activity concludes once the drawings have completed a full cycle.',
     ],
+    introduction:
+      'In this activity, you begin with your own canvas and may draw whatever you like. However, every 2 minutes, you swap canvases with another artist and must continue their work.',
   },
   'art-dealer': {
     imageSource: SampleActivityImage,
     name: 'Art Dealer',
     description:
-      "Each artist is given a problem and must draw their solution to that problem. After some time, each artist is presented with the work of another and must give a 'sales pitch' of the solution to the other artists.",
+      "Artists are given a problem statement and must draw their solution to that problem. After some time, each artist is assigned the work of another and must give a 'sales pitch' of the solution to the other artists.",
     minArtistCount: 3,
     modeType: 'Humorous',
     conceptCovered: 'Critical Thinking',
     instructions: [
       'Every artist begins by drawing a solution to a problem.',
-      'After 5 minutes, every artist is then presented with the work of another artist.',
-      "Without knowing what the problem each artist was trying to solve, each artist must make a 'sales pitch' to the other artists.",
+      'After 5 minutes, every artist is assigned the work of another artist.',
+      "Each artist must make a 'sales pitch' to the other artists.",
       'In the end, the artist and art dealer with the most amount of votes wins!',
     ],
+    introduction:
+      "You must draw a solution to the following problem. After 5 minutes, you will be assigned the work of another artist and must give a 'sales pitch' of the idea to the other artists. Be creative!",
   },
 };
