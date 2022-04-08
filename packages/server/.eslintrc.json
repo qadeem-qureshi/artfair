@@ -16,6 +16,7 @@
     "@typescript-eslint"
   ],
   "rules": {
+    "no-param-reassign": "off",
     "linebreak-style": "off",
     "no-console": "off",
     "import/extensions": [

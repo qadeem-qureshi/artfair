@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
-  Box, BoxProps, makeStyles, Paper, Typography, useMediaQuery,
+  Box,
+  BoxProps,
+  makeStyles,
+  Paper,
+  useMediaQuery,
 } from '@material-ui/core';
 import clsx from 'clsx';
 import { Activity, Artist } from '@artfair/common';
@@ -13,12 +17,13 @@ import { useRoomContext } from './RoomContextProvider';
 import HostPromotionAlert from './HostPromotionAlert';
 import KickAlert from './KickAlert';
 import RoomTabs from './RoomTabs';
-import Discussion from './Discussion';
+import DiscussionPanel from './DiscussionPanel';
 import ExitRoomButton from './ExitRoomButton';
 import StartActivityButton from './StartActivityButton';
-import StartDiscussionButton from './StartDiscussionButton';
-import EndActivityButton from './EndActivityButton';
 import ActivityCarousel from './ActivityCarousel';
+import StartDiscussionButton from './StartDiscussionButton';
+import EndDiscussionButton from './EndDiscussionButton';
+import ActivityPrompt from './ActivityPrompt';
 
 const CANVAS_RESOLUTION = 1024;
 const MAIN_SIZE_LANDSCAPE = 'clamp(15rem, 50vw, 80vh)';
@@ -45,14 +50,8 @@ const useStyles = makeStyles({
   sidebar: {
     gridArea: '2 / 2 / 3 / 3',
   },
-  activityCarousel: {
+  stageContent: {
     padding: '1.5rem',
-  },
-  discussion: {
-    padding: '1.5rem',
-  },
-  discussionText: {
-    fontWeight: 'bold',
   },
   stageButton: {
     alignSelf: 'center',
@@ -75,7 +74,9 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   const classes = useStyles();
   const portraitOverrideClasses = usePortraitOverrideStyles();
   const isPortrait = useMediaQuery('(max-aspect-ratio: 1/1)');
-  const isCompact = useMediaQuery('(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)');
+  const isCompact = useMediaQuery(
+    '(max-width: 60rem), (max-height: 40rem) and (min-aspect-ratio: 3/2)',
+  );
   const { state, dispatch } = useRoomContext();
   const isHost = state.artist.name === state.room.hostname;
 
@@ -93,37 +94,40 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
     [dispatch],
   );
 
-  const handleEndActivity = useCallback(() => {
-    dispatch({ type: 'end-activity' });
-  }, [dispatch]);
-
   const handleStartActivity = useCallback(
-    (activity: Activity) => {
-      dispatch({ type: 'start-activity', activity });
+    (activity: Activity, prompt?: string) => {
+      dispatch({ type: 'start-activity', activity, prompt });
     },
     [dispatch],
   );
-
   const handleStartDiscussion = useCallback(() => {
-    if (state.artist.stage === 'activity') {
-      dispatch({ type: 'start-discussion' });
-    }
-  }, [dispatch, state.artist.stage]);
+    dispatch({ type: 'start-discussion' });
+  }, [dispatch]);
+
+  const handleEndDiscussion = useCallback(() => {
+    dispatch({ type: 'end-discussion' });
+  }, [dispatch]);
 
   useEffect(() => {
     socket.on('artist_join', handleArtistJoin);
     socket.on('artist_leave', handleArtistLeave);
     socket.on('start_activity', handleStartActivity);
-    socket.on('end_activity', handleEndActivity);
     socket.on('start_discussion', handleStartDiscussion);
+    socket.on('end_discussion', handleEndDiscussion);
     return () => {
       socket.off('artist_join', handleArtistJoin);
       socket.off('artist_leave', handleArtistLeave);
       socket.off('start_activity', handleStartActivity);
-      socket.off('end_activity', handleEndActivity);
       socket.off('start_discussion', handleStartDiscussion);
+      socket.on('end_discussion', handleEndDiscussion);
     };
-  }, [handleEndActivity, handleArtistJoin, handleArtistLeave, handleStartDiscussion, handleStartActivity]);
+  }, [
+    handleArtistJoin,
+    handleArtistLeave,
+    handleStartDiscussion,
+    handleStartActivity,
+    handleEndDiscussion,
+  ]);
 
   const stageContent = useMemo(() => {
     switch (state.artist.stage) {
@@ -131,37 +135,49 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         return (
           <>
             <RoomName className={classes.header} />
-            <ActivityCarousel className={clsx(classes.main, classes.activityCarousel)} component={Paper} />
+            <ActivityCarousel
+              className={clsx(classes.main, classes.stageContent)}
+              component={Paper}
+            />
           </>
         );
       case 'activity':
         return (
-          <CanvasContextProvider>
-            <Toolbar className={classes.header} compact={isPortrait || isCompact} />
-            <Canvas className={classes.main} component={Paper} resolution={CANVAS_RESOLUTION} />
-          </CanvasContextProvider>
+          <>
+            <ActivityPrompt />
+            <CanvasContextProvider>
+              <Toolbar
+                className={classes.header}
+                compact={isPortrait || isCompact}
+              />
+              <Canvas
+                className={classes.main}
+                component={Paper}
+                resolution={CANVAS_RESOLUTION}
+              />
+            </CanvasContextProvider>
+          </>
         );
       case 'discussion':
         return (
           <>
-            <Typography noWrap variant="h3" className={clsx(classes.header, classes.discussionText)}>
-              Discussion
-            </Typography>
-            <Discussion className={clsx(classes.main, classes.discussion)} component={Paper} />
+            <RoomName className={classes.header} />
+            <DiscussionPanel
+              className={clsx(classes.main, classes.stageContent)}
+              component={Paper}
+            />
           </>
         );
       default:
         return null;
     }
   }, [
-    classes.discussion,
-    classes.discussionText,
-    classes.header,
-    classes.activityCarousel,
-    classes.main,
-    isCompact,
-    isPortrait,
     state.artist.stage,
+    classes.header,
+    classes.main,
+    classes.stageContent,
+    isPortrait,
+    isCompact,
   ]);
 
   const stageButton = useMemo(() => {
@@ -172,7 +188,7 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
         case 'activity':
           return <StartDiscussionButton className={classes.stageButton} />;
         case 'discussion':
-          return <EndActivityButton className={classes.stageButton} />;
+          return <EndDiscussionButton className={classes.stageButton} />;
         default:
           return null;
       }
@@ -182,10 +198,23 @@ const Room: React.FC<RoomProps> = ({ className, ...rest }) => {
   }, [classes.stageButton, isHost, state.artist.stage]);
 
   return (
-    <Box className={clsx(classes.root, isPortrait && portraitOverrideClasses.root, className)} {...rest}>
+    <Box
+      className={clsx(
+        classes.root,
+        isPortrait && portraitOverrideClasses.root,
+        className,
+      )}
+      {...rest}
+    >
       {stageContent}
       {stageButton}
-      <RoomTabs className={clsx(classes.sidebar, isPortrait && portraitOverrideClasses.sidebar)} component={Paper} />
+      <RoomTabs
+        className={clsx(
+          classes.sidebar,
+          isPortrait && portraitOverrideClasses.sidebar,
+        )}
+        component={Paper}
+      />
       <HostPromotionAlert />
       <KickAlert />
     </Box>

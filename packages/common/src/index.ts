@@ -27,9 +27,11 @@ export interface Artist {
   name: string;
   avatarIndex: number;
   stage: Stage;
+  prompt?: string;
+  roomname: string;
 }
 
-export interface User {
+export interface LoginData {
   name: string;
   roomname: string;
   avatarIndex: number;
