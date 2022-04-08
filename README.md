@@ -1,5 +1,7 @@
 # Company Corporation LLC ArtFair
 
+ArtFair is an online collaborative drawing experience centered around the idea of a shared canvas where team members may work together to create pieces of art. ArtFair facilitates team building through several fun activites that focus on various interpersonal skills, discussion questions that spark reflective conversation, and tangible artifacts that serve as lasting memories of the experience.
+
 ## Note
 
 At a high level, this project is made up of three packages: `client`, `server`, and `common`. The `client` package contains the frontend code, the `server` package contains the backend code, and the `common` package contains code that is shared between `client` and `server`.
