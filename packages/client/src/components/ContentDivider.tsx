@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, BoxProps, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
     gap: '1rem',
@@ -19,12 +19,14 @@ const useStyles = makeStyles({
     flex: 1,
   },
   horizontalDivider: {
-    borderBottom: '0.2rem solid #eeeeee',
+    borderBottom: `0.2rem solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
   },
   verticalDivider: {
-    borderRight: '0.2rem solid #eeeeee',
+    borderRight: `0.2rem solid ${theme.palette.divider}`,
+    borderRadius: theme.shape.borderRadius,
   },
-});
+}));
 
 export interface ContentDividerProps extends BoxProps {
   orientation: 'horizontal' | 'vertical';
