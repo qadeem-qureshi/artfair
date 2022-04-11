@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    borderBottom: '0.2rem solid #eeeeee',
+    borderBottom: `0.2rem solid ${theme.palette.divider}`,
   },
   tab: {
     flex: 1,

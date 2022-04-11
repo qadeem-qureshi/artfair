@@ -13,6 +13,7 @@ const THEME = responsiveFontSizes(
       error: {
         main: '#e53935',
       },
+      divider: '#eeeeee',
     },
     shape: {
       borderRadius: 12,
