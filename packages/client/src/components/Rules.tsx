@@ -45,9 +45,10 @@ const Rules: React.FC<BoxProps> = ({ className, ...rest }) => {
             Welcome to ArtFair!
           </Typography>
           <Typography variant="body1" color="textSecondary">
-            ArtFair is a drawing experience that can help provide meaningful interaction with friends, family, or
-            coworkers online. ArtFair is a family-friendly safe-for-work game that includes several unique modes that
-            each offer a different experience.
+            ArtFair is an online collaborative drawing experience centered around the idea of a shared canvas where team
+            members may work together to create pieces of art. ArtFair facilitates team building through several fun
+            activites that focus on various interpersonal skills, discussion questions that spark reflective
+            conversation, and tangible artifacts that serve as lasting memories of the experience.
           </Typography>
         </>
       ) : (

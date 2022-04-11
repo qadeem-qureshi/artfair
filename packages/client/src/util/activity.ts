@@ -1,5 +1,5 @@
 import { Activity } from '@artfair/common';
-import SampleActivityImage from '../assets/activity.jpg';
+import ActivityImage from '../assets/activity.webp';
 
 export interface ActivityInformation {
   name: string;
@@ -17,7 +17,7 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
   ActivityInformation
 > = {
   'free-draw': {
-    imageSource: SampleActivityImage,
+    imageSource: ActivityImage,
     name: 'Free Draw',
     description:
       'Artists share a canvas and may draw whatever they desire. This is an opportunity for artists to showcase their talent and creativity.',
@@ -32,7 +32,7 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
       'Get ready to share a canvas with your fellow artists and draw whatever you like. There are no rules for this activity, so let your creativity shine!',
   },
   'art-collab': {
-    imageSource: SampleActivityImage,
+    imageSource: ActivityImage,
     name: 'Art Collab',
     description:
       "Artists are prompted with a scene to draw and must collaborate to complete it. Artists must work together and delegate tasks to efficiently create their masterpiece without stepping on each other's toes.",
@@ -47,10 +47,10 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
       'You must work with your fellow artists to complete a drawing based on the following prompt. Everyone shares the same canvas, so plan carefully!',
   },
   'con-artist': {
-    imageSource: SampleActivityImage,
+    imageSource: ActivityImage,
     name: 'Con Artist',
     description:
-      'All but one artist are given a prompt to draw. Those who know the prompt must work together to add to the drawing while the con artist attempts to fit in. After some time, everyone attempts to vote out the con artist. If the majority agree on the correct identity of the con artist, they win. Otherwise, the con artist is the winner!',
+      'All but one artist are given a prompt to draw. Those who know the prompt must add to the drawing while the con artist attempts to fit in. After some time, everyone tries to vote out the con artist. If the majority agree on the correct identity of the con artist, they win. Otherwise, the con artist is the winner!',
     minArtistCount: 4,
     modeType: 'Competitive',
     conceptCovered: 'Problem-solving',
@@ -64,7 +64,7 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
       'One of your rank is chosen as a con artist who is not given a prompt. The con artist must avoid suspicion by contributing to the drawing like everyone else. After 5 minutes, artists will attempt to vote out the con artist.',
   },
   'canvas-swap': {
-    imageSource: SampleActivityImage,
+    imageSource: ActivityImage,
     name: 'Canvas Swap',
     description:
       "Artists each start off with an individual canvas to draw whatever they like. Every few minutes, the canvases rotate so that each artist may continue the other's work.",
@@ -80,7 +80,7 @@ export const ACTIVITY_INFORMATION_RECORD: Record<
       'In this activity, you begin with your own canvas and may draw whatever you like. However, every 2 minutes, you swap canvases with another artist and must continue their work.',
   },
   'art-dealer': {
-    imageSource: SampleActivityImage,
+    imageSource: ActivityImage,
     name: 'Art Dealer',
     description:
       "Artists are given a problem statement and must draw their solution to that problem. After some time, each artist is assigned the work of another and must give a 'sales pitch' of the solution to the other artists.",
