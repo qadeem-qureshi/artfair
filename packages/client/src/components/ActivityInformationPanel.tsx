@@ -13,8 +13,9 @@ const useStyles = makeStyles({
     gap: '1rem',
   },
   image: {
-    width: '100%',
+    width: '85%',
     height: 'auto',
+    alignSelf: 'center',
   },
   name: {
     fontWeight: 'bold',

@@ -1,10 +1,10 @@
-import Acorn from '../assets/acorn.svg';
+import Sunnie from '../assets/sunnie.svg';
 import Berry from '../assets/berry.svg';
 import Chipbag from '../assets/chipbag.svg';
 import Flor from '../assets/flor.svg';
 import JeanRalphio from '../assets/jean-ralphio.svg';
 import Rufus from '../assets/rufus.svg';
-import Sunnie from '../assets/sunnie.svg';
+import Acorn from '../assets/acorn.svg';
 
 export interface Avatar {
   name: string;
@@ -13,8 +13,8 @@ export interface Avatar {
 
 export const AVATARS: Avatar[] = [
   {
-    name: 'Acorn',
-    src: Acorn,
+    name: 'Sunnie',
+    src: Sunnie,
   },
   {
     name: 'Berry',
@@ -37,7 +37,7 @@ export const AVATARS: Avatar[] = [
     src: Rufus,
   },
   {
-    name: 'Sunnie',
-    src: Sunnie,
+    name: 'Acorn',
+    src: Acorn,
   },
 ];
